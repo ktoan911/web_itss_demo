@@ -1,3 +1,5 @@
+@import 'react-big-calendar/lib/css/react-big-calendar.css';
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -19,3 +21,12 @@
 
 html, body, #root { height: 100%; }
 body { @apply bg-bg text-text font-sans antialiased; }
+
+.rbc-calendar { background: rgb(var(--surface)); color: rgb(var(--text)); border-radius: 16px; padding: 8px; }
+.rbc-toolbar button { color: rgb(var(--text)); }
+.rbc-month-view, .rbc-time-view, .rbc-time-header, .rbc-header,
+.rbc-day-bg, .rbc-month-row { border-color: rgb(var(--border)) !important; }
+.rbc-off-range-bg { background: rgba(0,0,0,0.04); }
+.dark .rbc-off-range-bg { background: rgba(255,255,255,0.04); }
+.rbc-today { background: rgba(99,102,241,0.08); }
+.rbc-event { border: none; padding: 2px 6px; }

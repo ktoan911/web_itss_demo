@@ -9,6 +9,7 @@
     "start": "node src/index.js",
     "seed": "node src/seed/seed.js",
     "seed:reset": "node src/seed/seed.js --reset",
+    "seed:docker": "node src/seed/seed.js --reset",
     "test:watch": "NODE_OPTIONS=--experimental-vm-modules jest --watch",
     "lint": "eslint src tests",
     "format": "prettier --write \"src/**/*.js\" \"tests/**/*.js\""

@@ -44,6 +44,21 @@ Visit http://localhost:5173 and log in:
 - Email: `demo@taskflow.com`
 - Password: `123456`
 
+## Run with Docker
+
+A `docker-compose.yml` at the repo root boots MongoDB, the Express API, and an nginx-served production build of the client.
+
+```bash
+docker compose up --build
+# then in another terminal, seed the demo data:
+docker compose exec server npm run seed:reset
+# browse http://localhost:8080
+```
+
+The client container reverse-proxies `/api` to the `server` service over the internal Docker network, so no extra config is needed. To shut everything down and discard the Mongo volume, run `docker compose down -v`.
+
+> The compose file ships with a development `JWT_SECRET`. Override it via the `environment:` block (or a `docker-compose.override.yml`) before exposing the stack to anything other than localhost.
+
 ## Environment variables
 
 ### `server/.env`
@@ -103,7 +118,6 @@ Visit http://localhost:5173 and log in:
 - Study Together (and any realtime collaboration)
 - Forgot password / email reset
 - E2E browser tests
-- Docker / deployment configs
 - i18n (UI is English only)
 
 ## Tests

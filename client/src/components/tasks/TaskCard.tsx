@@ -4,6 +4,7 @@ import { Card } from '@/components/common/Card';
 import { OverdueBadge, PriorityBadge, StatusBadge } from '@/components/common/Badge';
 import { Button } from '@/components/common/Button';
 import { formatDateTime } from '@/utils/dateUtils';
+import { cn } from '@/utils/cn';
 
 type Props = {
   task: Task;
@@ -12,18 +13,41 @@ type Props = {
   onComplete: (t: Task) => void;
   onClick?: (t: Task) => void;
   onTagClick?: (tag: string) => void;
+  selected?: boolean;
+  onToggleSelect?: (id: string) => void;
 };
 
-export function TaskCard({ task, onEdit, onDelete, onComplete, onClick, onTagClick }: Props) {
+export function TaskCard({
+  task,
+  onEdit,
+  onDelete,
+  onComplete,
+  onClick,
+  onTagClick,
+  selected,
+  onToggleSelect,
+}: Props) {
   return (
-    <Card>
+    <Card className={cn(selected && 'ring-2 ring-primary-500')}>
       <div className="flex items-start justify-between gap-2">
-        <button onClick={() => onClick?.(task)} className="flex-1 text-left">
-          <h3 className="line-clamp-1 text-sm font-semibold">{task.title}</h3>
-          {task.description && (
-            <p className="mt-1 line-clamp-2 text-xs text-text-muted">{task.description}</p>
+        <div className="flex flex-1 items-start gap-2">
+          {onToggleSelect && (
+            <input
+              type="checkbox"
+              checked={!!selected}
+              onChange={() => onToggleSelect(task._id)}
+              onClick={(e) => e.stopPropagation()}
+              aria-label={`Select task ${task.title}`}
+              className="mt-1 h-4 w-4 cursor-pointer rounded border-border text-primary-600 focus:ring-primary-500"
+            />
           )}
-        </button>
+          <button onClick={() => onClick?.(task)} className="flex-1 text-left">
+            <h3 className="line-clamp-1 text-sm font-semibold">{task.title}</h3>
+            {task.description && (
+              <p className="mt-1 line-clamp-2 text-xs text-text-muted">{task.description}</p>
+            )}
+          </button>
+        </div>
         <PriorityBadge priority={task.priority} />
       </div>
       {task.tags && task.tags.length > 0 && (

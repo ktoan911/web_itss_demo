@@ -3,6 +3,7 @@ import type { Task } from '@/types/task';
 import { OverdueBadge, PriorityBadge, StatusBadge } from '@/components/common/Badge';
 import { Button } from '@/components/common/Button';
 import { formatDateTime } from '@/utils/dateUtils';
+import { cn } from '@/utils/cn';
 
 type Props = {
   task: Task;
@@ -10,11 +11,35 @@ type Props = {
   onDelete: (t: Task) => void;
   onComplete: (t: Task) => void;
   onTagClick?: (tag: string) => void;
+  selected?: boolean;
+  onToggleSelect?: (id: string) => void;
 };
 
-export function TaskRow({ task, onEdit, onDelete, onComplete, onTagClick }: Props) {
+export function TaskRow({
+  task,
+  onEdit,
+  onDelete,
+  onComplete,
+  onTagClick,
+  selected,
+  onToggleSelect,
+}: Props) {
   return (
-    <div className="flex items-center justify-between gap-3 rounded-2xl border border-border bg-surface px-4 py-3">
+    <div
+      className={cn(
+        'flex items-center justify-between gap-3 rounded-2xl border border-border bg-surface px-4 py-3',
+        selected && 'ring-2 ring-primary-500',
+      )}
+    >
+      {onToggleSelect && (
+        <input
+          type="checkbox"
+          checked={!!selected}
+          onChange={() => onToggleSelect(task._id)}
+          aria-label={`Select task ${task.title}`}
+          className="h-4 w-4 cursor-pointer rounded border-border text-primary-600 focus:ring-primary-500"
+        />
+      )}
       <div className="min-w-0 flex-1">
         <div className="flex items-center gap-2">
           <h4 className="truncate text-sm font-medium">{task.title}</h4>

@@ -2,11 +2,12 @@ import { Task } from '../models/Task.js';
 import { AppError } from '../utils/AppError.js';
 import { deadlineFilterToQuery } from '../utils/dateRange.js';
 import { notificationService } from './notification.service.js';
+import { rankOf } from '../utils/priorityRank.js';
 
 const sortMap = {
   deadline: { deadline: 1 },
   priority: { priorityRank: -1, deadline: 1 },
-  newest:   { createdAt: -1 },
+  newest: { createdAt: -1 },
 };
 
 const notFound = () => new AppError('Task not found', 404);
@@ -14,10 +15,10 @@ const notFound = () => new AppError('Task not found', 404);
 export const taskService = {
   async list(userId, query) {
     const filter = { userId, ...deadlineFilterToQuery(query.deadlineFilter) };
-    if (query.status)   filter.status = query.status;
+    if (query.status) filter.status = query.status;
     if (query.priority) filter.priority = query.priority;
-    if (query.tag)      filter.tags = query.tag;
-    if (query.search)   filter.$text = { $search: query.search };
+    if (query.tag) filter.tags = query.tag;
+    if (query.search) filter.$text = { $search: query.search };
     return Task.find(filter).sort(sortMap[query.sortBy ?? 'deadline']);
   },
 
@@ -32,7 +33,11 @@ export const taskService = {
   },
 
   async update(userId, id, body) {
-    const task = await Task.findOneAndUpdate({ _id: id, userId }, { $set: body }, { new: true, runValidators: true });
+    const task = await Task.findOneAndUpdate(
+      { _id: id, userId },
+      { $set: body },
+      { new: true, runValidators: true },
+    );
     if (!task) throw notFound();
     return task;
   },
@@ -81,10 +86,7 @@ export const taskService = {
     task.completedPomodoros += 1;
     if (task.status === 'Todo') task.status = 'InProgress';
     await task.save();
-    if (
-      task.completedPomodoros >= task.estimatedPomodoros &&
-      task.status !== 'Completed'
-    ) {
+    if (task.completedPomodoros >= task.estimatedPomodoros && task.status !== 'Completed') {
       await notificationService.createDeduped(userId, {
         title: 'Estimated pomodoros reached',
         message: `You've reached the estimated pomodoros for "${task.title}".`,
@@ -94,5 +96,29 @@ export const taskService = {
       });
     }
     return task;
+  },
+
+  // Bulk ops: every query is scoped by userId for IDOR protection.
+  // NOTE: bulk-completion intentionally does NOT generate per-task notifications
+  // (single complete does); bulk completing many tasks would spam the user.
+  async bulkDelete(userId, ids) {
+    const r = await Task.deleteMany({ _id: { $in: ids }, userId });
+    return { count: r.deletedCount };
+  },
+
+  async bulkComplete(userId, ids) {
+    const r = await Task.updateMany(
+      { _id: { $in: ids }, userId, status: { $ne: 'Completed' } },
+      { $set: { status: 'Completed', completedAt: new Date() } },
+    );
+    return { count: r.modifiedCount };
+  },
+
+  async bulkChangePriority(userId, ids, priority) {
+    const r = await Task.updateMany(
+      { _id: { $in: ids }, userId },
+      { $set: { priority, priorityRank: rankOf(priority) } },
+    );
+    return { count: r.modifiedCount };
   },
 };

@@ -13,17 +13,27 @@ export const taskCreateSchema = z.object({
 
 export const taskUpdateSchema = taskCreateSchema.partial();
 
-export const taskListQuerySchema = z.object({
-  search: z.string().optional(),
-  status: z.enum(['Todo', 'InProgress', 'Completed']).optional(),
-  priority: z.enum(['Low', 'Medium', 'High']).optional(),
-  deadlineFilter: z.enum(['today', 'upcoming', 'overdue', 'completed']).optional(),
-  sortBy: z.enum(['deadline', 'priority', 'newest']).default('deadline'),
-  tag: z.string().optional(),
-}).strict();
+export const taskListQuerySchema = z
+  .object({
+    search: z.string().optional(),
+    status: z.enum(['Todo', 'InProgress', 'Completed']).optional(),
+    priority: z.enum(['Low', 'Medium', 'High']).optional(),
+    deadlineFilter: z.enum(['today', 'upcoming', 'overdue', 'completed']).optional(),
+    sortBy: z.enum(['deadline', 'priority', 'newest']).default('deadline'),
+    tag: z.string().optional(),
+  })
+  .strict();
 
 export const taskIdParam = z.object({ id: objectId });
 
 export const taskStatusSchema = z.object({
   status: z.enum(['Todo', 'InProgress', 'Completed']),
+});
+
+export const bulkIdsSchema = z.object({
+  ids: z.array(objectId).min(1).max(100),
+});
+
+export const bulkPrioritySchema = bulkIdsSchema.extend({
+  priority: z.enum(['Low', 'Medium', 'High']),
 });

@@ -104,4 +104,51 @@ describe('Tasks CRUD', () => {
     expect(r.body).toHaveLength(1);
     expect(r.body[0].title).toBe('Tagged');
   });
+
+  it('bulk deletes tasks', async () => {
+    const a = await createAuthedAgent(app);
+    const t1 = (await a.post('/api/tasks').send(baseTask({ title: 'A' }))).body;
+    const t2 = (await a.post('/api/tasks').send(baseTask({ title: 'B' }))).body;
+    const r = await a.post('/api/tasks/bulk/delete').send({ ids: [t1._id, t2._id] });
+    expect(r.status).toBe(200);
+    expect(r.body.count).toBe(2);
+    const list = await a.get('/api/tasks');
+    expect(list.body).toHaveLength(0);
+  });
+
+  it('bulk completes tasks', async () => {
+    const a = await createAuthedAgent(app);
+    const t1 = (await a.post('/api/tasks').send(baseTask({ title: 'A' }))).body;
+    const t2 = (await a.post('/api/tasks').send(baseTask({ title: 'B' }))).body;
+    const r = await a.post('/api/tasks/bulk/complete').send({ ids: [t1._id, t2._id] });
+    expect(r.status).toBe(200);
+    expect(r.body.count).toBe(2);
+    const list = await a.get('/api/tasks');
+    expect(list.body.every((t) => t.status === 'Completed')).toBe(true);
+  });
+
+  it('bulk changes priority', async () => {
+    const a = await createAuthedAgent(app);
+    const t1 = (await a.post('/api/tasks').send(baseTask({ title: 'A', priority: 'Low' }))).body;
+    const t2 = (await a.post('/api/tasks').send(baseTask({ title: 'B', priority: 'Medium' }))).body;
+    const r = await a
+      .post('/api/tasks/bulk/priority')
+      .send({ ids: [t1._id, t2._id], priority: 'High' });
+    expect(r.status).toBe(200);
+    expect(r.body.count).toBe(2);
+    const list = await a.get('/api/tasks');
+    expect(list.body.every((t) => t.priority === 'High')).toBe(true);
+  });
+
+  it('IDOR: bulk delete from another user does not affect tasks', async () => {
+    const a = await createAuthedAgent(app);
+    const b = await createAuthedAgent(app);
+    const t1 = (await a.post('/api/tasks').send(baseTask({ title: 'A' }))).body;
+    const t2 = (await a.post('/api/tasks').send(baseTask({ title: 'B' }))).body;
+    const r = await b.post('/api/tasks/bulk/delete').send({ ids: [t1._id, t2._id] });
+    expect(r.status).toBe(200);
+    expect(r.body.count).toBe(0);
+    const list = await a.get('/api/tasks');
+    expect(list.body).toHaveLength(2);
+  });
 });

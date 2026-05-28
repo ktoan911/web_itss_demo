@@ -1,15 +1,17 @@
-# TaskFlow Clone — Design Spec
+# Task88 Clone — Design Spec
 
 **Date:** 2026-05-27
 **Status:** Approved (brainstorming complete)
-**Reference:** Inspired by https://www.taskflow.pro.vn/ — productivity app with tasks, pomodoro, calendar, stats. Study Together explicitly excluded.
+**Reference:** Inspired by https://www.Task88.pro.vn/ — productivity app with tasks, pomodoro, calendar, stats. Study Together explicitly excluded.
 
 ---
 
 ## 1. Goals & Non-Goals
 
 ### Goals
+
 A productivity web app where an authenticated user can:
+
 - Manage tasks (CRUD, filter, search, sort, mark complete)
 - Run a Pomodoro timer (focus / short break / long break) tied to tasks
 - View tasks on a monthly/weekly calendar by deadline
@@ -18,6 +20,7 @@ A productivity web app where an authenticated user can:
 - Receive in-app notifications (overdue, completion, deadline-soon, pomodoro done, estimated reached)
 
 ### Non-Goals (explicitly out of scope)
+
 - Study Together (all related features)
 - Realtime chat, video call, WebSocket/SSE study rooms
 - Forgot password / email reset
@@ -32,6 +35,7 @@ A productivity web app where an authenticated user can:
 ## 2. Tech Stack (final, decided during brainstorm)
 
 ### Backend
+
 - **Node.js 20+** + **Express**
 - **MongoDB 6+** via **Mongoose**
 - **JWT** authentication (jsonwebtoken), **bcrypt** for password hashing
@@ -41,6 +45,7 @@ A productivity web app where an authenticated user can:
 - **Jest** + **Supertest** + **mongodb-memory-server** for tests
 
 ### Frontend
+
 - **React 18** + **Vite** + **TypeScript** (strict)
 - **Tailwind CSS** (CSS-vars-based theming, `class` dark mode strategy)
 - **React Router DOM v6**
@@ -55,13 +60,14 @@ A productivity web app where an authenticated user can:
 - **Vitest** + **@testing-library/react** for tests
 
 ### Repo Layout
+
 Monorepo with **two independent `package.json` files** (no workspaces):
 
 ```
 web_itss_demo/
 ├── README.md
 ├── .gitignore
-├── docs/superpowers/specs/2026-05-27-taskflow-clone-design.md
+├── docs/superpowers/specs/2026-05-27-Task88-clone-design.md
 ├── server/
 └── client/
 ```
@@ -107,6 +113,7 @@ web_itss_demo/
 ### 3.4 Pomodoro engine — runs in Zustand store
 
 Critical design decision: timer state lives in `pomodoroStore`, not in a component. Reasons:
+
 - Timer survives route changes
 - One source of truth for current mode/task/status
 - Browser tab throttling does not drift the timer because we use **`endsAt` timestamp**, not tick counter
@@ -341,6 +348,7 @@ client/
 ### 5.2 Schemas
 
 #### User
+
 ```js
 {
   _id: ObjectId,
@@ -352,6 +360,7 @@ client/
 ```
 
 #### Task
+
 ```js
 {
   _id: ObjectId,
@@ -377,6 +386,7 @@ client/
 ```
 
 #### PomodoroSession
+
 ```js
 {
   _id: ObjectId,
@@ -395,6 +405,7 @@ client/
 ```
 
 #### UserSetting (1-1 with User; created in same transaction as register)
+
 ```js
 {
   _id: ObjectId,
@@ -409,6 +420,7 @@ client/
 ```
 
 #### Notification
+
 ```js
 {
   _id: ObjectId,
@@ -432,6 +444,7 @@ client/
 ```
 
 ### 5.3 Relationships
+
 - User 1—N Task
 - User 1—N PomodoroSession; Task 1—N PomodoroSession
 - User 1—1 UserSetting
@@ -443,32 +456,32 @@ client/
 
 All routes under `/api`. All non-auth routes require `Authorization: Bearer <jwt>`.
 
-| Method | Path | Body / Query | Response | Service |
-|---|---|---|---|---|
-| POST | `/auth/register` | `{fullName,email,password,confirmPassword}` | `{token,user}` | authService.register |
-| POST | `/auth/login` | `{email,password}` | `{token,user}` | authService.login |
-| GET | `/auth/me` | – | `{user}` | authService.me |
-| GET | `/tasks` | `?search&status&priority&deadlineFilter&sortBy` | `Task[]` (with `isOverdue`) | taskService.list |
-| GET | `/tasks/:id` | – | `Task` | taskService.get |
-| POST | `/tasks` | `{title,description?,deadline,priority,estimatedPomodoros}` | `Task` | taskService.create |
-| PUT | `/tasks/:id` | same as POST | `Task` | taskService.update |
-| DELETE | `/tasks/:id` | – | `{ok:true}` | taskService.remove |
-| PATCH | `/tasks/:id/status` | `{status}` | `Task` | taskService.changeStatus |
-| PATCH | `/tasks/:id/complete` | – | `Task` | taskService.markCompleted |
-| PATCH | `/tasks/:id/pomodoro/increment` | – | `Task` | taskService.incrementPomodoro |
-| POST | `/pomodoro-sessions` | `{taskId?,mode,durationMinutes,startedAt,endedAt,isCompleted}` | `Session` | pomodoroService.create |
-| GET | `/pomodoro-sessions/recent` | `?limit=10` | `Session[]` | pomodoroService.recent |
-| GET | `/pomodoro-sessions/statistics` | `?range` | `{...}` | pomodoroService.stats |
-| GET | `/dashboard/summary` | – | summary object (see 6.2) | dashboardService.summary |
-| GET | `/statistics/tasks` | `?range=7days\|30days\|month` | series array | statsService.tasks |
-| GET | `/statistics/pomodoros` | `?range=...` | series array | statsService.pomodoros |
-| GET | `/settings` | – | `Setting` | settingsService.get |
-| PUT | `/settings` | `{focusDuration?,shortBreakDuration?,longBreakDuration?,theme?,notificationEnabled?}` | `Setting` | settingsService.update |
-| PUT | `/settings/profile` | `{fullName}` | `User` | settingsService.updateProfile |
-| PUT | `/settings/password` | `{currentPassword,newPassword,confirmPassword}` | `{ok:true}` | settingsService.changePassword |
-| GET | `/notifications` | `?limit=20` | `Notification[]` | notifService.list |
-| PATCH | `/notifications/:id/read` | – | `Notification` | notifService.markRead |
-| PATCH | `/notifications/read-all` | – | `{count}` | notifService.markAllRead |
+| Method | Path                            | Body / Query                                                                          | Response                    | Service                        |
+| ------ | ------------------------------- | ------------------------------------------------------------------------------------- | --------------------------- | ------------------------------ |
+| POST   | `/auth/register`                | `{fullName,email,password,confirmPassword}`                                           | `{token,user}`              | authService.register           |
+| POST   | `/auth/login`                   | `{email,password}`                                                                    | `{token,user}`              | authService.login              |
+| GET    | `/auth/me`                      | –                                                                                     | `{user}`                    | authService.me                 |
+| GET    | `/tasks`                        | `?search&status&priority&deadlineFilter&sortBy`                                       | `Task[]` (with `isOverdue`) | taskService.list               |
+| GET    | `/tasks/:id`                    | –                                                                                     | `Task`                      | taskService.get                |
+| POST   | `/tasks`                        | `{title,description?,deadline,priority,estimatedPomodoros}`                           | `Task`                      | taskService.create             |
+| PUT    | `/tasks/:id`                    | same as POST                                                                          | `Task`                      | taskService.update             |
+| DELETE | `/tasks/:id`                    | –                                                                                     | `{ok:true}`                 | taskService.remove             |
+| PATCH  | `/tasks/:id/status`             | `{status}`                                                                            | `Task`                      | taskService.changeStatus       |
+| PATCH  | `/tasks/:id/complete`           | –                                                                                     | `Task`                      | taskService.markCompleted      |
+| PATCH  | `/tasks/:id/pomodoro/increment` | –                                                                                     | `Task`                      | taskService.incrementPomodoro  |
+| POST   | `/pomodoro-sessions`            | `{taskId?,mode,durationMinutes,startedAt,endedAt,isCompleted}`                        | `Session`                   | pomodoroService.create         |
+| GET    | `/pomodoro-sessions/recent`     | `?limit=10`                                                                           | `Session[]`                 | pomodoroService.recent         |
+| GET    | `/pomodoro-sessions/statistics` | `?range`                                                                              | `{...}`                     | pomodoroService.stats          |
+| GET    | `/dashboard/summary`            | –                                                                                     | summary object (see 6.2)    | dashboardService.summary       |
+| GET    | `/statistics/tasks`             | `?range=7days\|30days\|month`                                                         | series array                | statsService.tasks             |
+| GET    | `/statistics/pomodoros`         | `?range=...`                                                                          | series array                | statsService.pomodoros         |
+| GET    | `/settings`                     | –                                                                                     | `Setting`                   | settingsService.get            |
+| PUT    | `/settings`                     | `{focusDuration?,shortBreakDuration?,longBreakDuration?,theme?,notificationEnabled?}` | `Setting`                   | settingsService.update         |
+| PUT    | `/settings/profile`             | `{fullName}`                                                                          | `User`                      | settingsService.updateProfile  |
+| PUT    | `/settings/password`            | `{currentPassword,newPassword,confirmPassword}`                                       | `{ok:true}`                 | settingsService.changePassword |
+| GET    | `/notifications`                | `?limit=20`                                                                           | `Notification[]`            | notifService.list              |
+| PATCH  | `/notifications/:id/read`       | –                                                                                     | `Notification`              | notifService.markRead          |
+| PATCH  | `/notifications/read-all`       | –                                                                                     | `{count}`                   | notifService.markAllRead       |
 
 ### 6.1 Query semantics for `GET /tasks`
 
@@ -528,9 +541,17 @@ GET /statistics/pomodoros?range=30days
 ### 6.4 Error response shape
 
 All errors:
+
 ```json
-{ "error": { "message": "human readable", "code": "OPTIONAL_CODE", "fields": { "fieldName": "msg" } } }
+{
+  "error": {
+    "message": "human readable",
+    "code": "OPTIONAL_CODE",
+    "fields": { "fieldName": "msg" }
+  }
+}
 ```
+
 Status codes: 400 (validation), 401 (no/invalid token), 403 (forbidden), 404 (not found, also for IDOR — never leak existence), 409 (conflict, e.g. duplicate email), 429 (rate limit), 500.
 
 ---
@@ -540,6 +561,7 @@ Status codes: 400 (validation), 401 (no/invalid token), 403 (forbidden), 404 (no
 ### 7.1 Auth
 
 **Register:**
+
 1. Validate `{fullName, email, password, confirmPassword}` (zod).
 2. Lowercase email; if exists → 409.
 3. Hash password with bcrypt (cost from `BCRYPT_COST` env, default 10).
@@ -548,6 +570,7 @@ Status codes: 400 (validation), 401 (no/invalid token), 403 (forbidden), 404 (no
 6. Respond `{ token, user: {id, fullName, email} }`.
 
 **Login:**
+
 1. Find user by lowercase email, `select('+passwordHash')`.
 2. `bcrypt.compare`. Wrong → 401 generic "Invalid credentials".
 3. Sign JWT and respond.
@@ -573,6 +596,7 @@ Status codes: 400 (validation), 401 (no/invalid token), 403 (forbidden), 404 (no
 ### 7.3 Pomodoro session
 
 **Create:**
+
 1. Validate body.
 2. If `taskId`: verify `Task.findOne({ _id: taskId, userId })` — else 403.
 3. Save session.
@@ -601,6 +625,7 @@ Single endpoint, computed via `Promise.all` of independent queries:
 ### 7.5 Statistics
 
 `parseRange(range)`:
+
 - `7days` → `{ start: startOfDay(today - 6d), end: now }`
 - `30days` → `{ start: startOfDay(today - 29d), end: now }`
 - `month` → `{ start: startOfMonth(now), end: now }`
@@ -618,6 +643,7 @@ Single endpoint, computed via `Promise.all` of independent queries:
 **updateProfile**: only `fullName` editable. Email is immutable in this MVP.
 
 **changePassword**:
+
 1. Validate `{currentPassword, newPassword, confirmPassword}`.
 2. Re-fetch user with `+passwordHash`.
 3. `bcrypt.compare(currentPassword, hash)`; wrong → 401.
@@ -626,6 +652,7 @@ Single endpoint, computed via `Promise.all` of independent queries:
 ### 7.7 Notifications
 
 Created by:
+
 - `task_overdue` — cron job `overdueChecker` every 5 minutes
 - `deadline_soon` — cron job `deadlineSoonReminder` every 15 minutes (deadline within next 1h)
 - `task_completed` — service when status transitions to Completed
@@ -649,10 +676,12 @@ Tests: for each resource, an explicit cross-user test creates user A's resource 
 ### 8.1 Bootstrapping (`main.tsx` + `App.tsx`)
 
 `main.tsx`:
+
 - Create QueryClient (config below)
 - Wrap `<QueryClientProvider>`, `<BrowserRouter>`, `<App/>`
 
 `App.tsx`:
+
 - `useTheme()` mounts theme effect (apply `dark` class to `<html>`)
 - `<Toaster />` from sonner (top-right, light/dark adaptive)
 - `<AppRouter />`
@@ -666,7 +695,7 @@ new QueryClient({
     queries: {
       staleTime: 30_000,
       gcTime: 5 * 60_000,
-      retry: (n, err) => err?.response?.status === 401 ? false : n < 2,
+      retry: (n, err) => (err?.response?.status === 401 ? false : n < 2),
       refetchOnWindowFocus: false,
     },
     mutations: { retry: false },
@@ -691,24 +720,25 @@ new QueryClient({
 
 ### 8.4 Mutation invalidation map
 
-| Mutation | Invalidates |
-|---|---|
-| login / register | sets auth state, prefetches `['auth','me']` |
-| logout | resets QueryClient cache |
-| createTask | `['tasks']`, `['dashboard']` |
-| updateTask | `['tasks']`, `['tasks', id]`, `['dashboard']` |
-| deleteTask | `['tasks']`, `['dashboard']` (optimistic) |
-| changeStatus / markCompleted | `['tasks']`, `['dashboard']`, `['statistics']` |
-| incrementPomodoro | `['tasks']`, `['dashboard']` |
-| createPomodoroSession | `['pomodoros','recent']`, `['tasks']`, `['dashboard']`, `['statistics']`, `['notifications']` |
-| updateSettings | `['settings']` |
-| updateProfile | `['auth','me']`, `['settings']` |
-| changePassword | none |
-| markNotifRead / markAllRead | `['notifications']` |
+| Mutation                     | Invalidates                                                                                   |
+| ---------------------------- | --------------------------------------------------------------------------------------------- |
+| login / register             | sets auth state, prefetches `['auth','me']`                                                   |
+| logout                       | resets QueryClient cache                                                                      |
+| createTask                   | `['tasks']`, `['dashboard']`                                                                  |
+| updateTask                   | `['tasks']`, `['tasks', id]`, `['dashboard']`                                                 |
+| deleteTask                   | `['tasks']`, `['dashboard']` (optimistic)                                                     |
+| changeStatus / markCompleted | `['tasks']`, `['dashboard']`, `['statistics']`                                                |
+| incrementPomodoro            | `['tasks']`, `['dashboard']`                                                                  |
+| createPomodoroSession        | `['pomodoros','recent']`, `['tasks']`, `['dashboard']`, `['statistics']`, `['notifications']` |
+| updateSettings               | `['settings']`                                                                                |
+| updateProfile                | `['auth','me']`, `['settings']`                                                               |
+| changePassword               | none                                                                                          |
+| markNotifRead / markAllRead  | `['notifications']`                                                                           |
 
 ### 8.5 Stores
 
-**`authStore`** (Zustand + persist key `taskflow-auth`, localStorage):
+**`authStore`** (Zustand + persist key `Task88-auth`, localStorage):
+
 ```ts
 {
   token: string | null,
@@ -719,15 +749,21 @@ new QueryClient({
   isAuthenticated() => !!token
 }
 ```
+
 Hydration: on App mount, if `token` exists, fire `useAuthQueries.useMe()` once; on 401, logout.
 
-**`themeStore`** (persist key `taskflow-theme`):
+**`themeStore`** (persist key `Task88-theme`):
+
 ```ts
-{ theme: 'light'|'dark', setTheme(t), toggle() }
+{
+  theme: ('light' | 'dark', setTheme(t), toggle());
+}
 ```
+
 `useTheme()` effect: applies/removes `dark` class on `<html>`. Initial value: persisted > settings.theme (after auth) > `prefers-color-scheme`.
 
 **`pomodoroStore`** (NOT persisted, session-only):
+
 ```ts
 {
   mode: 'Focus'|'ShortBreak'|'LongBreak',
@@ -770,6 +806,7 @@ idle ─────────────▶ running
 ```
 
 **`start()`:**
+
 - If `idle`: `endsAt = Date.now() + durations[mode] * 60_000`; `startedAt = mode === 'Focus' ? new Date() : startedAt`; `status = 'running'`; `intervalId = setInterval(_tick, 250)`.
 - If `paused`: `endsAt = Date.now() + remainingMs`; `status = 'running'`; resume interval.
 
@@ -782,6 +819,7 @@ idle ─────────────▶ running
 **`_tick()`:** if `now >= endsAt` → `_complete()`. Otherwise notify subscribers (component reads `endsAt` and computes display).
 
 **`_complete()`:**
+
 - `clearInterval`
 - If `mode === 'Focus'`:
   - `focusCount += 1`
@@ -822,7 +860,7 @@ export const taskFormSchema = z.object({
   title: z.string().min(1, 'Title is required'),
   description: z.string().max(2000).optional().or(z.literal('')),
   deadline: z.coerce.date(),
-  priority: z.enum(['Low','Medium','High']),
+  priority: z.enum(['Low', 'Medium', 'High']),
   estimatedPomodoros: z.coerce.number().int().min(1, 'At least 1'),
 });
 export type TaskFormValues = z.infer<typeof taskFormSchema>;
@@ -857,12 +895,18 @@ theme: {
 ```css
 /* index.css */
 :root {
-  --bg: 250 250 250; --surface: 255 255 255; --border: 229 231 235;
-  --text: 15 23 42; --text-muted: 100 116 139;
+  --bg: 250 250 250;
+  --surface: 255 255 255;
+  --border: 229 231 235;
+  --text: 15 23 42;
+  --text-muted: 100 116 139;
 }
 .dark {
-  --bg: 15 23 42; --surface: 30 41 59; --border: 51 65 85;
-  --text: 241 245 249; --text-muted: 148 163 184;
+  --bg: 15 23 42;
+  --surface: 30 41 59;
+  --border: 51 65 85;
+  --text: 241 245 249;
+  --text-muted: 148 163 184;
 }
 ```
 
@@ -871,12 +915,13 @@ Components use `bg-bg`, `bg-surface`, `text-text`, `text-text-muted`, `border-bo
 ### 8.9 Notifications polling
 
 `useNotificationQueries.useList()`:
+
 ```ts
 useQuery({
   queryKey: ['notifications'],
   queryFn: notificationApi.list,
   refetchInterval: 30_000,
-  enabled: useAuthStore(s => !!s.token),
+  enabled: useAuthStore((s) => !!s.token),
 });
 ```
 
@@ -889,12 +934,14 @@ useQuery({
 ### 9.1 AppLayout
 
 Sidebar (left, 256px on `lg`, drawer on `<lg`):
-- Logo "TaskFlow"
+
+- Logo "Task88"
 - Nav items: Dashboard, Tasks, Pomodoro, Calendar, Statistics, Settings
 - Bottom: Logout button
 - Active route highlighted (`bg-primary-50 dark:bg-primary-500/10` + `text-primary-600`)
 
 Header (top, h-16):
+
 - Page title (derived from current route)
 - Quick "+ Add Task" button → opens TaskFormModal (create) with deadline pre-filled to end-of-today
 - Notification bell with badge
@@ -906,12 +953,14 @@ Header (top, h-16):
 Centered card on gradient background (`bg-gradient-to-br from-primary-50 to-bg`).
 
 **LoginPage form:**
+
 - Email (input)
 - Password (input type=password)
 - Submit "Log in"
 - Link to `/register`
 
 **RegisterPage form:**
+
 - Full name
 - Email
 - Password
@@ -926,6 +975,7 @@ Validation messages in English. On success → `authStore.login` → `navigate('
 Greeting `Welcome back, {firstName}` + today's date.
 
 Layout grid (responsive):
+
 - Row 1: 4 SummaryCard (Total / Completed / In Progress / Overdue)
 - Row 2: 2 wide SummaryCard (Pomodoros today / Focus minutes today)
 - Row 3: TodayTasks (left) + UpcomingTasks (right)
@@ -936,10 +986,12 @@ Click any task row → opens TaskFormModal (view/edit). Empty states for each se
 ### 9.4 TasksPage
 
 Header:
+
 - Title "My Tasks"
 - "+ Add Task" button
 
 Toolbar (sticky):
+
 - Search input (debounced 300ms)
 - Status select (All / Todo / In Progress / Completed)
 - Priority select (All / Low / Medium / High)
@@ -950,6 +1002,7 @@ Toolbar (sticky):
 Filter state syncs to URL query params. Hard refresh preserves filter.
 
 **TaskCard (grid):**
+
 - Priority dot + Title (truncate) + ⋮ menu
 - Description 2-line clamp
 - Bottom row: 🕐 deadline · ⏱ `{completed}/{estimated}` · status badge · overdue badge if applicable
@@ -975,6 +1028,7 @@ Below: FocusTaskSelector — dropdown filtered to tasks with `status ∈ {Todo, 
 Bottom: Today's stats row (sessions count + focus minutes) and recent sessions list (last 5).
 
 End-of-focus modal (only when `task.completedPomodoros >= task.estimatedPomodoros` AND `status !== 'Completed'`):
+
 > "You've reached the estimated pomodoros for **{task.title}**. Mark as completed?"
 > [Mark Complete] [Keep Going]
 
@@ -997,6 +1051,7 @@ Tailwind/CSS overrides for react-big-calendar to match dark theme (separate `cal
 Header: page title + RangeSelector (segmented 7 days / 30 days / Month).
 
 Grid:
+
 - Row 1: TaskCompletionChart (BarChart) | PomodoroChart (BarChart)
 - Row 2: FocusMinutesChart (LineChart, full width)
 - Row 3: PriorityPie | StatusPie
@@ -1008,22 +1063,26 @@ Empty state: "Not enough data yet — complete some tasks or focus sessions to s
 Sections (each its own form, own submit button):
 
 **Profile:**
+
 - Full name (editable)
 - Email (read-only)
 
 **Change Password:**
+
 - Current password
 - New password (min 6)
 - Confirm new password
 - Submit "Update password"
 
 **Pomodoro durations (minutes):**
+
 - Focus duration (default 25)
 - Short break duration (default 5)
 - Long break duration (default 15)
 - Submit "Save"
 
 **Preferences:**
+
 - Theme: Light / Dark (radio)
 - Notifications enabled (toggle)
 - Submit "Save"
@@ -1032,14 +1091,14 @@ After durations update: `pomodoroStore.hydrateFromSettings()` so the timer refle
 
 ### 9.9 Empty / Loading / Error states
 
-| Page | Empty | Loading | Error |
-|---|---|---|---|
-| Tasks | "No tasks yet. Click + Add Task." + button | Skeleton 3 cards | "Couldn't load tasks. Retry" |
-| Pomodoro recent | "No sessions yet today" | Skeleton 3 rows | – |
-| Dashboard | "Welcome! Create your first task" + button | Skeleton cards | Retry |
-| Calendar | calendar renders, panel: "No tasks on this day" | Skeleton calendar | – |
-| Statistics | "Not enough data yet" + illustration | Skeleton charts | Retry |
-| Notifications | "You're all caught up 🎉" | Skeleton items | – |
+| Page            | Empty                                           | Loading           | Error                        |
+| --------------- | ----------------------------------------------- | ----------------- | ---------------------------- |
+| Tasks           | "No tasks yet. Click + Add Task." + button      | Skeleton 3 cards  | "Couldn't load tasks. Retry" |
+| Pomodoro recent | "No sessions yet today"                         | Skeleton 3 rows   | –                            |
+| Dashboard       | "Welcome! Create your first task" + button      | Skeleton cards    | Retry                        |
+| Calendar        | calendar renders, panel: "No tasks on this day" | Skeleton calendar | –                            |
+| Statistics      | "Not enough data yet" + illustration            | Skeleton charts   | Retry                        |
+| Notifications   | "You're all caught up 🎉"                       | Skeleton items    | –                            |
 
 ### 9.10 Responsive breakpoints
 
@@ -1144,6 +1203,7 @@ Stack: Jest + Supertest + mongodb-memory-server.
 **Helper (`createAuthedAgent`):** registers a fresh user, returns supertest agent with token attached.
 
 **Coverage (target ~25 tests):**
+
 - `auth.test.js` — register, login, duplicate email (409), wrong password (401), missing token on /me (401)
 - `tasks.test.js` — CRUD, search, filters by status/priority/deadlineFilter, sort, IDOR (user A's task hidden from user B as 404)
 - `pomodoro.test.js` — Focus session triggers task increment + status Todo→InProgress; taskId of another user → 403; estimated_reached fires once
@@ -1159,6 +1219,7 @@ Test scripts: `npm test` runs Jest with `--runInBand` to share the in-memory mon
 Stack: Vitest + @testing-library/react + jsdom.
 
 **Minimal critical tests:**
+
 - `pomodoroStore.test.ts` — start/pause/resume preserve `remainingMs`; tick at `endsAt` calls `_complete`; mode auto-suggest on focus completion; hydrateFromSettings updates durations
 - `taskUtils.test.ts` — isOverdue, priorityRank, deadlineFilter helpers
 - `LoginPage.test.tsx` — invalid form shows errors; valid form calls login mutation and navigates
@@ -1168,6 +1229,7 @@ E2E (Playwright/Cypress) is out of scope for MVP.
 ### 12.3 Manual verification (per acceptance criteria)
 
 After implementation, manually verify:
+
 - Register → auto-login → dashboard
 - CRUD task + filter + search + sort
 - Pomodoro focus → session saved → task progress increments → estimated_reached prompt
@@ -1187,7 +1249,7 @@ After implementation, manually verify:
 
 ```
 PORT=4000
-MONGO_URI=mongodb://localhost:27017/taskflow
+MONGO_URI=mongodb://localhost:27017/Task88
 JWT_SECRET=replace-with-random-32-byte-hex
 JWT_EXPIRES_IN=7d
 CLIENT_ORIGIN=http://localhost:5173
@@ -1204,6 +1266,7 @@ VITE_API_BASE_URL=/api
 ```
 
 Vite dev proxy in `vite.config.ts`:
+
 ```ts
 server: { proxy: { '/api': { target: 'http://localhost:4000', changeOrigin: true } } }
 ```
@@ -1211,6 +1274,7 @@ server: { proxy: { '/api': { target: 'http://localhost:4000', changeOrigin: true
 ### 13.3 Scripts
 
 **Server `package.json`:**
+
 ```json
 {
   "scripts": {
@@ -1227,6 +1291,7 @@ server: { proxy: { '/api': { target: 'http://localhost:4000', changeOrigin: true
 ```
 
 **Client `package.json`:**
+
 ```json
 {
   "scripts": {
@@ -1256,7 +1321,7 @@ cd ../client
 cp .env.example .env
 npm install
 npm run dev                # http://localhost:5173
-# login: demo@taskflow.com / 123456
+# login: demo@Task88.com / 123456
 ```
 
 ### 13.5 README contents (root)
@@ -1279,7 +1344,8 @@ npm run dev                # http://localhost:5173
 `server/src/seed/seed.js` accepts `--reset` flag. Without `--reset`, exits if collections non-empty.
 
 Seeds:
-- 1 user: `demo@taskflow.com` / `123456`
+
+- 1 user: `demo@Task88.com` / `123456`
 - 1 UserSetting (defaults)
 - 8 Tasks distributed across:
   - 2 with deadline today (Todo + InProgress, mixed priority)

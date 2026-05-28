@@ -16,7 +16,7 @@ export function buildApp() {
     next();
   });
 
-  app.get('/api/health', (_req, res) => res.json({ ok: true, service: 'taskflow-api' }));
+  app.get('/api/health', (_req, res) => res.json({ ok: true, service: 'Task88-api' }));
 
   app.use('/api', apiRoutes);
 

@@ -16,8 +16,10 @@ async function run() {
   await connectDB();
   if (RESET) {
     await Promise.all([
-      User.deleteMany({}), Task.deleteMany({}),
-      PomodoroSession.deleteMany({}), UserSetting.deleteMany({}),
+      User.deleteMany({}),
+      Task.deleteMany({}),
+      PomodoroSession.deleteMany({}),
+      UserSetting.deleteMany({}),
       Notification.deleteMany({}),
     ]);
     console.log('🧹 Cleared collections');
@@ -33,20 +35,79 @@ async function run() {
   const passwordHash = await hashPassword('123456');
   const user = await User.create({
     fullName: 'Demo User',
-    email: 'demo@taskflow.com',
+    email: 'demo@Task88.com',
     passwordHash,
   });
   await UserSetting.create({ userId: user._id });
 
   const taskSeeds = [
-    { title: 'Finish Q2 report',  deadline: daysFromNow(0),   priority: 'High',   status: 'Todo',         estimatedPomodoros: 4, completedPomodoros: 1 },
-    { title: 'Review chapter 5',  deadline: daysFromNow(0),   priority: 'Medium', status: 'InProgress',   estimatedPomodoros: 3, completedPomodoros: 2 },
-    { title: 'Prepare presentation', deadline: daysFromNow(2),priority: 'High',   status: 'Todo',         estimatedPomodoros: 6, completedPomodoros: 0 },
-    { title: 'Practice coding',   deadline: daysFromNow(3),   priority: 'Low',    status: 'Todo',         estimatedPomodoros: 2, completedPomodoros: 0 },
-    { title: 'Buy groceries',     deadline: daysFromNow(-1),  priority: 'Low',    status: 'Todo',         estimatedPomodoros: 1, completedPomodoros: 0 },
-    { title: 'Send invoice',      deadline: daysFromNow(-3),  priority: 'Medium', status: 'Completed',    estimatedPomodoros: 1, completedPomodoros: 1, completedAt: daysFromNow(-3) },
-    { title: 'Read book chapter', deadline: daysFromNow(-5),  priority: 'Low',    status: 'Completed',    estimatedPomodoros: 2, completedPomodoros: 2, completedAt: daysFromNow(-4) },
-    { title: 'Refactor module',   deadline: daysFromNow(-10), priority: 'High',   status: 'Completed',    estimatedPomodoros: 5, completedPomodoros: 5, completedAt: daysFromNow(-8) },
+    {
+      title: 'Finish Q2 report',
+      deadline: daysFromNow(0),
+      priority: 'High',
+      status: 'Todo',
+      estimatedPomodoros: 4,
+      completedPomodoros: 1,
+    },
+    {
+      title: 'Review chapter 5',
+      deadline: daysFromNow(0),
+      priority: 'Medium',
+      status: 'InProgress',
+      estimatedPomodoros: 3,
+      completedPomodoros: 2,
+    },
+    {
+      title: 'Prepare presentation',
+      deadline: daysFromNow(2),
+      priority: 'High',
+      status: 'Todo',
+      estimatedPomodoros: 6,
+      completedPomodoros: 0,
+    },
+    {
+      title: 'Practice coding',
+      deadline: daysFromNow(3),
+      priority: 'Low',
+      status: 'Todo',
+      estimatedPomodoros: 2,
+      completedPomodoros: 0,
+    },
+    {
+      title: 'Buy groceries',
+      deadline: daysFromNow(-1),
+      priority: 'Low',
+      status: 'Todo',
+      estimatedPomodoros: 1,
+      completedPomodoros: 0,
+    },
+    {
+      title: 'Send invoice',
+      deadline: daysFromNow(-3),
+      priority: 'Medium',
+      status: 'Completed',
+      estimatedPomodoros: 1,
+      completedPomodoros: 1,
+      completedAt: daysFromNow(-3),
+    },
+    {
+      title: 'Read book chapter',
+      deadline: daysFromNow(-5),
+      priority: 'Low',
+      status: 'Completed',
+      estimatedPomodoros: 2,
+      completedPomodoros: 2,
+      completedAt: daysFromNow(-4),
+    },
+    {
+      title: 'Refactor module',
+      deadline: daysFromNow(-10),
+      priority: 'High',
+      status: 'Completed',
+      estimatedPomodoros: 5,
+      completedPomodoros: 5,
+      completedAt: daysFromNow(-8),
+    },
   ];
   const tasks = await Task.insertMany(
     taskSeeds.map((t) => ({ ...t, userId: user._id, priorityRank: rankOf(t.priority) })),
@@ -64,22 +125,44 @@ async function run() {
         taskId: tasks[Math.floor(Math.random() * tasks.length)]._id,
         mode: 'Focus',
         durationMinutes: 25,
-        startedAt, endedAt, isCompleted: true,
+        startedAt,
+        endedAt,
+        isCompleted: true,
       });
     }
   }
   await PomodoroSession.insertMany(sessions);
 
   await Notification.insertMany([
-    { userId: user._id, type: 'task_overdue',   taskId: tasks[4]._id,
-      title: 'Task overdue', message: '"Buy groceries" passed its deadline.', isRead: false },
-    { userId: user._id, type: 'task_completed', taskId: tasks[5]._id,
-      title: 'Task completed', message: '"Send invoice" marked as completed.', isRead: true },
-    { userId: user._id, type: 'pomodoro_done',  taskId: tasks[1]._id,
-      title: 'Focus session complete', message: 'Great job! 25 min focus done.', isRead: false },
+    {
+      userId: user._id,
+      type: 'task_overdue',
+      taskId: tasks[4]._id,
+      title: 'Task overdue',
+      message: '"Buy groceries" passed its deadline.',
+      isRead: false,
+    },
+    {
+      userId: user._id,
+      type: 'task_completed',
+      taskId: tasks[5]._id,
+      title: 'Task completed',
+      message: '"Send invoice" marked as completed.',
+      isRead: true,
+    },
+    {
+      userId: user._id,
+      type: 'pomodoro_done',
+      taskId: tasks[1]._id,
+      title: 'Focus session complete',
+      message: 'Great job! 25 min focus done.',
+      isRead: false,
+    },
   ]);
 
-  console.log(`✅ Seeded user demo@taskflow.com / 123456 with ${tasks.length} tasks, ${sessions.length} sessions, 3 notifications.`);
+  console.log(
+    `✅ Seeded user demo@Task88.com / 123456 with ${tasks.length} tasks, ${sessions.length} sessions, 3 notifications.`,
+  );
   await disconnectDB();
 }
 

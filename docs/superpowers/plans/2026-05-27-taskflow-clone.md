@@ -1,14 +1,15 @@
-# TaskFlow Clone Implementation Plan
+# Task88 Clone Implementation Plan
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** Build a productivity web app (TaskFlow clone) with auth, tasks, pomodoro timer, calendar, dashboard, statistics, settings, and notifications. Per the approved spec at `docs/superpowers/specs/2026-05-27-taskflow-clone-design.md`.
+**Goal:** Build a productivity web app (Task88 clone) with auth, tasks, pomodoro timer, calendar, dashboard, statistics, settings, and notifications. Per the approved spec at `docs/superpowers/specs/2026-05-27-Task88-clone-design.md`.
 
 **Architecture:** Monorepo with two independent packages — `server/` (Node + Express + MongoDB via Mongoose, JWT auth) and `client/` (React + Vite + TypeScript + Tailwind + React Query + Zustand). Backend layered as routes → controllers → services → models. Frontend uses lazy-loaded pages; pomodoro timer state lives in a Zustand store with `endsAt` timestamps so it survives route changes and tab throttling.
 
 **Tech Stack:** Node 20, Express, Mongoose, JWT, bcrypt, zod, node-cron, Jest, Supertest, mongodb-memory-server, helmet, express-rate-limit, express-mongo-sanitize · React 18, Vite, TypeScript, Tailwind, React Router 6, Axios, @tanstack/react-query, Zustand, react-hook-form, @hookform/resolvers, recharts, react-big-calendar, date-fns, sonner, lucide-react, Vitest, @testing-library/react.
 
 **Conventions for every task:**
+
 - TDD: write failing test → see it fail → minimal code → see it pass → refactor → commit.
 - Each commit message follows conventional commits (`feat:`, `chore:`, `test:`, `docs:`, `fix:`).
 - All paths are relative to repo root `web_itss_demo/`.
@@ -71,6 +72,7 @@ web_itss_demo/
 ## Task 1: Repo scaffolding + root README skeleton
 
 **Files:**
+
 - Create: `.gitignore`
 - Modify: `README.md`
 
@@ -107,20 +109,23 @@ coverage/
 - [ ] **Step 2: Replace root `README.md` with skeleton**
 
 ```markdown
-# TaskFlow Clone
+# Task88 Clone
 
-A productivity web app with tasks, pomodoro timer, calendar, dashboard, statistics, and settings. Inspired by https://www.taskflow.pro.vn/.
+A productivity web app with tasks, pomodoro timer, calendar, dashboard, statistics, and settings. Inspired by https://www.Task88.pro.vn/.
 
 ## Stack
+
 - **Frontend:** React 18 + Vite + TypeScript + Tailwind CSS + React Query + Zustand + Recharts + react-big-calendar
 - **Backend:** Node.js 20 + Express + MongoDB (Mongoose) + JWT + bcrypt
 - **Tests:** Jest + Supertest (server), Vitest + Testing Library (client)
 
 ## Project layout
 ```
-server/   Express + Mongo API
-client/   React SPA
-docs/     Design specs and implementation plans
+
+server/ Express + Mongo API
+client/ React SPA
+docs/ Design specs and implementation plans
+
 ```
 
 ## Prerequisites
@@ -131,7 +136,7 @@ docs/     Design specs and implementation plans
 See task 24 for finalized README.
 
 ## Demo account
-`demo@taskflow.com` / `123456` (after running `npm run seed:reset` in `server/`).
+`demo@Task88.com` / `123456` (after running `npm run seed:reset` in `server/`).
 ```
 
 - [ ] **Step 3: Commit**
@@ -146,6 +151,7 @@ git commit -m "chore: scaffold repo with .gitignore and README skeleton"
 ## Task 2: Server skeleton — package.json, env, db, app, index
 
 **Files:**
+
 - Create: `server/package.json`, `server/nodemon.json`, `server/.env.example`, `server/jest.config.js`, `server/.eslintrc.json`, `server/.prettierrc`
 - Create: `server/src/{index.js,app.js}`
 - Create: `server/src/config/{env.js,db.js}`
@@ -157,7 +163,7 @@ From repo root:
 ```bash
 mkdir -p server && cd server
 npm init -y
-npm pkg set name=taskflow-server type=module engines.node=">=20"
+npm pkg set name=Task88-server type=module engines.node=">=20"
 npm pkg set scripts.dev="nodemon src/index.js"
 npm pkg set scripts.start="node src/index.js"
 npm pkg set scripts.seed="node src/seed/seed.js"
@@ -188,7 +194,7 @@ npm install --save-dev nodemon jest supertest mongodb-memory-server \
 
 ```
 PORT=4000
-MONGO_URI=mongodb://localhost:27017/taskflow
+MONGO_URI=mongodb://localhost:27017/Task88
 JWT_SECRET=replace-with-32-bytes-of-randomness
 JWT_EXPIRES_IN=7d
 CLIENT_ORIGIN=http://localhost:5173
@@ -294,7 +300,7 @@ export function buildApp() {
   app.use(express.json({ limit: '1mb' }));
   app.use(mongoSanitize());
 
-  app.get('/api/health', (_req, res) => res.json({ ok: true, service: 'taskflow-api' }));
+  app.get('/api/health', (_req, res) => res.json({ ok: true, service: 'Task88-api' }));
 
   // routes mounted in Task 5+
   // error handler mounted in Task 3
@@ -327,7 +333,7 @@ bootstrap().catch((err) => {
 cd server && npm run dev
 # In another terminal:
 curl http://localhost:4000/api/health
-# Expected: {"ok":true,"service":"taskflow-api"}
+# Expected: {"ok":true,"service":"Task88-api"}
 # Stop server with Ctrl+C
 ```
 
@@ -344,6 +350,7 @@ git commit -m "feat(server): scaffold express app with env validation and mongo 
 ## Task 3: Error handling — AppError, asyncHandler, validate middleware, errorHandler
 
 **Files:**
+
 - Create: `server/src/utils/{AppError.js,asyncHandler.js}`
 - Create: `server/src/middlewares/{error.middleware.js,validate.middleware.js}`
 - Modify: `server/src/app.js`
@@ -380,8 +387,8 @@ import { AppError } from '../utils/AppError.js';
 // validate({ body?, query?, params? }) → middleware
 export const validate = (schemas) => (req, _res, next) => {
   try {
-    if (schemas.body)   req.body   = schemas.body.parse(req.body);
-    if (schemas.query)  req.query  = schemas.query.parse(req.query);
+    if (schemas.body) req.body = schemas.body.parse(req.body);
+    if (schemas.query) req.query = schemas.query.parse(req.query);
     if (schemas.params) req.params = schemas.params.parse(req.params);
     next();
   } catch (err) {
@@ -442,7 +449,7 @@ export function buildApp() {
   app.use(express.json({ limit: '1mb' }));
   app.use(mongoSanitize());
 
-  app.get('/api/health', (_req, res) => res.json({ ok: true, service: 'taskflow-api' }));
+  app.get('/api/health', (_req, res) => res.json({ ok: true, service: 'Task88-api' }));
 
   // ROUTES_MOUNT — added in subsequent tasks
 
@@ -500,6 +507,7 @@ git commit -m "feat(server): add error handler, validate middleware, asyncHandle
 ## Task 4: User model + JWT service + password hasher + auth middleware
 
 **Files:**
+
 - Create: `server/src/models/User.js`
 - Create: `server/src/services/jwt.service.js`
 - Create: `server/src/utils/passwordHasher.js`
@@ -513,8 +521,8 @@ import mongoose from 'mongoose';
 
 const userSchema = new mongoose.Schema(
   {
-    fullName:     { type: String, required: true, trim: true, maxlength: 100 },
-    email:        { type: String, required: true, lowercase: true, trim: true, unique: true, index: true },
+    fullName: { type: String, required: true, trim: true, maxlength: 100 },
+    email: { type: String, required: true, lowercase: true, trim: true, unique: true, index: true },
     passwordHash: { type: String, required: true, select: false },
   },
   {
@@ -522,7 +530,10 @@ const userSchema = new mongoose.Schema(
     toJSON: {
       virtuals: true,
       versionKey: false,
-      transform: (_, ret) => { delete ret.passwordHash; return ret; },
+      transform: (_, ret) => {
+        delete ret.passwordHash;
+        return ret;
+      },
     },
   },
 );
@@ -598,6 +609,7 @@ git commit -m "feat(server): User model, JWT service, password hasher, auth midd
 ## Task 5: Auth routes (register / login / me) + tests
 
 **Files:**
+
 - Create: `server/src/validators/auth.validator.js`
 - Create: `server/src/services/auth.service.js`
 - Create: `server/src/controllers/auth.controller.js`
@@ -695,15 +707,17 @@ cd server && npm test -- tests/auth.test.js
 ```js
 import { z } from 'zod';
 
-export const registerSchema = z.object({
-  fullName: z.string().min(1).max(100),
-  email: z.string().email().toLowerCase(),
-  password: z.string().min(6),
-  confirmPassword: z.string().min(6),
-}).refine((d) => d.password === d.confirmPassword, {
-  message: 'Passwords do not match',
-  path: ['confirmPassword'],
-});
+export const registerSchema = z
+  .object({
+    fullName: z.string().min(1).max(100),
+    email: z.string().email().toLowerCase(),
+    password: z.string().min(6),
+    confirmPassword: z.string().min(6),
+  })
+  .refine((d) => d.password === d.confirmPassword, {
+    message: 'Passwords do not match',
+    path: ['confirmPassword'],
+  });
 
 export const loginSchema = z.object({
   email: z.string().email().toLowerCase(),
@@ -783,8 +797,8 @@ import { registerSchema, loginSchema } from '../validators/auth.validator.js';
 
 const router = Router();
 router.post('/register', authLimiter, validate({ body: registerSchema }), authController.register);
-router.post('/login',    authLimiter, validate({ body: loginSchema }),    authController.login);
-router.get('/me',        authRequired, authController.me);
+router.post('/login', authLimiter, validate({ body: loginSchema }), authController.login);
+router.get('/me', authRequired, authController.me);
 
 export default router;
 ```
@@ -817,7 +831,7 @@ import request from 'supertest';
 export async function createAuthedAgent(app, overrides = {}) {
   const body = {
     fullName: overrides.fullName ?? 'Test User',
-    email:    overrides.email    ?? `u${Date.now()}${Math.random().toString(16).slice(2,6)}@x.com`,
+    email: overrides.email ?? `u${Date.now()}${Math.random().toString(16).slice(2, 6)}@x.com`,
     password: overrides.password ?? '123456',
   };
   const res = await request(app)
@@ -834,10 +848,10 @@ export async function createAuthedAgent(app, overrides = {}) {
     token,
     userId,
     user: res.body.user,
-    get:    wrap('get'),
-    post:   wrap('post'),
-    put:    wrap('put'),
-    patch:  wrap('patch'),
+    get: wrap('get'),
+    post: wrap('post'),
+    put: wrap('put'),
+    patch: wrap('patch'),
     delete: wrap('delete'),
   };
 }
@@ -862,6 +876,7 @@ git commit -m "feat(server): auth register/login/me with JWT, validation, tests"
 ## Task 6: UserSetting model + settings endpoints + tests
 
 **Files:**
+
 - Create: `server/src/models/UserSetting.js`
 - Create: `server/src/services/settings.service.js`
 - Create: `server/src/controllers/settings.controller.js`
@@ -878,12 +893,18 @@ import mongoose from 'mongoose';
 
 const settingSchema = new mongoose.Schema(
   {
-    userId:               { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true, unique: true, index: true },
-    focusDuration:        { type: Number, default: 25, min: 1, max: 120 },
-    shortBreakDuration:   { type: Number, default: 5,  min: 1, max: 60 },
-    longBreakDuration:    { type: Number, default: 15, min: 1, max: 60 },
-    theme:                { type: String, enum: ['light', 'dark'], default: 'light' },
-    notificationEnabled:  { type: Boolean, default: true },
+    userId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User',
+      required: true,
+      unique: true,
+      index: true,
+    },
+    focusDuration: { type: Number, default: 25, min: 1, max: 120 },
+    shortBreakDuration: { type: Number, default: 5, min: 1, max: 60 },
+    longBreakDuration: { type: Number, default: 15, min: 1, max: 60 },
+    theme: { type: String, enum: ['light', 'dark'], default: 'light' },
+    notificationEnabled: { type: Boolean, default: true },
   },
   { timestamps: true, toJSON: { virtuals: true, versionKey: false } },
 );
@@ -906,8 +927,11 @@ describe('GET /api/settings', () => {
     const res = await a.get('/api/settings');
     expect(res.status).toBe(200);
     expect(res.body).toMatchObject({
-      focusDuration: 25, shortBreakDuration: 5, longBreakDuration: 15,
-      theme: 'light', notificationEnabled: true,
+      focusDuration: 25,
+      shortBreakDuration: 5,
+      longBreakDuration: 15,
+      theme: 'light',
+      notificationEnabled: true,
     });
   });
 
@@ -947,7 +971,9 @@ describe('PUT /api/settings/password', () => {
   it('changes password when current is correct', async () => {
     const a = await createAuthedAgent(app);
     const res = await a.put('/api/settings/password').send({
-      currentPassword: '123456', newPassword: 'newpass1', confirmPassword: 'newpass1',
+      currentPassword: '123456',
+      newPassword: 'newpass1',
+      confirmPassword: 'newpass1',
     });
     expect(res.status).toBe(200);
   });
@@ -955,7 +981,9 @@ describe('PUT /api/settings/password', () => {
   it('rejects wrong current password', async () => {
     const a = await createAuthedAgent(app);
     const res = await a.put('/api/settings/password').send({
-      currentPassword: 'wrong1', newPassword: 'newpass1', confirmPassword: 'newpass1',
+      currentPassword: 'wrong1',
+      newPassword: 'newpass1',
+      confirmPassword: 'newpass1',
     });
     expect(res.status).toBe(401);
   });
@@ -967,26 +995,30 @@ describe('PUT /api/settings/password', () => {
 ```js
 import { z } from 'zod';
 
-export const settingsUpdateSchema = z.object({
-  focusDuration:       z.number().int().min(1).max(120).optional(),
-  shortBreakDuration:  z.number().int().min(1).max(60).optional(),
-  longBreakDuration:   z.number().int().min(1).max(60).optional(),
-  theme:               z.enum(['light', 'dark']).optional(),
-  notificationEnabled: z.boolean().optional(),
-}).strict();
+export const settingsUpdateSchema = z
+  .object({
+    focusDuration: z.number().int().min(1).max(120).optional(),
+    shortBreakDuration: z.number().int().min(1).max(60).optional(),
+    longBreakDuration: z.number().int().min(1).max(60).optional(),
+    theme: z.enum(['light', 'dark']).optional(),
+    notificationEnabled: z.boolean().optional(),
+  })
+  .strict();
 
 export const profileUpdateSchema = z.object({
   fullName: z.string().min(1).max(100),
 });
 
-export const passwordChangeSchema = z.object({
-  currentPassword: z.string().min(1),
-  newPassword: z.string().min(6),
-  confirmPassword: z.string().min(6),
-}).refine((d) => d.newPassword === d.confirmPassword, {
-  message: 'Passwords do not match',
-  path: ['confirmPassword'],
-});
+export const passwordChangeSchema = z
+  .object({
+    currentPassword: z.string().min(1),
+    newPassword: z.string().min(6),
+    confirmPassword: z.string().min(6),
+  })
+  .refine((d) => d.newPassword === d.confirmPassword, {
+    message: 'Passwords do not match',
+    path: ['confirmPassword'],
+  });
 ```
 
 - [ ] **Step 4: Write `server/src/services/settings.service.js`**
@@ -1064,12 +1096,16 @@ import { settingsService } from '../services/settings.service.js';
 import { asyncHandler } from '../utils/asyncHandler.js';
 
 export const settingsController = {
-  get:    asyncHandler(async (req, res) => res.json(await settingsService.get(req.user.id))),
-  update: asyncHandler(async (req, res) => res.json(await settingsService.update(req.user.id, req.body))),
+  get: asyncHandler(async (req, res) => res.json(await settingsService.get(req.user.id))),
+  update: asyncHandler(async (req, res) =>
+    res.json(await settingsService.update(req.user.id, req.body)),
+  ),
   updateProfile: asyncHandler(async (req, res) =>
-    res.json(await settingsService.updateProfile(req.user.id, req.body))),
+    res.json(await settingsService.updateProfile(req.user.id, req.body)),
+  ),
   changePassword: asyncHandler(async (req, res) =>
-    res.json(await settingsService.changePassword(req.user.id, req.body))),
+    res.json(await settingsService.changePassword(req.user.id, req.body)),
+  ),
 };
 ```
 
@@ -1081,16 +1117,22 @@ import { settingsController } from '../controllers/settings.controller.js';
 import { validate } from '../middlewares/validate.middleware.js';
 import { authRequired } from '../middlewares/auth.middleware.js';
 import {
-  settingsUpdateSchema, profileUpdateSchema, passwordChangeSchema,
+  settingsUpdateSchema,
+  profileUpdateSchema,
+  passwordChangeSchema,
 } from '../validators/settings.validator.js';
 
 const router = Router();
 router.use(authRequired);
 
-router.get('/',          settingsController.get);
-router.put('/',          validate({ body: settingsUpdateSchema }), settingsController.update);
-router.put('/profile',   validate({ body: profileUpdateSchema }),  settingsController.updateProfile);
-router.put('/password',  validate({ body: passwordChangeSchema }), settingsController.changePassword);
+router.get('/', settingsController.get);
+router.put('/', validate({ body: settingsUpdateSchema }), settingsController.update);
+router.put('/profile', validate({ body: profileUpdateSchema }), settingsController.updateProfile);
+router.put(
+  '/password',
+  validate({ body: passwordChangeSchema }),
+  settingsController.changePassword,
+);
 
 export default router;
 ```
@@ -1121,6 +1163,7 @@ git commit -m "feat(server): UserSetting model + settings endpoints (get/update/
 ## Task 7: Task model + priorityRank + virtual isOverdue + indexes
 
 **Files:**
+
 - Create: `server/src/models/Task.js`
 - Create: `server/src/utils/priorityRank.js`
 
@@ -1139,23 +1182,26 @@ import { rankOf } from '../utils/priorityRank.js';
 
 const taskSchema = new mongoose.Schema(
   {
-    userId:              { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true, index: true },
-    title:               { type: String, required: true, trim: true, maxlength: 200 },
-    description:         { type: String, default: '', maxlength: 2000 },
-    deadline:            { type: Date, required: true },
-    priority:            { type: String, enum: ['Low', 'Medium', 'High'], required: true },
-    priorityRank:        { type: Number, default: 0 },
-    status:              { type: String, enum: ['Todo', 'InProgress', 'Completed'], default: 'Todo' },
-    estimatedPomodoros:  { type: Number, default: 1, min: 1 },
-    completedPomodoros:  { type: Number, default: 0, min: 0 },
-    completedAt:         { type: Date, default: null },
+    userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true, index: true },
+    title: { type: String, required: true, trim: true, maxlength: 200 },
+    description: { type: String, default: '', maxlength: 2000 },
+    deadline: { type: Date, required: true },
+    priority: { type: String, enum: ['Low', 'Medium', 'High'], required: true },
+    priorityRank: { type: Number, default: 0 },
+    status: { type: String, enum: ['Todo', 'InProgress', 'Completed'], default: 'Todo' },
+    estimatedPomodoros: { type: Number, default: 1, min: 1 },
+    completedPomodoros: { type: Number, default: 0, min: 0 },
+    completedAt: { type: Date, default: null },
   },
   {
     timestamps: true,
     toJSON: {
       virtuals: true,
       versionKey: false,
-      transform: (_, ret) => { delete ret.priorityRank; return ret; },
+      transform: (_, ret) => {
+        delete ret.priorityRank;
+        return ret;
+      },
     },
   },
 );
@@ -1199,6 +1245,7 @@ git commit -m "feat(server): Task model with virtual isOverdue, priorityRank, in
 ## Task 8: Task service + controller + routes + tests (CRUD, filter, search, sort, IDOR)
 
 **Files:**
+
 - Create: `server/src/services/task.service.js`
 - Create: `server/src/controllers/task.controller.js`
 - Create: `server/src/validators/task.validator.js`
@@ -1229,10 +1276,13 @@ export function deadlineFilterToQuery(filter, now = new Date()) {
 
 export function parseStatRange(range, now = new Date()) {
   switch (range) {
-    case '30days': return { start: startOfDay(subDays(now, 29)), end: now };
-    case 'month':  return { start: startOfMonth(now), end: now };
+    case '30days':
+      return { start: startOfDay(subDays(now, 29)), end: now };
+    case 'month':
+      return { start: startOfMonth(now), end: now };
     case '7days':
-    default:       return { start: startOfDay(subDays(now, 6)), end: now };
+    default:
+      return { start: startOfDay(subDays(now, 6)), end: now };
   }
 }
 ```
@@ -1254,13 +1304,15 @@ export const taskCreateSchema = z.object({
 
 export const taskUpdateSchema = taskCreateSchema.partial();
 
-export const taskListQuerySchema = z.object({
-  search: z.string().optional(),
-  status: z.enum(['Todo', 'InProgress', 'Completed']).optional(),
-  priority: z.enum(['Low', 'Medium', 'High']).optional(),
-  deadlineFilter: z.enum(['today', 'upcoming', 'overdue', 'completed']).optional(),
-  sortBy: z.enum(['deadline', 'priority', 'newest']).default('deadline'),
-}).strict();
+export const taskListQuerySchema = z
+  .object({
+    search: z.string().optional(),
+    status: z.enum(['Todo', 'InProgress', 'Completed']).optional(),
+    priority: z.enum(['Low', 'Medium', 'High']).optional(),
+    deadlineFilter: z.enum(['today', 'upcoming', 'overdue', 'completed']).optional(),
+    sortBy: z.enum(['deadline', 'priority', 'newest']).default('deadline'),
+  })
+  .strict();
 
 export const taskIdParam = z.object({ id: objectId });
 
@@ -1279,7 +1331,7 @@ import { deadlineFilterToQuery } from '../utils/dateRange.js';
 const sortMap = {
   deadline: { deadline: 1 },
   priority: { priorityRank: -1, deadline: 1 },
-  newest:   { createdAt: -1 },
+  newest: { createdAt: -1 },
 };
 
 const notFound = () => new AppError('Task not found', 404);
@@ -1287,9 +1339,9 @@ const notFound = () => new AppError('Task not found', 404);
 export const taskService = {
   async list(userId, query) {
     const filter = { userId, ...deadlineFilterToQuery(query.deadlineFilter) };
-    if (query.status)   filter.status = query.status;
+    if (query.status) filter.status = query.status;
     if (query.priority) filter.priority = query.priority;
-    if (query.search)   filter.$text = { $search: query.search };
+    if (query.search) filter.$text = { $search: query.search };
     return Task.find(filter).sort(sortMap[query.sortBy ?? 'deadline']);
   },
 
@@ -1304,7 +1356,11 @@ export const taskService = {
   },
 
   async update(userId, id, body) {
-    const task = await Task.findOneAndUpdate({ _id: id, userId }, { $set: body }, { new: true, runValidators: true });
+    const task = await Task.findOneAndUpdate(
+      { _id: id, userId },
+      { $set: body },
+      { new: true, runValidators: true },
+    );
     if (!task) throw notFound();
     return task;
   },
@@ -1353,14 +1409,26 @@ import { asyncHandler } from '../utils/asyncHandler.js';
 const uid = (req) => req.user.id;
 
 export const taskController = {
-  list:           asyncHandler(async (req, res) => res.json(await taskService.list(uid(req), req.query))),
-  get:            asyncHandler(async (req, res) => res.json(await taskService.get(uid(req), req.params.id))),
-  create:         asyncHandler(async (req, res) => res.status(201).json(await taskService.create(uid(req), req.body))),
-  update:         asyncHandler(async (req, res) => res.json(await taskService.update(uid(req), req.params.id, req.body))),
-  remove:         asyncHandler(async (req, res) => res.json(await taskService.remove(uid(req), req.params.id))),
-  changeStatus:   asyncHandler(async (req, res) => res.json(await taskService.changeStatus(uid(req), req.params.id, req.body.status))),
-  markCompleted:  asyncHandler(async (req, res) => res.json(await taskService.markCompleted(uid(req), req.params.id))),
-  incrementPomo:  asyncHandler(async (req, res) => res.json(await taskService.incrementPomodoro(uid(req), req.params.id))),
+  list: asyncHandler(async (req, res) => res.json(await taskService.list(uid(req), req.query))),
+  get: asyncHandler(async (req, res) => res.json(await taskService.get(uid(req), req.params.id))),
+  create: asyncHandler(async (req, res) =>
+    res.status(201).json(await taskService.create(uid(req), req.body)),
+  ),
+  update: asyncHandler(async (req, res) =>
+    res.json(await taskService.update(uid(req), req.params.id, req.body)),
+  ),
+  remove: asyncHandler(async (req, res) =>
+    res.json(await taskService.remove(uid(req), req.params.id)),
+  ),
+  changeStatus: asyncHandler(async (req, res) =>
+    res.json(await taskService.changeStatus(uid(req), req.params.id, req.body.status)),
+  ),
+  markCompleted: asyncHandler(async (req, res) =>
+    res.json(await taskService.markCompleted(uid(req), req.params.id)),
+  ),
+  incrementPomo: asyncHandler(async (req, res) =>
+    res.json(await taskService.incrementPomodoro(uid(req), req.params.id)),
+  ),
 };
 ```
 
@@ -1372,20 +1440,36 @@ import { taskController } from '../controllers/task.controller.js';
 import { authRequired } from '../middlewares/auth.middleware.js';
 import { validate } from '../middlewares/validate.middleware.js';
 import {
-  taskCreateSchema, taskUpdateSchema, taskListQuerySchema, taskIdParam, taskStatusSchema,
+  taskCreateSchema,
+  taskUpdateSchema,
+  taskListQuerySchema,
+  taskIdParam,
+  taskStatusSchema,
 } from '../validators/task.validator.js';
 
 const router = Router();
 router.use(authRequired);
 
-router.get('/',    validate({ query: taskListQuerySchema }), taskController.list);
-router.post('/',   validate({ body: taskCreateSchema }),     taskController.create);
-router.get('/:id', validate({ params: taskIdParam }),        taskController.get);
-router.put('/:id', validate({ params: taskIdParam, body: taskUpdateSchema }), taskController.update);
+router.get('/', validate({ query: taskListQuerySchema }), taskController.list);
+router.post('/', validate({ body: taskCreateSchema }), taskController.create);
+router.get('/:id', validate({ params: taskIdParam }), taskController.get);
+router.put(
+  '/:id',
+  validate({ params: taskIdParam, body: taskUpdateSchema }),
+  taskController.update,
+);
 router.delete('/:id', validate({ params: taskIdParam }), taskController.remove);
-router.patch('/:id/status',   validate({ params: taskIdParam, body: taskStatusSchema }), taskController.changeStatus);
+router.patch(
+  '/:id/status',
+  validate({ params: taskIdParam, body: taskStatusSchema }),
+  taskController.changeStatus,
+);
 router.patch('/:id/complete', validate({ params: taskIdParam }), taskController.markCompleted);
-router.patch('/:id/pomodoro/increment', validate({ params: taskIdParam }), taskController.incrementPomo);
+router.patch(
+  '/:id/pomodoro/increment',
+  validate({ params: taskIdParam }),
+  taskController.incrementPomo,
+);
 
 export default router;
 ```
@@ -1510,6 +1594,7 @@ git commit -m "feat(server): tasks CRUD with filters, search, sort, IDOR protect
 ## Task 9: Notification model + service (used by other modules) + endpoints + tests
 
 **Files:**
+
 - Create: `server/src/models/Notification.js`
 - Create: `server/src/services/notification.service.js`
 - Create: `server/src/controllers/notification.controller.js`
@@ -1524,18 +1609,27 @@ import mongoose from 'mongoose';
 
 const notificationSchema = new mongoose.Schema(
   {
-    userId:  { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true, index: true },
-    title:   { type: String, required: true },
+    userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true, index: true },
+    title: { type: String, required: true },
     message: { type: String, required: true },
-    type:    {
+    type: {
       type: String,
-      enum: ['task_overdue', 'task_completed', 'pomodoro_done', 'deadline_soon', 'estimated_reached'],
+      enum: [
+        'task_overdue',
+        'task_completed',
+        'pomodoro_done',
+        'deadline_soon',
+        'estimated_reached',
+      ],
       required: true,
     },
-    taskId:  { type: mongoose.Schema.Types.ObjectId, ref: 'Task', default: null },
-    isRead:  { type: Boolean, default: false },
+    taskId: { type: mongoose.Schema.Types.ObjectId, ref: 'Task', default: null },
+    isRead: { type: Boolean, default: false },
   },
-  { timestamps: { createdAt: true, updatedAt: false }, toJSON: { virtuals: true, versionKey: false } },
+  {
+    timestamps: { createdAt: true, updatedAt: false },
+    toJSON: { virtuals: true, versionKey: false },
+  },
 );
 
 notificationSchema.index({ userId: 1, isRead: 1, createdAt: -1 });
@@ -1603,9 +1697,11 @@ export const notificationController = {
     res.json(await notificationService.list(req.user.id, limit));
   }),
   markRead: asyncHandler(async (req, res) =>
-    res.json(await notificationService.markRead(req.user.id, req.params.id))),
+    res.json(await notificationService.markRead(req.user.id, req.params.id)),
+  ),
   markAllRead: asyncHandler(async (req, res) =>
-    res.json(await notificationService.markAllRead(req.user.id))),
+    res.json(await notificationService.markAllRead(req.user.id)),
+  ),
 };
 ```
 
@@ -1656,7 +1752,9 @@ describe('Notifications', () => {
   it('marks single as read', async () => {
     const a = await createAuthedAgent(app);
     const n = await notificationService.create(a.userId, {
-      title: 't', message: 'm', type: 'task_completed',
+      title: 't',
+      message: 'm',
+      type: 'task_completed',
     });
     const r = await a.patch(`/api/notifications/${n._id}/read`);
     expect(r.body.isRead).toBe(true);
@@ -1664,7 +1762,11 @@ describe('Notifications', () => {
 
   it('mark all read', async () => {
     const a = await createAuthedAgent(app);
-    await notificationService.create(a.userId, { title: 'a', message: 'a', type: 'task_completed' });
+    await notificationService.create(a.userId, {
+      title: 'a',
+      message: 'a',
+      type: 'task_completed',
+    });
     await notificationService.create(a.userId, { title: 'b', message: 'b', type: 'pomodoro_done' });
     const r = await a.patch('/api/notifications/read-all');
     expect(r.body.count).toBe(2);
@@ -1674,10 +1776,18 @@ describe('Notifications', () => {
     const a = await createAuthedAgent(app);
     const taskId = '507f1f77bcf86cd799439011';
     const first = await notificationService.createDeduped(a.userId, {
-      title: 't', message: 'm', type: 'task_overdue', taskId, withinMs: 86_400_000,
+      title: 't',
+      message: 'm',
+      type: 'task_overdue',
+      taskId,
+      withinMs: 86_400_000,
     });
     const second = await notificationService.createDeduped(a.userId, {
-      title: 't', message: 'm', type: 'task_overdue', taskId, withinMs: 86_400_000,
+      title: 't',
+      message: 'm',
+      type: 'task_overdue',
+      taskId,
+      withinMs: 86_400_000,
     });
     expect(first).not.toBeNull();
     expect(second).toBeNull();
@@ -1687,7 +1797,9 @@ describe('Notifications', () => {
     const a = await createAuthedAgent(app);
     await a.put('/api/settings').send({ notificationEnabled: false });
     const n = await notificationService.create(a.userId, {
-      title: 't', message: 'm', type: 'task_completed',
+      title: 't',
+      message: 'm',
+      type: 'task_completed',
     });
     expect(n).toBeNull();
   });
@@ -1713,6 +1825,7 @@ git commit -m "feat(server): Notification model, service, endpoints, dedup"
 ## Task 10: Pomodoro session model + service + endpoints + tests (with task increment, notifications)
 
 **Files:**
+
 - Create: `server/src/models/PomodoroSession.js`
 - Create: `server/src/services/pomodoro.service.js`
 - Create: `server/src/controllers/pomodoro.controller.js`
@@ -1729,13 +1842,13 @@ import mongoose from 'mongoose';
 
 const sessionSchema = new mongoose.Schema(
   {
-    userId:           { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true, index: true },
-    taskId:           { type: mongoose.Schema.Types.ObjectId, ref: 'Task', default: null },
-    mode:             { type: String, enum: ['Focus', 'ShortBreak', 'LongBreak'], required: true },
-    durationMinutes:  { type: Number, required: true, min: 1 },
-    startedAt:        { type: Date, required: true },
-    endedAt:          { type: Date, default: null },
-    isCompleted:      { type: Boolean, default: false },
+    userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true, index: true },
+    taskId: { type: mongoose.Schema.Types.ObjectId, ref: 'Task', default: null },
+    mode: { type: String, enum: ['Focus', 'ShortBreak', 'LongBreak'], required: true },
+    durationMinutes: { type: Number, required: true, min: 1 },
+    startedAt: { type: Date, required: true },
+    endedAt: { type: Date, default: null },
+    isCompleted: { type: Boolean, default: false },
   },
   { timestamps: true, toJSON: { virtuals: true, versionKey: false } },
 );
@@ -1878,7 +1991,8 @@ import { asyncHandler } from '../utils/asyncHandler.js';
 
 export const pomodoroController = {
   create: asyncHandler(async (req, res) =>
-    res.status(201).json(await pomodoroService.create(req.user.id, req.body))),
+    res.status(201).json(await pomodoroService.create(req.user.id, req.body)),
+  ),
   recent: asyncHandler(async (req, res) => {
     const limit = Math.min(Number(req.query.limit) || 10, 50);
     res.json(await pomodoroService.recent(req.user.id, limit));
@@ -1918,20 +2032,29 @@ import { buildApp } from '../src/app.js';
 import { createAuthedAgent } from './helpers/createAuthedAgent.js';
 
 const app = buildApp();
-const futureISO = (d=1) => new Date(Date.now() + d*86_400_000).toISOString();
+const futureISO = (d = 1) => new Date(Date.now() + d * 86_400_000).toISOString();
 
-const baseTask = (over={}) => ({
-  title: 'Study', deadline: futureISO(2), priority: 'Medium', estimatedPomodoros: 2, ...over,
+const baseTask = (over = {}) => ({
+  title: 'Study',
+  deadline: futureISO(2),
+  priority: 'Medium',
+  estimatedPomodoros: 2,
+  ...over,
 });
 
 describe('Pomodoro sessions', () => {
   it('creates a Focus session and increments task pomodoros', async () => {
     const a = await createAuthedAgent(app);
     const t = (await a.post('/api/tasks').send(baseTask())).body;
-    const startedAt = new Date(Date.now() - 25*60_000).toISOString();
+    const startedAt = new Date(Date.now() - 25 * 60_000).toISOString();
     const endedAt = new Date().toISOString();
     const r = await a.post('/api/pomodoro-sessions').send({
-      taskId: t._id, mode: 'Focus', durationMinutes: 25, startedAt, endedAt, isCompleted: true,
+      taskId: t._id,
+      mode: 'Focus',
+      durationMinutes: 25,
+      startedAt,
+      endedAt,
+      isCompleted: true,
     });
     expect(r.status).toBe(201);
     const updated = await a.get(`/api/tasks/${t._id}`);
@@ -1944,8 +2067,12 @@ describe('Pomodoro sessions', () => {
     const b = await createAuthedAgent(app);
     const t = (await a.post('/api/tasks').send(baseTask())).body;
     const r = await b.post('/api/pomodoro-sessions').send({
-      taskId: t._id, mode: 'Focus', durationMinutes: 25,
-      startedAt: new Date().toISOString(), endedAt: new Date().toISOString(), isCompleted: true,
+      taskId: t._id,
+      mode: 'Focus',
+      durationMinutes: 25,
+      startedAt: new Date().toISOString(),
+      endedAt: new Date().toISOString(),
+      isCompleted: true,
     });
     expect(r.status).toBe(403);
   });
@@ -1954,13 +2081,21 @@ describe('Pomodoro sessions', () => {
     const a = await createAuthedAgent(app);
     const t = (await a.post('/api/tasks').send(baseTask({ estimatedPomodoros: 1 }))).body;
     await a.post('/api/pomodoro-sessions').send({
-      taskId: t._id, mode: 'Focus', durationMinutes: 25,
-      startedAt: new Date().toISOString(), endedAt: new Date().toISOString(), isCompleted: true,
+      taskId: t._id,
+      mode: 'Focus',
+      durationMinutes: 25,
+      startedAt: new Date().toISOString(),
+      endedAt: new Date().toISOString(),
+      isCompleted: true,
     });
     // second focus should NOT create another estimated_reached
     await a.post('/api/pomodoro-sessions').send({
-      taskId: t._id, mode: 'Focus', durationMinutes: 25,
-      startedAt: new Date().toISOString(), endedAt: new Date().toISOString(), isCompleted: true,
+      taskId: t._id,
+      mode: 'Focus',
+      durationMinutes: 25,
+      startedAt: new Date().toISOString(),
+      endedAt: new Date().toISOString(),
+      isCompleted: true,
     });
     const list = await a.get('/api/notifications');
     const reached = list.body.filter((n) => n.type === 'estimated_reached');
@@ -1970,8 +2105,11 @@ describe('Pomodoro sessions', () => {
   it('returns recent sessions', async () => {
     const a = await createAuthedAgent(app);
     await a.post('/api/pomodoro-sessions').send({
-      mode: 'Focus', durationMinutes: 25,
-      startedAt: new Date().toISOString(), endedAt: new Date().toISOString(), isCompleted: true,
+      mode: 'Focus',
+      durationMinutes: 25,
+      startedAt: new Date().toISOString(),
+      endedAt: new Date().toISOString(),
+      isCompleted: true,
     });
     const r = await a.get('/api/pomodoro-sessions/recent');
     expect(r.body).toHaveLength(1);
@@ -1998,6 +2136,7 @@ git commit -m "feat(server): pomodoro sessions, increment task, notifications wi
 ## Task 11: Dashboard endpoint + tests
 
 **Files:**
+
 - Create: `server/src/services/dashboard.service.js`
 - Create: `server/src/controllers/dashboard.controller.js`
 - Create: `server/src/routes/dashboard.routes.js`
@@ -2012,8 +2151,7 @@ import { PomodoroSession } from '../models/PomodoroSession.js';
 import { startOfDay, endOfDay, subDays, format } from 'date-fns';
 import mongoose from 'mongoose';
 
-const oid = (id) =>
-  typeof id === 'string' ? new mongoose.Types.ObjectId(id) : id;
+const oid = (id) => (typeof id === 'string' ? new mongoose.Types.ObjectId(id) : id);
 
 export const dashboardService = {
   async summary(userId, now = new Date()) {
@@ -2022,9 +2160,15 @@ export const dashboardService = {
     const sevenDaysAgo = startOfDay(subDays(now, 6));
 
     const [
-      totalTasks, completedTasks, inProgressTasks, overdueTasks,
-      todayPomodoros, todayFocusAgg,
-      todayTasks, upcomingTasks, recentSessions,
+      totalTasks,
+      completedTasks,
+      inProgressTasks,
+      overdueTasks,
+      todayPomodoros,
+      todayFocusAgg,
+      todayTasks,
+      upcomingTasks,
+      recentSessions,
       completionDocs,
     ] = await Promise.all([
       Task.countDocuments({ userId }),
@@ -2032,31 +2176,45 @@ export const dashboardService = {
       Task.countDocuments({ userId, status: 'InProgress' }),
       Task.countDocuments({ userId, status: { $ne: 'Completed' }, deadline: { $lt: now } }),
       PomodoroSession.countDocuments({
-        userId, mode: 'Focus', isCompleted: true,
+        userId,
+        mode: 'Focus',
+        isCompleted: true,
         startedAt: { $gte: todayStart, $lte: todayEnd },
       }),
       PomodoroSession.aggregate([
-        { $match: {
+        {
+          $match: {
             userId: oid(userId),
-            mode: 'Focus', isCompleted: true,
+            mode: 'Focus',
+            isCompleted: true,
             startedAt: { $gte: todayStart, $lte: todayEnd },
-        } },
+          },
+        },
         { $group: { _id: null, total: { $sum: '$durationMinutes' } } },
       ]),
-      Task.find({ userId, status: { $ne: 'Completed' },
-        deadline: { $gte: todayStart, $lte: todayEnd } }).limit(10),
+      Task.find({
+        userId,
+        status: { $ne: 'Completed' },
+        deadline: { $gte: todayStart, $lte: todayEnd },
+      }).limit(10),
       Task.find({ userId, status: { $ne: 'Completed' }, deadline: { $gt: todayEnd } })
-        .sort({ deadline: 1 }).limit(5),
+        .sort({ deadline: 1 })
+        .limit(5),
       PomodoroSession.find({ userId }).sort({ startedAt: -1 }).limit(5),
       Task.aggregate([
-        { $match: {
+        {
+          $match: {
             userId: oid(userId),
-            status: 'Completed', completedAt: { $gte: sevenDaysAgo },
-        } },
-        { $group: {
+            status: 'Completed',
+            completedAt: { $gte: sevenDaysAgo },
+          },
+        },
+        {
+          $group: {
             _id: { $dateToString: { format: '%Y-%m-%d', date: '$completedAt' } },
             count: { $sum: 1 },
-        } },
+          },
+        },
       ]),
     ]);
 
@@ -2068,10 +2226,15 @@ export const dashboardService = {
     }
 
     return {
-      totalTasks, completedTasks, inProgressTasks, overdueTasks,
+      totalTasks,
+      completedTasks,
+      inProgressTasks,
+      overdueTasks,
       todayPomodoros,
       todayFocusMinutes: todayFocusAgg[0]?.total || 0,
-      todayTasks, upcomingTasks, recentSessions,
+      todayTasks,
+      upcomingTasks,
+      recentSessions,
       completionChart,
     };
   },
@@ -2085,8 +2248,7 @@ import { dashboardService } from '../services/dashboard.service.js';
 import { asyncHandler } from '../utils/asyncHandler.js';
 
 export const dashboardController = {
-  summary: asyncHandler(async (req, res) =>
-    res.json(await dashboardService.summary(req.user.id))),
+  summary: asyncHandler(async (req, res) => res.json(await dashboardService.summary(req.user.id))),
 };
 ```
 
@@ -2117,16 +2279,22 @@ import { buildApp } from '../src/app.js';
 import { createAuthedAgent } from './helpers/createAuthedAgent.js';
 
 const app = buildApp();
-const futureISO = (d=1) => new Date(Date.now() + d*86_400_000).toISOString();
-const pastISO   = (d=1) => new Date(Date.now() - d*86_400_000).toISOString();
+const futureISO = (d = 1) => new Date(Date.now() + d * 86_400_000).toISOString();
+const pastISO = (d = 1) => new Date(Date.now() - d * 86_400_000).toISOString();
 
 describe('GET /api/dashboard/summary', () => {
   it('aggregates counts correctly', async () => {
     const a = await createAuthedAgent(app);
-    await a.post('/api/tasks').send({ title: 't1', deadline: futureISO(1), priority: 'Low', estimatedPomodoros: 1 });
-    const t2 = await a.post('/api/tasks').send({ title: 't2', deadline: futureISO(1), priority: 'Medium', estimatedPomodoros: 1 });
+    await a
+      .post('/api/tasks')
+      .send({ title: 't1', deadline: futureISO(1), priority: 'Low', estimatedPomodoros: 1 });
+    const t2 = await a
+      .post('/api/tasks')
+      .send({ title: 't2', deadline: futureISO(1), priority: 'Medium', estimatedPomodoros: 1 });
     await a.patch(`/api/tasks/${t2.body._id}/complete`);
-    await a.post('/api/tasks').send({ title: 'overdue', deadline: pastISO(1), priority: 'High', estimatedPomodoros: 1 });
+    await a
+      .post('/api/tasks')
+      .send({ title: 'overdue', deadline: pastISO(1), priority: 'High', estimatedPomodoros: 1 });
 
     const r = await a.get('/api/dashboard/summary');
     expect(r.body.totalTasks).toBe(3);
@@ -2156,6 +2324,7 @@ git commit -m "feat(server): dashboard summary endpoint with parallel aggregatio
 ## Task 12: Statistics endpoints + tests
 
 **Files:**
+
 - Create: `server/src/services/statistics.service.js`
 - Create: `server/src/controllers/statistics.controller.js`
 - Create: `server/src/routes/statistics.routes.js`
@@ -2189,8 +2358,19 @@ export const statisticsService = {
   async tasks(userId, range) {
     const { start, end } = parseStatRange(range);
     const docs = await Task.aggregate([
-      { $match: { userId: oid(userId), status: 'Completed', completedAt: { $gte: start, $lte: end } } },
-      { $group: { _id: { $dateToString: { format: '%Y-%m-%d', date: '$completedAt' } }, count: { $sum: 1 } } },
+      {
+        $match: {
+          userId: oid(userId),
+          status: 'Completed',
+          completedAt: { $gte: start, $lte: end },
+        },
+      },
+      {
+        $group: {
+          _id: { $dateToString: { format: '%Y-%m-%d', date: '$completedAt' } },
+          count: { $sum: 1 },
+        },
+      },
     ]);
     const map = Object.fromEntries(docs.map((d) => [d._id, d.count]));
     return fillSeries(start, end, map, (v) => ({ count: v || 0 }));
@@ -2199,12 +2379,21 @@ export const statisticsService = {
   async pomodoros(userId, range) {
     const { start, end } = parseStatRange(range);
     const dailyDocs = await PomodoroSession.aggregate([
-      { $match: { userId: oid(userId), mode: 'Focus', isCompleted: true, startedAt: { $gte: start, $lte: end } } },
-      { $group: {
+      {
+        $match: {
+          userId: oid(userId),
+          mode: 'Focus',
+          isCompleted: true,
+          startedAt: { $gte: start, $lte: end },
+        },
+      },
+      {
+        $group: {
           _id: { $dateToString: { format: '%Y-%m-%d', date: '$startedAt' } },
           sessions: { $sum: 1 },
           focusMinutes: { $sum: '$durationMinutes' },
-      } },
+        },
+      },
     ]);
     const map = Object.fromEntries(dailyDocs.map((d) => [d._id, d]));
     const daily = fillSeries(start, end, map, (v) => ({
@@ -2235,9 +2424,11 @@ import { asyncHandler } from '../utils/asyncHandler.js';
 
 export const statisticsController = {
   tasks: asyncHandler(async (req, res) =>
-    res.json(await statisticsService.tasks(req.user.id, req.query.range))),
+    res.json(await statisticsService.tasks(req.user.id, req.query.range)),
+  ),
   pomodoros: asyncHandler(async (req, res) =>
-    res.json(await statisticsService.pomodoros(req.user.id, req.query.range))),
+    res.json(await statisticsService.pomodoros(req.user.id, req.query.range)),
+  ),
 };
 ```
 
@@ -2315,6 +2506,7 @@ git commit -m "feat(server): statistics endpoints (tasks/pomodoros) with date-fi
 ## Task 13: Cron jobs (overdueChecker, deadlineSoonReminder) + seed script
 
 **Files:**
+
 - Create: `server/src/jobs/{index.js,overdueChecker.js,deadlineSoonReminder.js}`
 - Modify: `server/src/index.js`
 - Create: `server/src/seed/seed.js`
@@ -2420,8 +2612,10 @@ describe('Cron job logic', () => {
   it('overdueChecker creates notification once per task', async () => {
     const a = await createAuthedAgent(app);
     await a.post('/api/tasks').send({
-      title: 'past', deadline: new Date(Date.now() - 86_400_000).toISOString(),
-      priority: 'High', estimatedPomodoros: 1,
+      title: 'past',
+      deadline: new Date(Date.now() - 86_400_000).toISOString(),
+      priority: 'High',
+      estimatedPomodoros: 1,
     });
     const n1 = await runOverdueChecker();
     const n2 = await runOverdueChecker();
@@ -2435,7 +2629,10 @@ describe('Cron job logic', () => {
     const a = await createAuthedAgent(app);
     const inHalfHour = new Date(Date.now() + 30 * 60_000).toISOString();
     await a.post('/api/tasks').send({
-      title: 'soon', deadline: inHalfHour, priority: 'High', estimatedPomodoros: 1,
+      title: 'soon',
+      deadline: inHalfHour,
+      priority: 'High',
+      estimatedPomodoros: 1,
     });
     await runDeadlineSoonReminder();
     const list = await a.get('/api/notifications');
@@ -2465,8 +2662,10 @@ async function run() {
   await connectDB();
   if (RESET) {
     await Promise.all([
-      User.deleteMany({}), Task.deleteMany({}),
-      PomodoroSession.deleteMany({}), UserSetting.deleteMany({}),
+      User.deleteMany({}),
+      Task.deleteMany({}),
+      PomodoroSession.deleteMany({}),
+      UserSetting.deleteMany({}),
       Notification.deleteMany({}),
     ]);
     console.log('🧹 Cleared collections');
@@ -2482,20 +2681,79 @@ async function run() {
   const passwordHash = await hashPassword('123456');
   const user = await User.create({
     fullName: 'Demo User',
-    email: 'demo@taskflow.com',
+    email: 'demo@Task88.com',
     passwordHash,
   });
   await UserSetting.create({ userId: user._id });
 
   const taskSeeds = [
-    { title: 'Finish Q2 report',  deadline: daysFromNow(0),   priority: 'High',   status: 'Todo',         estimatedPomodoros: 4, completedPomodoros: 1 },
-    { title: 'Review chapter 5',  deadline: daysFromNow(0),   priority: 'Medium', status: 'InProgress',   estimatedPomodoros: 3, completedPomodoros: 2 },
-    { title: 'Prepare presentation', deadline: daysFromNow(2),priority: 'High',   status: 'Todo',         estimatedPomodoros: 6, completedPomodoros: 0 },
-    { title: 'Practice coding',   deadline: daysFromNow(3),   priority: 'Low',    status: 'Todo',         estimatedPomodoros: 2, completedPomodoros: 0 },
-    { title: 'Buy groceries',     deadline: daysFromNow(-1),  priority: 'Low',    status: 'Todo',         estimatedPomodoros: 1, completedPomodoros: 0 },
-    { title: 'Send invoice',      deadline: daysFromNow(-3),  priority: 'Medium', status: 'Completed',    estimatedPomodoros: 1, completedPomodoros: 1, completedAt: daysFromNow(-3) },
-    { title: 'Read book chapter', deadline: daysFromNow(-5),  priority: 'Low',    status: 'Completed',    estimatedPomodoros: 2, completedPomodoros: 2, completedAt: daysFromNow(-4) },
-    { title: 'Refactor module',   deadline: daysFromNow(-10), priority: 'High',   status: 'Completed',    estimatedPomodoros: 5, completedPomodoros: 5, completedAt: daysFromNow(-8) },
+    {
+      title: 'Finish Q2 report',
+      deadline: daysFromNow(0),
+      priority: 'High',
+      status: 'Todo',
+      estimatedPomodoros: 4,
+      completedPomodoros: 1,
+    },
+    {
+      title: 'Review chapter 5',
+      deadline: daysFromNow(0),
+      priority: 'Medium',
+      status: 'InProgress',
+      estimatedPomodoros: 3,
+      completedPomodoros: 2,
+    },
+    {
+      title: 'Prepare presentation',
+      deadline: daysFromNow(2),
+      priority: 'High',
+      status: 'Todo',
+      estimatedPomodoros: 6,
+      completedPomodoros: 0,
+    },
+    {
+      title: 'Practice coding',
+      deadline: daysFromNow(3),
+      priority: 'Low',
+      status: 'Todo',
+      estimatedPomodoros: 2,
+      completedPomodoros: 0,
+    },
+    {
+      title: 'Buy groceries',
+      deadline: daysFromNow(-1),
+      priority: 'Low',
+      status: 'Todo',
+      estimatedPomodoros: 1,
+      completedPomodoros: 0,
+    },
+    {
+      title: 'Send invoice',
+      deadline: daysFromNow(-3),
+      priority: 'Medium',
+      status: 'Completed',
+      estimatedPomodoros: 1,
+      completedPomodoros: 1,
+      completedAt: daysFromNow(-3),
+    },
+    {
+      title: 'Read book chapter',
+      deadline: daysFromNow(-5),
+      priority: 'Low',
+      status: 'Completed',
+      estimatedPomodoros: 2,
+      completedPomodoros: 2,
+      completedAt: daysFromNow(-4),
+    },
+    {
+      title: 'Refactor module',
+      deadline: daysFromNow(-10),
+      priority: 'High',
+      status: 'Completed',
+      estimatedPomodoros: 5,
+      completedPomodoros: 5,
+      completedAt: daysFromNow(-8),
+    },
   ];
   const tasks = await Task.insertMany(
     taskSeeds.map((t) => ({ ...t, userId: user._id, priorityRank: rankOf(t.priority) })),
@@ -2513,22 +2771,44 @@ async function run() {
         taskId: tasks[Math.floor(Math.random() * tasks.length)]._id,
         mode: 'Focus',
         durationMinutes: 25,
-        startedAt, endedAt, isCompleted: true,
+        startedAt,
+        endedAt,
+        isCompleted: true,
       });
     }
   }
   await PomodoroSession.insertMany(sessions);
 
   await Notification.insertMany([
-    { userId: user._id, type: 'task_overdue',   taskId: tasks[4]._id,
-      title: 'Task overdue', message: '"Buy groceries" passed its deadline.', isRead: false },
-    { userId: user._id, type: 'task_completed', taskId: tasks[5]._id,
-      title: 'Task completed', message: '"Send invoice" marked as completed.', isRead: true },
-    { userId: user._id, type: 'pomodoro_done',  taskId: tasks[1]._id,
-      title: 'Focus session complete', message: 'Great job! 25 min focus done.', isRead: false },
+    {
+      userId: user._id,
+      type: 'task_overdue',
+      taskId: tasks[4]._id,
+      title: 'Task overdue',
+      message: '"Buy groceries" passed its deadline.',
+      isRead: false,
+    },
+    {
+      userId: user._id,
+      type: 'task_completed',
+      taskId: tasks[5]._id,
+      title: 'Task completed',
+      message: '"Send invoice" marked as completed.',
+      isRead: true,
+    },
+    {
+      userId: user._id,
+      type: 'pomodoro_done',
+      taskId: tasks[1]._id,
+      title: 'Focus session complete',
+      message: 'Great job! 25 min focus done.',
+      isRead: false,
+    },
   ]);
 
-  console.log(`✅ Seeded user demo@taskflow.com / 123456 with ${tasks.length} tasks, ${sessions.length} sessions, 3 notifications.`);
+  console.log(
+    `✅ Seeded user demo@Task88.com / 123456 with ${tasks.length} tasks, ${sessions.length} sessions, 3 notifications.`,
+  );
   await disconnectDB();
 }
 
@@ -2550,7 +2830,7 @@ npm test
 ```bash
 # Only if you have local mongo:
 npm run seed:reset
-# Expected: "✅ Seeded user demo@taskflow.com / 123456 ..."
+# Expected: "✅ Seeded user demo@Task88.com / 123456 ..."
 ```
 
 - [ ] **Step 9: Commit**
@@ -2565,6 +2845,7 @@ git commit -m "feat(server): cron jobs + seed script (demo user, 8 tasks, ~20 se
 ## Task 14: Client scaffolding — Vite + TS + Tailwind + tokens + Router + React Query
 
 **Files:**
+
 - Create: `client/package.json`, `client/vite.config.ts`, `client/tsconfig.json`, `client/tsconfig.node.json`, `client/tailwind.config.js`, `client/postcss.config.js`, `client/.eslintrc.cjs`, `client/.prettierrc`, `client/.env.example`, `client/index.html`
 - Create: `client/src/{main.tsx,App.tsx,index.css}`
 - Create: `client/src/lib/queryClient.ts`
@@ -2609,21 +2890,26 @@ export default {
   theme: {
     extend: {
       colors: {
-        bg:      'rgb(var(--bg) / <alpha-value>)',
+        bg: 'rgb(var(--bg) / <alpha-value>)',
         surface: 'rgb(var(--surface) / <alpha-value>)',
-        border:  'rgb(var(--border) / <alpha-value>)',
+        border: 'rgb(var(--border) / <alpha-value>)',
         text: {
           DEFAULT: 'rgb(var(--text))',
-          muted:   'rgb(var(--text-muted))',
+          muted: 'rgb(var(--text-muted))',
         },
         primary: {
-          50:'#eef2ff', 100:'#e0e7ff', 200:'#c7d2fe',
-          500:'#6366f1', 600:'#4f46e5', 700:'#4338ca', 800:'#3730a3',
+          50: '#eef2ff',
+          100: '#e0e7ff',
+          200: '#c7d2fe',
+          500: '#6366f1',
+          600: '#4f46e5',
+          700: '#4338ca',
+          800: '#3730a3',
         },
-        priority: { low:'#16a34a', medium:'#f59e0b', high:'#dc2626' },
-        status:   { todo:'#64748b', progress:'#2563eb', done:'#16a34a', overdue:'#dc2626' },
+        priority: { low: '#16a34a', medium: '#f59e0b', high: '#dc2626' },
+        status: { todo: '#64748b', progress: '#2563eb', done: '#16a34a', overdue: '#dc2626' },
       },
-      borderRadius: { '2xl':'16px', '3xl':'20px' },
+      borderRadius: { '2xl': '16px', '3xl': '20px' },
       fontFamily: { sans: ['Inter', 'system-ui', 'sans-serif'] },
     },
   },
@@ -2653,8 +2939,14 @@ export default {
   --text-muted: 148 163 184;
 }
 
-html, body, #root { height: 100%; }
-body { @apply bg-bg text-text font-sans antialiased; }
+html,
+body,
+#root {
+  height: 100%;
+}
+body {
+  @apply bg-bg text-text font-sans antialiased;
+}
 ```
 
 - [ ] **Step 6: Replace `client/index.html`** body content (head only):
@@ -2665,10 +2957,13 @@ body { @apply bg-bg text-text font-sans antialiased; }
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>TaskFlow</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <title>Task88</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
   </head>
   <body>
     <div id="root"></div>
@@ -2745,12 +3040,14 @@ Then `cp .env.example .env`.
 - [ ] **Step 11: Write all type files**
 
 `client/src/types/auth.ts`:
+
 ```ts
 export type User = { id: string; fullName: string; email: string };
 export type AuthResponse = { token: string; user: User };
 ```
 
 `client/src/types/task.ts`:
+
 ```ts
 export type Priority = 'Low' | 'Medium' | 'High';
 export type TaskStatus = 'Todo' | 'InProgress' | 'Completed';
@@ -2760,7 +3057,7 @@ export type Task = {
   userId: string;
   title: string;
   description?: string;
-  deadline: string;          // ISO
+  deadline: string; // ISO
   priority: Priority;
   status: TaskStatus;
   estimatedPomodoros: number;
@@ -2790,6 +3087,7 @@ export type TaskUpdateInput = Partial<TaskCreateInput>;
 ```
 
 `client/src/types/pomodoro.ts`:
+
 ```ts
 export type PomodoroMode = 'Focus' | 'ShortBreak' | 'LongBreak';
 
@@ -2816,6 +3114,7 @@ export type PomodoroCreateInput = {
 ```
 
 `client/src/types/statistics.ts`:
+
 ```ts
 export type DailyTaskPoint = { date: string; count: number };
 export type DailyPomodoroPoint = { date: string; sessions: number; focusMinutes: number };
@@ -2833,6 +3132,7 @@ export type StatRange = '7days' | '30days' | 'month';
 ```
 
 `client/src/types/settings.ts`:
+
 ```ts
 export type Settings = {
   _id: string;
@@ -2844,14 +3144,23 @@ export type Settings = {
   notificationEnabled: boolean;
 };
 
-export type SettingsUpdateInput = Partial<Pick<Settings,
-  'focusDuration' | 'shortBreakDuration' | 'longBreakDuration' | 'theme' | 'notificationEnabled'>>;
+export type SettingsUpdateInput = Partial<
+  Pick<
+    Settings,
+    'focusDuration' | 'shortBreakDuration' | 'longBreakDuration' | 'theme' | 'notificationEnabled'
+  >
+>;
 ```
 
 `client/src/types/notification.ts`:
+
 ```ts
 export type NotificationType =
-  | 'task_overdue' | 'task_completed' | 'pomodoro_done' | 'deadline_soon' | 'estimated_reached';
+  | 'task_overdue'
+  | 'task_completed'
+  | 'pomodoro_done'
+  | 'deadline_soon'
+  | 'estimated_reached';
 
 export type Notification = {
   _id: string;
@@ -2875,7 +3184,7 @@ export const queryClient = new QueryClient({
     queries: {
       staleTime: 30_000,
       gcTime: 5 * 60_000,
-      retry: (n, err: any) => err?.response?.status === 401 ? false : n < 2,
+      retry: (n, err: any) => (err?.response?.status === 401 ? false : n < 2),
       refetchOnWindowFocus: false,
     },
     mutations: { retry: false },
@@ -2902,7 +3211,7 @@ export const useThemeStore = create<ThemeState>()(
       setTheme: (t) => set({ theme: t }),
       toggle: () => set({ theme: get().theme === 'light' ? 'dark' : 'light' }),
     }),
-    { name: 'taskflow-theme' },
+    { name: 'Task88-theme' },
   ),
 );
 ```
@@ -2946,7 +3255,7 @@ export const useAuthStore = create<AuthState>()(
       setUser: (user) => set({ user }),
       logout: () => set({ token: null, user: null }),
     }),
-    { name: 'taskflow-auth' },
+    { name: 'Task88-auth' },
   ),
 );
 ```
@@ -2986,7 +3295,7 @@ export default function App() {
   useTheme();
   return (
     <div className="flex min-h-full items-center justify-center">
-      <p className="text-text-muted">TaskFlow client booting…</p>
+      <p className="text-text-muted">Task88 client booting…</p>
     </div>
   );
 }
@@ -2996,7 +3305,7 @@ export default function App() {
 
 ```bash
 cd client && npm run dev
-# Visit http://localhost:5173 — should show "TaskFlow client booting…"
+# Visit http://localhost:5173 — should show "Task88 client booting…"
 # Stop with Ctrl+C
 npm run build
 # Expected: build succeeds
@@ -3015,6 +3324,7 @@ git commit -m "feat(client): scaffold Vite+React+TS+Tailwind with theme tokens, 
 ## Task 15: Client API layer + axios interceptors + queries hook scaffolding
 
 **Files:**
+
 - Create: `client/src/api/{axiosClient.ts,authApi.ts,taskApi.ts,pomodoroApi.ts,dashboardApi.ts,statisticsApi.ts,settingsApi.ts,notificationApi.ts}`
 - Create: `client/src/hooks/queries/{useAuthQueries.ts,useTaskQueries.ts,usePomodoroQueries.ts,useDashboardQuery.ts,useStatisticsQueries.ts,useSettingsQueries.ts,useNotificationQueries.ts}`
 - Create: `client/src/hooks/useAuth.ts`
@@ -3054,13 +3364,18 @@ api.interceptors.response.use(
 - [ ] **Step 2: Write API modules**
 
 `client/src/api/authApi.ts`:
+
 ```ts
 import { api } from './axiosClient';
 import type { AuthResponse, User } from '@/types/auth';
 
 export const authApi = {
-  register: (body: { fullName: string; email: string; password: string; confirmPassword: string }) =>
-    api.post<AuthResponse>('/auth/register', body).then((r) => r.data),
+  register: (body: {
+    fullName: string;
+    email: string;
+    password: string;
+    confirmPassword: string;
+  }) => api.post<AuthResponse>('/auth/register', body).then((r) => r.data),
   login: (body: { email: string; password: string }) =>
     api.post<AuthResponse>('/auth/login', body).then((r) => r.data),
   me: () => api.get<{ user: User }>('/auth/me').then((r) => r.data.user),
@@ -3068,9 +3383,16 @@ export const authApi = {
 ```
 
 `client/src/api/taskApi.ts`:
+
 ```ts
 import { api } from './axiosClient';
-import type { Task, TaskCreateInput, TaskListQuery, TaskUpdateInput, TaskStatus } from '@/types/task';
+import type {
+  Task,
+  TaskCreateInput,
+  TaskListQuery,
+  TaskUpdateInput,
+  TaskStatus,
+} from '@/types/task';
 
 export const taskApi = {
   list: (q: TaskListQuery = {}) => api.get<Task[]>('/tasks', { params: q }).then((r) => r.data),
@@ -3087,6 +3409,7 @@ export const taskApi = {
 ```
 
 `client/src/api/pomodoroApi.ts`:
+
 ```ts
 import { api } from './axiosClient';
 import type { PomodoroSession, PomodoroCreateInput } from '@/types/pomodoro';
@@ -3095,12 +3418,14 @@ export const pomodoroApi = {
   create: (b: PomodoroCreateInput) =>
     api.post<PomodoroSession>('/pomodoro-sessions', b).then((r) => r.data),
   recent: (limit = 10) =>
-    api.get<PomodoroSession[]>('/pomodoro-sessions/recent', { params: { limit } })
+    api
+      .get<PomodoroSession[]>('/pomodoro-sessions/recent', { params: { limit } })
       .then((r) => r.data),
 };
 ```
 
 `client/src/api/dashboardApi.ts`:
+
 ```ts
 import { api } from './axiosClient';
 
@@ -3110,6 +3435,7 @@ export const dashboardApi = {
 ```
 
 `client/src/api/statisticsApi.ts`:
+
 ```ts
 import { api } from './axiosClient';
 import type { StatRange, TaskStatsResponse, PomodoroStatsResponse } from '@/types/statistics';
@@ -3118,11 +3444,14 @@ export const statisticsApi = {
   tasks: (range: StatRange) =>
     api.get<TaskStatsResponse>('/statistics/tasks', { params: { range } }).then((r) => r.data),
   pomodoros: (range: StatRange) =>
-    api.get<PomodoroStatsResponse>('/statistics/pomodoros', { params: { range } }).then((r) => r.data),
+    api
+      .get<PomodoroStatsResponse>('/statistics/pomodoros', { params: { range } })
+      .then((r) => r.data),
 };
 ```
 
 `client/src/api/settingsApi.ts`:
+
 ```ts
 import { api } from './axiosClient';
 import type { Settings, SettingsUpdateInput } from '@/types/settings';
@@ -3139,6 +3468,7 @@ export const settingsApi = {
 ```
 
 `client/src/api/notificationApi.ts`:
+
 ```ts
 import { api } from './axiosClient';
 import type { Notification } from '@/types/notification';
@@ -3147,14 +3477,14 @@ export const notificationApi = {
   list: () => api.get<Notification[]>('/notifications').then((r) => r.data),
   markRead: (id: string) =>
     api.patch<Notification>(`/notifications/${id}/read`).then((r) => r.data),
-  markAllRead: () =>
-    api.patch<{ count: number }>('/notifications/read-all').then((r) => r.data),
+  markAllRead: () => api.patch<{ count: number }>('/notifications/read-all').then((r) => r.data),
 };
 ```
 
 - [ ] **Step 3: Write query hooks**
 
 `client/src/hooks/queries/useAuthQueries.ts`:
+
 ```ts
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { authApi } from '@/api/authApi';
@@ -3191,10 +3521,17 @@ export function useRegister() {
 ```
 
 `client/src/hooks/queries/useTaskQueries.ts`:
+
 ```ts
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { taskApi } from '@/api/taskApi';
-import type { TaskCreateInput, TaskListQuery, TaskUpdateInput, TaskStatus, Task } from '@/types/task';
+import type {
+  TaskCreateInput,
+  TaskListQuery,
+  TaskUpdateInput,
+  TaskStatus,
+  Task,
+} from '@/types/task';
 
 export function useTasksQuery(filters: TaskListQuery = {}) {
   return useQuery({
@@ -3244,7 +3581,11 @@ export function useDeleteTask() {
       await qc.cancelQueries({ queryKey: ['tasks'] });
       const snaps = qc.getQueriesData<Task[]>({ queryKey: ['tasks'] });
       snaps.forEach(([key, data]) => {
-        if (Array.isArray(data)) qc.setQueryData(key, data.filter((t) => t._id !== id));
+        if (Array.isArray(data))
+          qc.setQueryData(
+            key,
+            data.filter((t) => t._id !== id),
+          );
       });
       return { snaps };
     },
@@ -3269,7 +3610,8 @@ export function useMarkComplete() {
 export function useChangeStatus() {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: ({ id, status }: { id: string; status: TaskStatus }) => taskApi.changeStatus(id, status),
+    mutationFn: ({ id, status }: { id: string; status: TaskStatus }) =>
+      taskApi.changeStatus(id, status),
     onSuccess: () => {
       invalidateTaskGroups(qc);
       qc.invalidateQueries({ queryKey: ['notifications'] });
@@ -3279,6 +3621,7 @@ export function useChangeStatus() {
 ```
 
 `client/src/hooks/queries/usePomodoroQueries.ts`:
+
 ```ts
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { pomodoroApi } from '@/api/pomodoroApi';
@@ -3304,6 +3647,7 @@ export function useCreateSession() {
 ```
 
 `client/src/hooks/queries/useDashboardQuery.ts`:
+
 ```ts
 import { useQuery } from '@tanstack/react-query';
 import { dashboardApi } from '@/api/dashboardApi';
@@ -3314,20 +3658,28 @@ export function useDashboardQuery() {
 ```
 
 `client/src/hooks/queries/useStatisticsQueries.ts`:
+
 ```ts
 import { useQuery } from '@tanstack/react-query';
 import { statisticsApi } from '@/api/statisticsApi';
 import type { StatRange } from '@/types/statistics';
 
 export function useTaskStatsQuery(range: StatRange) {
-  return useQuery({ queryKey: ['statistics', 'tasks', range], queryFn: () => statisticsApi.tasks(range) });
+  return useQuery({
+    queryKey: ['statistics', 'tasks', range],
+    queryFn: () => statisticsApi.tasks(range),
+  });
 }
 export function usePomodoroStatsQuery(range: StatRange) {
-  return useQuery({ queryKey: ['statistics', 'pomodoros', range], queryFn: () => statisticsApi.pomodoros(range) });
+  return useQuery({
+    queryKey: ['statistics', 'pomodoros', range],
+    queryFn: () => statisticsApi.pomodoros(range),
+  });
 }
 ```
 
 `client/src/hooks/queries/useSettingsQueries.ts`:
+
 ```ts
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { settingsApi } from '@/api/settingsApi';
@@ -3357,7 +3709,11 @@ export function useUpdateProfile() {
   return useMutation({
     mutationFn: (b: { fullName: string }) => settingsApi.updateProfile(b),
     onSuccess: (user) => {
-      setUser({ id: (user as any)._id ?? (user as any).id, fullName: user.fullName, email: user.email });
+      setUser({
+        id: (user as any)._id ?? (user as any).id,
+        fullName: user.fullName,
+        email: user.email,
+      });
       qc.invalidateQueries({ queryKey: ['auth', 'me'] });
     },
   });
@@ -3371,6 +3727,7 @@ export function useChangePassword() {
 ```
 
 `client/src/hooks/queries/useNotificationQueries.ts`:
+
 ```ts
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { notificationApi } from '@/api/notificationApi';
@@ -3440,6 +3797,7 @@ git commit -m "feat(client): API layer + React Query hooks + axios interceptors"
 ## Task 16: Pomodoro engine store + tests
 
 **Files:**
+
 - Create: `client/src/lib/audio.ts`
 - Create: `client/src/store/pomodoroStore.ts`
 - Create: `client/src/hooks/usePomodoroEngine.ts`
@@ -3457,7 +3815,9 @@ let unlocked = false;
 
 export function preloadAudio() {
   if (audio) return audio;
-  audio = new Audio('https://cdn.jsdelivr.net/gh/anars/blank-audio/250-milliseconds-of-silence.mp3');
+  audio = new Audio(
+    'https://cdn.jsdelivr.net/gh/anars/blank-audio/250-milliseconds-of-silence.mp3',
+  );
   audio.preload = 'auto';
   return audio;
 }
@@ -3487,11 +3847,9 @@ export function playNotify() {
 ```ts
 import { format, formatDistanceToNow } from 'date-fns';
 
-export const formatDateTime = (iso: string) =>
-  format(new Date(iso), 'MMM d, HH:mm');
+export const formatDateTime = (iso: string) => format(new Date(iso), 'MMM d, HH:mm');
 export const formatDate = (iso: string) => format(new Date(iso), 'MMM d');
-export const fromNow = (iso: string) =>
-  formatDistanceToNow(new Date(iso), { addSuffix: true });
+export const fromNow = (iso: string) => formatDistanceToNow(new Date(iso), { addSuffix: true });
 export const minutesToHM = (m: number) => {
   const h = Math.floor(m / 60);
   const mm = m % 60;
@@ -3563,7 +3921,11 @@ type State = {
   // pending suggestion: when set, UI may show "task estimate reached" prompt
   estimateReachedTaskId: string | null;
 
-  hydrateFromSettings: (s: { focusDuration: number; shortBreakDuration: number; longBreakDuration: number }) => void;
+  hydrateFromSettings: (s: {
+    focusDuration: number;
+    shortBreakDuration: number;
+    longBreakDuration: number;
+  }) => void;
   setMode: (m: PomodoroMode) => void;
   selectTask: (id: string | null) => void;
   start: () => void;
@@ -3577,9 +3939,12 @@ const minutesMs = (m: number) => m * 60_000;
 
 const durationFor = (state: Pick<State, 'mode' | 'durations'>) => {
   switch (state.mode) {
-    case 'Focus': return state.durations.focus;
-    case 'ShortBreak': return state.durations.shortBreak;
-    case 'LongBreak': return state.durations.longBreak;
+    case 'Focus':
+      return state.durations.focus;
+    case 'ShortBreak':
+      return state.durations.shortBreak;
+    case 'LongBreak':
+      return state.durations.longBreak;
   }
 };
 
@@ -3627,7 +3992,9 @@ export const usePomodoroStore = create<State>((set, get) => {
         endsAt: null,
         startedAt: null,
         mode: nextMode,
-        remainingMs: minutesMs(nextMode === 'ShortBreak' ? durations.shortBreak : durations.longBreak),
+        remainingMs: minutesMs(
+          nextMode === 'ShortBreak' ? durations.shortBreak : durations.longBreak,
+        ),
         estimateReachedTaskId: selectedTaskId,
       });
     } else {
@@ -3654,9 +4021,14 @@ export const usePomodoroStore = create<State>((set, get) => {
     estimateReachedTaskId: null,
 
     hydrateFromSettings: ({ focusDuration, shortBreakDuration, longBreakDuration }) => {
-      const durations = { focus: focusDuration, shortBreak: shortBreakDuration, longBreak: longBreakDuration };
+      const durations = {
+        focus: focusDuration,
+        shortBreak: shortBreakDuration,
+        longBreak: longBreakDuration,
+      };
       set({ durations });
-      if (get().status === 'idle') set({ remainingMs: minutesMs(durationFor({ mode: get().mode, durations })) });
+      if (get().status === 'idle')
+        set({ remainingMs: minutesMs(durationFor({ mode: get().mode, durations })) });
     },
 
     setMode: (m) => {
@@ -3701,9 +4073,8 @@ export const usePomodoroStore = create<State>((set, get) => {
     skip: () => {
       clearTick();
       const { mode, durations, focusCount } = get();
-      const nextMode: PomodoroMode = mode === 'Focus'
-        ? ((focusCount + 1) % 4 === 0 ? 'LongBreak' : 'ShortBreak')
-        : 'Focus';
+      const nextMode: PomodoroMode =
+        mode === 'Focus' ? ((focusCount + 1) % 4 === 0 ? 'LongBreak' : 'ShortBreak') : 'Focus';
       const nextFocusCount = mode === 'Focus' ? focusCount + 1 : focusCount;
       set({
         status: 'idle',
@@ -3754,19 +4125,31 @@ import { usePomodoroStore } from '@/store/pomodoroStore';
 vi.mock('@/api/pomodoroApi', () => ({
   pomodoroApi: { create: vi.fn().mockResolvedValue({}), recent: vi.fn() },
 }));
-vi.mock('@/lib/audio', () => ({ playNotify: vi.fn(), preloadAudio: vi.fn(), unlockAudio: vi.fn() }));
+vi.mock('@/lib/audio', () => ({
+  playNotify: vi.fn(),
+  preloadAudio: vi.fn(),
+  unlockAudio: vi.fn(),
+}));
 vi.mock('@/lib/queryClient', () => ({ queryClient: { invalidateQueries: vi.fn() } }));
 
 const reset = () =>
   usePomodoroStore.setState({
-    mode: 'Focus', status: 'idle',
+    mode: 'Focus',
+    status: 'idle',
     durations: { focus: 25, shortBreak: 5, longBreak: 15 },
-    endsAt: null, remainingMs: 25 * 60_000,
-    startedAt: null, selectedTaskId: null, intervalId: null,
-    focusCount: 0, estimateReachedTaskId: null,
+    endsAt: null,
+    remainingMs: 25 * 60_000,
+    startedAt: null,
+    selectedTaskId: null,
+    intervalId: null,
+    focusCount: 0,
+    estimateReachedTaskId: null,
   });
 
-beforeEach(() => { vi.useFakeTimers(); reset(); });
+beforeEach(() => {
+  vi.useFakeTimers();
+  reset();
+});
 
 describe('pomodoroStore', () => {
   it('start sets endsAt and running', () => {
@@ -3790,7 +4173,9 @@ describe('pomodoroStore', () => {
 
   it('hydrateFromSettings updates durations and remainingMs when idle', () => {
     usePomodoroStore.getState().hydrateFromSettings({
-      focusDuration: 50, shortBreakDuration: 10, longBreakDuration: 20,
+      focusDuration: 50,
+      shortBreakDuration: 10,
+      longBreakDuration: 20,
     });
     expect(usePomodoroStore.getState().durations.focus).toBe(50);
     expect(usePomodoroStore.getState().remainingMs).toBe(50 * 60_000);
@@ -3822,13 +4207,19 @@ import { isOverdue, priorityRank } from '@/utils/taskUtils';
 
 describe('taskUtils', () => {
   it('isOverdue true when deadline past and not Completed', () => {
-    expect(isOverdue({ deadline: new Date(Date.now() - 1000).toISOString(), status: 'Todo' })).toBe(true);
+    expect(isOverdue({ deadline: new Date(Date.now() - 1000).toISOString(), status: 'Todo' })).toBe(
+      true,
+    );
   });
   it('isOverdue false when status is Completed', () => {
-    expect(isOverdue({ deadline: new Date(Date.now() - 1000).toISOString(), status: 'Completed' })).toBe(false);
+    expect(
+      isOverdue({ deadline: new Date(Date.now() - 1000).toISOString(), status: 'Completed' }),
+    ).toBe(false);
   });
   it('isOverdue false when deadline future', () => {
-    expect(isOverdue({ deadline: new Date(Date.now() + 60_000).toISOString(), status: 'Todo' })).toBe(false);
+    expect(
+      isOverdue({ deadline: new Date(Date.now() + 60_000).toISOString(), status: 'Todo' }),
+    ).toBe(false);
   });
   it('priorityRank ordering', () => {
     expect(priorityRank.High).toBeGreaterThan(priorityRank.Medium);
@@ -3857,6 +4248,7 @@ git commit -m "feat(client): pomodoro engine store with endsAt timing + tests"
 ## Task 17: Common UI primitives + utility cn()
 
 **Files:**
+
 - Create: `client/src/utils/cn.ts`
 - Create: `client/src/components/common/{Button,Input,Select,Textarea,Modal,Card,Badge,EmptyState,Loading,ErrorState,ConfirmDialog}.tsx`
 
@@ -3878,7 +4270,11 @@ type Variant = 'primary' | 'secondary' | 'ghost' | 'danger';
 type Size = 'sm' | 'md' | 'lg';
 
 type Props = ButtonHTMLAttributes<HTMLButtonElement> & {
-  variant?: Variant; size?: Size; loading?: boolean; icon?: ReactNode; fullWidth?: boolean;
+  variant?: Variant;
+  size?: Size;
+  loading?: boolean;
+  icon?: ReactNode;
+  fullWidth?: boolean;
 };
 
 const variants: Record<Variant, string> = {
@@ -3894,7 +4290,18 @@ const sizes: Record<Size, string> = {
 };
 
 export const Button = forwardRef<HTMLButtonElement, Props>(function Button(
-  { className, variant = 'primary', size = 'md', loading, icon, fullWidth, children, disabled, ...rest }, ref,
+  {
+    className,
+    variant = 'primary',
+    size = 'md',
+    loading,
+    icon,
+    fullWidth,
+    children,
+    disabled,
+    ...rest
+  },
+  ref,
 ) {
   return (
     <button
@@ -3902,7 +4309,10 @@ export const Button = forwardRef<HTMLButtonElement, Props>(function Button(
       disabled={disabled || loading}
       className={cn(
         'inline-flex items-center justify-center gap-2 rounded-2xl font-medium transition disabled:opacity-50 disabled:cursor-not-allowed',
-        variants[variant], sizes[size], fullWidth && 'w-full', className,
+        variants[variant],
+        sizes[size],
+        fullWidth && 'w-full',
+        className,
       )}
       {...rest}
     >
@@ -3920,22 +4330,31 @@ import { forwardRef, type InputHTMLAttributes } from 'react';
 import { cn } from '@/utils/cn';
 
 type Props = InputHTMLAttributes<HTMLInputElement> & {
-  label?: string; error?: string; hint?: string;
+  label?: string;
+  error?: string;
+  hint?: string;
 };
 
 export const Input = forwardRef<HTMLInputElement, Props>(function Input(
-  { label, error, hint, className, id, ...rest }, ref,
+  { label, error, hint, className, id, ...rest },
+  ref,
 ) {
   const inputId = id ?? `i-${Math.random().toString(36).slice(2, 8)}`;
   return (
     <div className="space-y-1">
-      {label && <label htmlFor={inputId} className="text-sm font-medium">{label}</label>}
+      {label && (
+        <label htmlFor={inputId} className="text-sm font-medium">
+          {label}
+        </label>
+      )}
       <input
         id={inputId}
         ref={ref}
         className={cn(
           'block w-full rounded-2xl border bg-surface px-3 py-2 text-sm outline-none placeholder:text-text-muted',
-          error ? 'border-priority-high focus:border-priority-high' : 'border-border focus:border-primary-500',
+          error
+            ? 'border-priority-high focus:border-priority-high'
+            : 'border-border focus:border-primary-500',
           className,
         )}
         aria-invalid={!!error}
@@ -3959,16 +4378,23 @@ import { cn } from '@/utils/cn';
 
 type Option = { value: string; label: string };
 type Props = SelectHTMLAttributes<HTMLSelectElement> & {
-  label?: string; error?: string; options: Option[];
+  label?: string;
+  error?: string;
+  options: Option[];
 };
 
 export const Select = forwardRef<HTMLSelectElement, Props>(function Select(
-  { label, error, options, className, id, ...rest }, ref,
+  { label, error, options, className, id, ...rest },
+  ref,
 ) {
   const sid = id ?? `s-${Math.random().toString(36).slice(2, 8)}`;
   return (
     <div className="space-y-1">
-      {label && <label htmlFor={sid} className="text-sm font-medium">{label}</label>}
+      {label && (
+        <label htmlFor={sid} className="text-sm font-medium">
+          {label}
+        </label>
+      )}
       <select
         id={sid}
         ref={ref}
@@ -3979,7 +4405,11 @@ export const Select = forwardRef<HTMLSelectElement, Props>(function Select(
         )}
         {...rest}
       >
-        {options.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
+        {options.map((o) => (
+          <option key={o.value} value={o.value}>
+            {o.label}
+          </option>
+        ))}
       </select>
       {error && <p className="text-xs text-priority-high">{error}</p>}
     </div>
@@ -3996,12 +4426,17 @@ import { cn } from '@/utils/cn';
 type Props = TextareaHTMLAttributes<HTMLTextAreaElement> & { label?: string; error?: string };
 
 export const Textarea = forwardRef<HTMLTextAreaElement, Props>(function Textarea(
-  { label, error, className, id, ...rest }, ref,
+  { label, error, className, id, ...rest },
+  ref,
 ) {
   const tid = id ?? `t-${Math.random().toString(36).slice(2, 8)}`;
   return (
     <div className="space-y-1">
-      {label && <label htmlFor={tid} className="text-sm font-medium">{label}</label>}
+      {label && (
+        <label htmlFor={tid} className="text-sm font-medium">
+          {label}
+        </label>
+      )}
       <textarea
         id={tid}
         ref={ref}
@@ -4028,7 +4463,11 @@ import { cn } from '@/utils/cn';
 
 type Size = 'sm' | 'md' | 'lg';
 type Props = {
-  open: boolean; onClose: () => void; title: string; size?: Size; children: ReactNode;
+  open: boolean;
+  onClose: () => void;
+  title: string;
+  size?: Size;
+  children: ReactNode;
 };
 
 const sizes: Record<Size, string> = { sm: 'max-w-sm', md: 'max-w-md', lg: 'max-w-2xl' };
@@ -4036,7 +4475,9 @@ const sizes: Record<Size, string> = { sm: 'max-w-sm', md: 'max-w-md', lg: 'max-w
 export function Modal({ open, onClose, title, size = 'md', children }: Props) {
   useEffect(() => {
     if (!open) return;
-    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose(); };
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onClose();
+    };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
   }, [open, onClose]);
@@ -4044,7 +4485,9 @@ export function Modal({ open, onClose, title, size = 'md', children }: Props) {
   if (!open) return null;
   return (
     <div
-      role="dialog" aria-modal="true" aria-label={title}
+      role="dialog"
+      aria-modal="true"
+      aria-label={title}
       className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4 backdrop-blur-sm"
       onClick={onClose}
     >
@@ -4078,7 +4521,8 @@ export function Card({ className, padded = true, ...rest }: Props) {
     <div
       className={cn(
         'rounded-3xl border border-border bg-surface shadow-sm',
-        padded && 'p-5', className,
+        padded && 'p-5',
+        className,
       )}
       {...rest}
     />
@@ -4104,14 +4548,36 @@ const statusClass: Record<TaskStatus, string> = {
 };
 
 export function PriorityBadge({ priority }: { priority: Priority }) {
-  return <span className={cn('inline-flex rounded-full px-2 py-0.5 text-xs font-medium', priorityClass[priority])}>{priority}</span>;
+  return (
+    <span
+      className={cn(
+        'inline-flex rounded-full px-2 py-0.5 text-xs font-medium',
+        priorityClass[priority],
+      )}
+    >
+      {priority}
+    </span>
+  );
 }
 export function StatusBadge({ status }: { status: TaskStatus }) {
   const label = status === 'InProgress' ? 'In progress' : status;
-  return <span className={cn('inline-flex rounded-full px-2 py-0.5 text-xs font-medium', statusClass[status])}>{label}</span>;
+  return (
+    <span
+      className={cn(
+        'inline-flex rounded-full px-2 py-0.5 text-xs font-medium',
+        statusClass[status],
+      )}
+    >
+      {label}
+    </span>
+  );
 }
 export function OverdueBadge() {
-  return <span className="inline-flex rounded-full bg-status-overdue/15 px-2 py-0.5 text-xs font-medium text-status-overdue">Overdue</span>;
+  return (
+    <span className="inline-flex rounded-full bg-status-overdue/15 px-2 py-0.5 text-xs font-medium text-status-overdue">
+      Overdue
+    </span>
+  );
 }
 ```
 
@@ -4165,7 +4631,11 @@ export function ErrorState({ title = 'Something went wrong', description, onRetr
     <div className="flex flex-col items-center justify-center gap-3 py-10 text-center">
       <h3 className="text-sm font-semibold text-priority-high">{title}</h3>
       {description && <p className="max-w-sm text-sm text-text-muted">{description}</p>}
-      {onRetry && <Button variant="secondary" onClick={onRetry}>Retry</Button>}
+      {onRetry && (
+        <Button variant="secondary" onClick={onRetry}>
+          Retry
+        </Button>
+      )}
     </div>
   );
 }
@@ -4178,19 +4648,40 @@ import { Modal } from './Modal';
 import { Button } from './Button';
 
 type Props = {
-  open: boolean; onClose: () => void; onConfirm: () => void;
-  title: string; description?: string; confirmText?: string; danger?: boolean;
+  open: boolean;
+  onClose: () => void;
+  onConfirm: () => void;
+  title: string;
+  description?: string;
+  confirmText?: string;
+  danger?: boolean;
 };
 
 export function ConfirmDialog({
-  open, onClose, onConfirm, title, description, confirmText = 'Confirm', danger,
+  open,
+  onClose,
+  onConfirm,
+  title,
+  description,
+  confirmText = 'Confirm',
+  danger,
 }: Props) {
   return (
     <Modal open={open} onClose={onClose} title={title} size="sm">
       {description && <p className="text-sm text-text-muted">{description}</p>}
       <div className="mt-5 flex justify-end gap-2">
-        <Button variant="secondary" onClick={onClose}>Cancel</Button>
-        <Button variant={danger ? 'danger' : 'primary'} onClick={() => { onConfirm(); onClose(); }}>{confirmText}</Button>
+        <Button variant="secondary" onClick={onClose}>
+          Cancel
+        </Button>
+        <Button
+          variant={danger ? 'danger' : 'primary'}
+          onClick={() => {
+            onConfirm();
+            onClose();
+          }}
+        >
+          {confirmText}
+        </Button>
       </div>
     </Modal>
   );
@@ -4217,6 +4708,7 @@ git commit -m "feat(client): common UI primitives (Button, Input, Modal, Card, B
 ## Task 18: Routing + AppLayout (Sidebar, Header, ProtectedRoute) + Login + Register
 
 **Files:**
+
 - Create: `client/src/routes/{AppRouter.tsx,ProtectedRoute.tsx,PublicOnlyRoute.tsx}`
 - Create: `client/src/components/layout/{AppLayout.tsx,Sidebar.tsx,Header.tsx,ThemeToggle.tsx}`
 - Create: `client/src/validators/auth.schema.ts`
@@ -4253,13 +4745,17 @@ export default function PublicOnlyRoute() {
 - [ ] **Step 3: Write all page placeholders** (full Login + Register; the rest are stubs)
 
 `client/src/pages/DashboardPage.tsx`:
+
 ```tsx
-export default function DashboardPage() { return <div>Dashboard (Task 19)</div>; }
+export default function DashboardPage() {
+  return <div>Dashboard (Task 19)</div>;
+}
 ```
 
 `client/src/pages/TasksPage.tsx`, `PomodoroPage.tsx`, `CalendarPage.tsx`, `StatisticsPage.tsx`, `SettingsPage.tsx`: same stub pattern with own page name.
 
 `client/src/pages/NotFoundPage.tsx`:
+
 ```tsx
 import { Link } from 'react-router-dom';
 export default function NotFoundPage() {
@@ -4267,7 +4763,9 @@ export default function NotFoundPage() {
     <div className="flex min-h-full flex-col items-center justify-center gap-3">
       <h1 className="text-2xl font-semibold">404</h1>
       <p className="text-text-muted">Page not found.</p>
-      <Link to="/dashboard" className="text-primary-600 hover:underline">Go to dashboard</Link>
+      <Link to="/dashboard" className="text-primary-600 hover:underline">
+        Go to dashboard
+      </Link>
     </div>
   );
 }
@@ -4284,15 +4782,17 @@ export const loginSchema = z.object({
 });
 export type LoginValues = z.infer<typeof loginSchema>;
 
-export const registerSchema = z.object({
-  fullName: z.string().min(1, 'Required').max(100),
-  email: z.string().email('Invalid email'),
-  password: z.string().min(6, 'At least 6 characters'),
-  confirmPassword: z.string().min(6),
-}).refine((d) => d.password === d.confirmPassword, {
-  message: 'Passwords do not match',
-  path: ['confirmPassword'],
-});
+export const registerSchema = z
+  .object({
+    fullName: z.string().min(1, 'Required').max(100),
+    email: z.string().email('Invalid email'),
+    password: z.string().min(6, 'At least 6 characters'),
+    confirmPassword: z.string().min(6),
+  })
+  .refine((d) => d.password === d.confirmPassword, {
+    message: 'Passwords do not match',
+    path: ['confirmPassword'],
+  });
 export type RegisterValues = z.infer<typeof registerSchema>;
 ```
 
@@ -4309,7 +4809,11 @@ import { Input } from '@/components/common/Input';
 import { Button } from '@/components/common/Button';
 
 export default function LoginPage() {
-  const { register, handleSubmit, formState: { errors } } = useForm<LoginValues>({
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<LoginValues>({
     resolver: zodResolver(loginSchema),
     defaultValues: { email: '', password: '' },
   });
@@ -4318,7 +4822,10 @@ export default function LoginPage() {
 
   const onSubmit = (v: LoginValues) =>
     login.mutate(v, {
-      onSuccess: (data) => { toast.success(`Welcome back, ${data.user.fullName.split(' ')[0]}`); navigate('/dashboard'); },
+      onSuccess: (data) => {
+        toast.success(`Welcome back, ${data.user.fullName.split(' ')[0]}`);
+        navigate('/dashboard');
+      },
       onError: (err: any) => toast.error(err?.response?.data?.error?.message ?? 'Login failed'),
     });
 
@@ -4326,16 +4833,33 @@ export default function LoginPage() {
     <div className="flex min-h-full items-center justify-center bg-gradient-to-br from-primary-50 to-bg p-4">
       <div className="w-full max-w-md rounded-3xl border border-border bg-surface p-8 shadow-sm">
         <div className="mb-6 text-center">
-          <h1 className="text-2xl font-semibold">TaskFlow</h1>
+          <h1 className="text-2xl font-semibold">Task88</h1>
           <p className="text-sm text-text-muted">Sign in to continue</p>
         </div>
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-          <Input label="Email" type="email" autoComplete="email" {...register('email')} error={errors.email?.message} />
-          <Input label="Password" type="password" autoComplete="current-password" {...register('password')} error={errors.password?.message} />
-          <Button type="submit" fullWidth loading={login.isPending}>Log in</Button>
+          <Input
+            label="Email"
+            type="email"
+            autoComplete="email"
+            {...register('email')}
+            error={errors.email?.message}
+          />
+          <Input
+            label="Password"
+            type="password"
+            autoComplete="current-password"
+            {...register('password')}
+            error={errors.password?.message}
+          />
+          <Button type="submit" fullWidth loading={login.isPending}>
+            Log in
+          </Button>
         </form>
         <p className="mt-6 text-center text-sm text-text-muted">
-          New here? <Link to="/register" className="text-primary-600 hover:underline">Create account</Link>
+          New here?{' '}
+          <Link to="/register" className="text-primary-600 hover:underline">
+            Create account
+          </Link>
         </p>
       </div>
     </div>
@@ -4356,7 +4880,11 @@ import { Input } from '@/components/common/Input';
 import { Button } from '@/components/common/Button';
 
 export default function RegisterPage() {
-  const { register, handleSubmit, formState: { errors } } = useForm<RegisterValues>({
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<RegisterValues>({
     resolver: zodResolver(registerSchema),
     defaultValues: { fullName: '', email: '', password: '', confirmPassword: '' },
   });
@@ -4365,8 +4893,12 @@ export default function RegisterPage() {
 
   const onSubmit = (v: RegisterValues) =>
     reg.mutate(v, {
-      onSuccess: () => { toast.success('Account created'); navigate('/dashboard'); },
-      onError: (err: any) => toast.error(err?.response?.data?.error?.message ?? 'Registration failed'),
+      onSuccess: () => {
+        toast.success('Account created');
+        navigate('/dashboard');
+      },
+      onError: (err: any) =>
+        toast.error(err?.response?.data?.error?.message ?? 'Registration failed'),
     });
 
   return (
@@ -4374,14 +4906,29 @@ export default function RegisterPage() {
       <div className="w-full max-w-md rounded-3xl border border-border bg-surface p-8 shadow-sm">
         <h1 className="mb-6 text-center text-2xl font-semibold">Create account</h1>
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-          <Input label="Full name"        {...register('fullName')}        error={errors.fullName?.message} />
-          <Input label="Email"      type="email"    {...register('email')}    error={errors.email?.message} />
-          <Input label="Password"   type="password" {...register('password')} error={errors.password?.message} />
-          <Input label="Confirm password" type="password" {...register('confirmPassword')} error={errors.confirmPassword?.message} />
-          <Button type="submit" fullWidth loading={reg.isPending}>Sign up</Button>
+          <Input label="Full name" {...register('fullName')} error={errors.fullName?.message} />
+          <Input label="Email" type="email" {...register('email')} error={errors.email?.message} />
+          <Input
+            label="Password"
+            type="password"
+            {...register('password')}
+            error={errors.password?.message}
+          />
+          <Input
+            label="Confirm password"
+            type="password"
+            {...register('confirmPassword')}
+            error={errors.confirmPassword?.message}
+          />
+          <Button type="submit" fullWidth loading={reg.isPending}>
+            Sign up
+          </Button>
         </form>
         <p className="mt-6 text-center text-sm text-text-muted">
-          Have an account? <Link to="/login" className="text-primary-600 hover:underline">Log in</Link>
+          Have an account?{' '}
+          <Link to="/login" className="text-primary-600 hover:underline">
+            Log in
+          </Link>
         </p>
       </div>
     </div>
@@ -4413,30 +4960,41 @@ export function ThemeToggle() {
 
 ```tsx
 import { NavLink } from 'react-router-dom';
-import { LayoutDashboard, ListTodo, Timer, Calendar, BarChart3, Settings as SettingsIcon, LogOut } from 'lucide-react';
+import {
+  LayoutDashboard,
+  ListTodo,
+  Timer,
+  Calendar,
+  BarChart3,
+  Settings as SettingsIcon,
+  LogOut,
+} from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { useNavigate } from 'react-router-dom';
 import { cn } from '@/utils/cn';
 
 const items = [
-  { to: '/dashboard',  icon: LayoutDashboard, label: 'Dashboard' },
-  { to: '/tasks',      icon: ListTodo,        label: 'Tasks' },
-  { to: '/pomodoro',   icon: Timer,           label: 'Pomodoro' },
-  { to: '/calendar',   icon: Calendar,        label: 'Calendar' },
-  { to: '/statistics', icon: BarChart3,       label: 'Statistics' },
-  { to: '/settings',   icon: SettingsIcon,    label: 'Settings' },
+  { to: '/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
+  { to: '/tasks', icon: ListTodo, label: 'Tasks' },
+  { to: '/pomodoro', icon: Timer, label: 'Pomodoro' },
+  { to: '/calendar', icon: Calendar, label: 'Calendar' },
+  { to: '/statistics', icon: BarChart3, label: 'Statistics' },
+  { to: '/settings', icon: SettingsIcon, label: 'Settings' },
 ];
 
 export function Sidebar({ onNavigate }: { onNavigate?: () => void }) {
   const { logout } = useAuth();
   const navigate = useNavigate();
-  const handleLogout = () => { logout(); navigate('/login'); };
+  const handleLogout = () => {
+    logout();
+    navigate('/login');
+  };
 
   return (
     <aside className="flex h-full w-64 shrink-0 flex-col border-r border-border bg-surface p-4">
       <div className="mb-6 flex items-center gap-2 px-2">
         <Timer className="h-6 w-6 text-primary-600" />
-        <span className="text-lg font-semibold">TaskFlow</span>
+        <span className="text-lg font-semibold">Task88</span>
       </div>
       <nav className="flex-1 space-y-1">
         {items.map((it) => (
@@ -4447,7 +5005,9 @@ export function Sidebar({ onNavigate }: { onNavigate?: () => void }) {
             className={({ isActive }) =>
               cn(
                 'flex items-center gap-3 rounded-2xl px-3 py-2 text-sm transition',
-                isActive ? 'bg-primary-50 text-primary-600 dark:bg-primary-500/10' : 'text-text hover:bg-bg',
+                isActive
+                  ? 'bg-primary-50 text-primary-600 dark:bg-primary-500/10'
+                  : 'text-text hover:bg-bg',
               )
             }
           >
@@ -4493,7 +5053,11 @@ export function Header({ onAddTask, onMenu }: { onAddTask?: () => void; onMenu?:
     <header className="flex h-16 items-center justify-between border-b border-border bg-surface px-4">
       <div className="flex items-center gap-3">
         {onMenu && (
-          <button onClick={onMenu} className="rounded-2xl p-2 hover:bg-bg lg:hidden" aria-label="Open menu">
+          <button
+            onClick={onMenu}
+            className="rounded-2xl p-2 hover:bg-bg lg:hidden"
+            aria-label="Open menu"
+          >
             ☰
           </button>
         )}
@@ -4546,8 +5110,12 @@ export default function AppLayout() {
   const loc = useLocation();
   const [drawerOpen, setDrawerOpen] = useState(false);
 
-  useEffect(() => { if (me) setUser(me); }, [me, setUser]);
-  useEffect(() => { if (isError) navigate('/login'); }, [isError, navigate]);
+  useEffect(() => {
+    if (me) setUser(me);
+  }, [me, setUser]);
+  useEffect(() => {
+    if (isError) navigate('/login');
+  }, [isError, navigate]);
   useEffect(() => {
     if (settings) {
       setTheme(settings.theme);
@@ -4558,7 +5126,9 @@ export default function AppLayout() {
       });
     }
   }, [settings, setTheme, hydrate]);
-  useEffect(() => { setDrawerOpen(false); }, [loc.pathname]);
+  useEffect(() => {
+    setDrawerOpen(false);
+  }, [loc.pathname]);
 
   return (
     <div className="flex h-full">
@@ -4592,15 +5162,15 @@ import PublicOnlyRoute from './PublicOnlyRoute';
 import AppLayout from '@/components/layout/AppLayout';
 import { Loading } from '@/components/common/Loading';
 
-const LoginPage      = lazy(() => import('@/pages/LoginPage'));
-const RegisterPage   = lazy(() => import('@/pages/RegisterPage'));
-const DashboardPage  = lazy(() => import('@/pages/DashboardPage'));
-const TasksPage      = lazy(() => import('@/pages/TasksPage'));
-const PomodoroPage   = lazy(() => import('@/pages/PomodoroPage'));
-const CalendarPage   = lazy(() => import('@/pages/CalendarPage'));
+const LoginPage = lazy(() => import('@/pages/LoginPage'));
+const RegisterPage = lazy(() => import('@/pages/RegisterPage'));
+const DashboardPage = lazy(() => import('@/pages/DashboardPage'));
+const TasksPage = lazy(() => import('@/pages/TasksPage'));
+const PomodoroPage = lazy(() => import('@/pages/PomodoroPage'));
+const CalendarPage = lazy(() => import('@/pages/CalendarPage'));
 const StatisticsPage = lazy(() => import('@/pages/StatisticsPage'));
-const SettingsPage   = lazy(() => import('@/pages/SettingsPage'));
-const NotFoundPage   = lazy(() => import('@/pages/NotFoundPage'));
+const SettingsPage = lazy(() => import('@/pages/SettingsPage'));
+const NotFoundPage = lazy(() => import('@/pages/NotFoundPage'));
 
 export default function AppRouter() {
   return (
@@ -4660,6 +5230,7 @@ git commit -m "feat(client): routing + AppLayout (Sidebar/Header/ThemeToggle) + 
 ## Task 19: Tasks Page (list/grid, filters, modal form, optimistic delete)
 
 **Files:**
+
 - Create: `client/src/validators/task.schema.ts`
 - Create: `client/src/components/tasks/{TaskCard.tsx,TaskRow.tsx,TaskList.tsx,TaskFilters.tsx,TaskFormModal.tsx,TaskDetailModal.tsx}`
 - Create: `client/src/hooks/useDebounce.ts`
@@ -4689,7 +5260,7 @@ import { z } from 'zod';
 export const taskFormSchema = z.object({
   title: z.string().min(1, 'Title is required').max(200),
   description: z.string().max(2000).optional().or(z.literal('')),
-  deadline: z.string().min(1, 'Deadline required'),  // datetime-local string
+  deadline: z.string().min(1, 'Deadline required'), // datetime-local string
   priority: z.enum(['Low', 'Medium', 'High']),
   estimatedPomodoros: z.coerce.number().int().min(1, 'At least 1'),
 });
@@ -4712,7 +5283,9 @@ import { useCreateTask, useUpdateTask } from '@/hooks/queries/useTaskQueries';
 import type { Task } from '@/types/task';
 
 type Props = {
-  open: boolean; onClose: () => void; task?: Task | null;
+  open: boolean;
+  onClose: () => void;
+  task?: Task | null;
 };
 
 const toLocalInput = (iso: string) => {
@@ -4725,24 +5298,41 @@ export function TaskFormModal({ open, onClose, task }: Props) {
   const create = useCreateTask();
   const update = useUpdateTask();
   const isEdit = !!task;
-  const { register, handleSubmit, reset, formState: { errors } } = useForm<TaskFormValues>({
+  const {
+    register,
+    handleSubmit,
+    reset,
+    formState: { errors },
+  } = useForm<TaskFormValues>({
     resolver: zodResolver(taskFormSchema),
-    defaultValues: { title: '', description: '', deadline: '', priority: 'Medium', estimatedPomodoros: 1 },
+    defaultValues: {
+      title: '',
+      description: '',
+      deadline: '',
+      priority: 'Medium',
+      estimatedPomodoros: 1,
+    },
   });
 
   useEffect(() => {
     if (open) {
-      reset(task ? {
-        title: task.title,
-        description: task.description ?? '',
-        deadline: toLocalInput(task.deadline),
-        priority: task.priority,
-        estimatedPomodoros: task.estimatedPomodoros,
-      } : {
-        title: '', description: '',
-        deadline: toLocalInput(new Date(new Date().setHours(23, 59, 0, 0)).toISOString()),
-        priority: 'Medium', estimatedPomodoros: 1,
-      });
+      reset(
+        task
+          ? {
+              title: task.title,
+              description: task.description ?? '',
+              deadline: toLocalInput(task.deadline),
+              priority: task.priority,
+              estimatedPomodoros: task.estimatedPomodoros,
+            }
+          : {
+              title: '',
+              description: '',
+              deadline: toLocalInput(new Date(new Date().setHours(23, 59, 0, 0)).toISOString()),
+              priority: 'Medium',
+              estimatedPomodoros: 1,
+            },
+      );
     }
   }, [open, task, reset]);
 
@@ -4752,9 +5342,13 @@ export function TaskFormModal({ open, onClose, task }: Props) {
       description: v.description ?? '',
       deadline: new Date(v.deadline).toISOString(),
     };
-    const success = (msg: string) => () => { toast.success(msg); onClose(); };
+    const success = (msg: string) => () => {
+      toast.success(msg);
+      onClose();
+    };
     const fail = (err: any) => toast.error(err?.response?.data?.error?.message ?? 'Save failed');
-    if (isEdit && task) update.mutate({ id: task._id, body }, { onSuccess: success('Task updated'), onError: fail });
+    if (isEdit && task)
+      update.mutate({ id: task._id, body }, { onSuccess: success('Task updated'), onError: fail });
     else create.mutate(body, { onSuccess: success('Task created'), onError: fail });
   };
 
@@ -4762,22 +5356,44 @@ export function TaskFormModal({ open, onClose, task }: Props) {
     <Modal open={open} onClose={onClose} title={isEdit ? 'Edit task' : 'New task'} size="md">
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
         <Input label="Title" {...register('title')} error={errors.title?.message} />
-        <Textarea label="Description" {...register('description')} error={errors.description?.message} />
-        <Input label="Deadline" type="datetime-local" {...register('deadline')} error={errors.deadline?.message} />
+        <Textarea
+          label="Description"
+          {...register('description')}
+          error={errors.description?.message}
+        />
+        <Input
+          label="Deadline"
+          type="datetime-local"
+          {...register('deadline')}
+          error={errors.deadline?.message}
+        />
         <div className="grid grid-cols-2 gap-3">
           <div>
             <label className="text-sm font-medium">Priority</label>
-            <select className="mt-1 block w-full rounded-2xl border border-border bg-surface px-3 py-2 text-sm" {...register('priority')}>
+            <select
+              className="mt-1 block w-full rounded-2xl border border-border bg-surface px-3 py-2 text-sm"
+              {...register('priority')}
+            >
               <option value="Low">Low</option>
               <option value="Medium">Medium</option>
               <option value="High">High</option>
             </select>
           </div>
-          <Input label="Est. Pomodoros" type="number" min={1} {...register('estimatedPomodoros')} error={errors.estimatedPomodoros?.message} />
+          <Input
+            label="Est. Pomodoros"
+            type="number"
+            min={1}
+            {...register('estimatedPomodoros')}
+            error={errors.estimatedPomodoros?.message}
+          />
         </div>
         <div className="flex justify-end gap-2 pt-2">
-          <Button type="button" variant="secondary" onClick={onClose}>Cancel</Button>
-          <Button type="submit" loading={create.isPending || update.isPending}>{isEdit ? 'Save' : 'Create'}</Button>
+          <Button type="button" variant="secondary" onClick={onClose}>
+            Cancel
+          </Button>
+          <Button type="submit" loading={create.isPending || update.isPending}>
+            {isEdit ? 'Save' : 'Create'}
+          </Button>
         </div>
       </form>
     </Modal>
@@ -4809,7 +5425,9 @@ export function TaskCard({ task, onEdit, onDelete, onComplete, onClick }: Props)
       <div className="flex items-start justify-between gap-2">
         <button onClick={() => onClick?.(task)} className="flex-1 text-left">
           <h3 className="line-clamp-1 text-sm font-semibold">{task.title}</h3>
-          {task.description && <p className="mt-1 line-clamp-2 text-xs text-text-muted">{task.description}</p>}
+          {task.description && (
+            <p className="mt-1 line-clamp-2 text-xs text-text-muted">{task.description}</p>
+          )}
         </button>
         <PriorityBadge priority={task.priority} />
       </div>
@@ -4817,18 +5435,39 @@ export function TaskCard({ task, onEdit, onDelete, onComplete, onClick }: Props)
         <Clock className="h-3.5 w-3.5" />
         <span>{formatDateTime(task.deadline)}</span>
         <span>·</span>
-        <span>⏱ {task.completedPomodoros}/{task.estimatedPomodoros}</span>
+        <span>
+          ⏱ {task.completedPomodoros}/{task.estimatedPomodoros}
+        </span>
         <StatusBadge status={task.status} />
         {task.isOverdue && <OverdueBadge />}
       </div>
       <div className="mt-4 flex flex-wrap gap-2">
         {task.status !== 'Completed' && (
-          <Button size="sm" variant="secondary" icon={<Check className="h-4 w-4" />} onClick={() => onComplete(task)}>
+          <Button
+            size="sm"
+            variant="secondary"
+            icon={<Check className="h-4 w-4" />}
+            onClick={() => onComplete(task)}
+          >
             Complete
           </Button>
         )}
-        <Button size="sm" variant="ghost" icon={<Edit2 className="h-4 w-4" />} onClick={() => onEdit(task)}>Edit</Button>
-        <Button size="sm" variant="ghost" icon={<Trash2 className="h-4 w-4" />} onClick={() => onDelete(task)}>Delete</Button>
+        <Button
+          size="sm"
+          variant="ghost"
+          icon={<Edit2 className="h-4 w-4" />}
+          onClick={() => onEdit(task)}
+        >
+          Edit
+        </Button>
+        <Button
+          size="sm"
+          variant="ghost"
+          icon={<Trash2 className="h-4 w-4" />}
+          onClick={() => onDelete(task)}
+        >
+          Delete
+        </Button>
       </div>
     </Card>
   );
@@ -4845,7 +5484,10 @@ import { Button } from '@/components/common/Button';
 import { formatDateTime } from '@/utils/dateUtils';
 
 type Props = {
-  task: Task; onEdit: (t: Task) => void; onDelete: (t: Task) => void; onComplete: (t: Task) => void;
+  task: Task;
+  onEdit: (t: Task) => void;
+  onDelete: (t: Task) => void;
+  onComplete: (t: Task) => void;
 };
 
 export function TaskRow({ task, onEdit, onDelete, onComplete }: Props) {
@@ -4864,10 +5506,28 @@ export function TaskRow({ task, onEdit, onDelete, onComplete }: Props) {
       </div>
       <div className="flex shrink-0 items-center gap-1">
         {task.status !== 'Completed' && (
-          <Button size="sm" variant="ghost" icon={<Check className="h-4 w-4" />} onClick={() => onComplete(task)} aria-label="Complete" />
+          <Button
+            size="sm"
+            variant="ghost"
+            icon={<Check className="h-4 w-4" />}
+            onClick={() => onComplete(task)}
+            aria-label="Complete"
+          />
         )}
-        <Button size="sm" variant="ghost" icon={<Edit2 className="h-4 w-4" />} onClick={() => onEdit(task)} aria-label="Edit" />
-        <Button size="sm" variant="ghost" icon={<Trash2 className="h-4 w-4" />} onClick={() => onDelete(task)} aria-label="Delete" />
+        <Button
+          size="sm"
+          variant="ghost"
+          icon={<Edit2 className="h-4 w-4" />}
+          onClick={() => onEdit(task)}
+          aria-label="Edit"
+        />
+        <Button
+          size="sm"
+          variant="ghost"
+          icon={<Trash2 className="h-4 w-4" />}
+          onClick={() => onDelete(task)}
+          aria-label="Delete"
+        />
       </div>
     </div>
   );
@@ -4901,30 +5561,92 @@ export function TaskFilters({ filters, onChange, view, onViewChange }: Props) {
         />
         <Search className="pointer-events-none absolute right-3 top-9 h-4 w-4 text-text-muted" />
       </div>
-      <Select label="Status" value={filters.status ?? ''} onChange={(v) => set({ status: (v || undefined) as any })}
-        options={[ ['', 'All'], ['Todo', 'Todo'], ['InProgress', 'In progress'], ['Completed', 'Completed'] ]} />
-      <Select label="Priority" value={filters.priority ?? ''} onChange={(v) => set({ priority: (v || undefined) as any })}
-        options={[ ['', 'All'], ['Low', 'Low'], ['Medium', 'Medium'], ['High', 'High'] ]} />
-      <Select label="Deadline" value={filters.deadlineFilter ?? ''} onChange={(v) => set({ deadlineFilter: (v || undefined) as any })}
-        options={[ ['', 'All'], ['today', 'Today'], ['upcoming', 'Upcoming'], ['overdue', 'Overdue'], ['completed', 'Completed'] ]} />
-      <Select label="Sort" value={filters.sortBy ?? 'deadline'} onChange={(v) => set({ sortBy: v as any })}
-        options={[ ['deadline', 'Deadline'], ['priority', 'Priority'], ['newest', 'Newest'] ]} />
+      <Select
+        label="Status"
+        value={filters.status ?? ''}
+        onChange={(v) => set({ status: (v || undefined) as any })}
+        options={[
+          ['', 'All'],
+          ['Todo', 'Todo'],
+          ['InProgress', 'In progress'],
+          ['Completed', 'Completed'],
+        ]}
+      />
+      <Select
+        label="Priority"
+        value={filters.priority ?? ''}
+        onChange={(v) => set({ priority: (v || undefined) as any })}
+        options={[
+          ['', 'All'],
+          ['Low', 'Low'],
+          ['Medium', 'Medium'],
+          ['High', 'High'],
+        ]}
+      />
+      <Select
+        label="Deadline"
+        value={filters.deadlineFilter ?? ''}
+        onChange={(v) => set({ deadlineFilter: (v || undefined) as any })}
+        options={[
+          ['', 'All'],
+          ['today', 'Today'],
+          ['upcoming', 'Upcoming'],
+          ['overdue', 'Overdue'],
+          ['completed', 'Completed'],
+        ]}
+      />
+      <Select
+        label="Sort"
+        value={filters.sortBy ?? 'deadline'}
+        onChange={(v) => set({ sortBy: v as any })}
+        options={[
+          ['deadline', 'Deadline'],
+          ['priority', 'Priority'],
+          ['newest', 'Newest'],
+        ]}
+      />
       <div className="ml-auto inline-flex rounded-2xl border border-border bg-surface p-0.5">
-        <button onClick={() => onViewChange('grid')} className={`rounded-xl px-3 py-1.5 text-xs ${view === 'grid' ? 'bg-primary-50 text-primary-700' : 'text-text-muted'}`}>Grid</button>
-        <button onClick={() => onViewChange('list')} className={`rounded-xl px-3 py-1.5 text-xs ${view === 'list' ? 'bg-primary-50 text-primary-700' : 'text-text-muted'}`}>List</button>
+        <button
+          onClick={() => onViewChange('grid')}
+          className={`rounded-xl px-3 py-1.5 text-xs ${view === 'grid' ? 'bg-primary-50 text-primary-700' : 'text-text-muted'}`}
+        >
+          Grid
+        </button>
+        <button
+          onClick={() => onViewChange('list')}
+          className={`rounded-xl px-3 py-1.5 text-xs ${view === 'list' ? 'bg-primary-50 text-primary-700' : 'text-text-muted'}`}
+        >
+          List
+        </button>
       </div>
     </div>
   );
 }
 
-function Select({ label, value, onChange, options }:
-  { label: string; value: string; onChange: (v: string) => void; options: [string, string][] }) {
+function Select({
+  label,
+  value,
+  onChange,
+  options,
+}: {
+  label: string;
+  value: string;
+  onChange: (v: string) => void;
+  options: [string, string][];
+}) {
   return (
     <div className="space-y-1">
       <label className="text-sm font-medium">{label}</label>
-      <select value={value} onChange={(e) => onChange(e.target.value)}
-        className="block rounded-2xl border border-border bg-surface px-3 py-2 text-sm">
-        {options.map(([v, l]) => <option key={v} value={v}>{l}</option>)}
+      <select
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        className="block rounded-2xl border border-border bg-surface px-3 py-2 text-sm"
+      >
+        {options.map(([v, l]) => (
+          <option key={v} value={v}>
+            {l}
+          </option>
+        ))}
       </select>
     </div>
   );
@@ -4953,7 +5675,10 @@ import type { Task, TaskListQuery } from '@/types/task';
 export default function TasksPage() {
   const [rawFilters, setRawFilters] = useState<TaskListQuery>({ sortBy: 'deadline' });
   const debouncedSearch = useDebounce(rawFilters.search, 300);
-  const filters = useMemo(() => ({ ...rawFilters, search: debouncedSearch }), [rawFilters, debouncedSearch]);
+  const filters = useMemo(
+    () => ({ ...rawFilters, search: debouncedSearch }),
+    [rawFilters, debouncedSearch],
+  );
   const [view, setView] = useState<'grid' | 'list'>('grid');
   const [editing, setEditing] = useState<Task | null>(null);
   const [creating, setCreating] = useState(false);
@@ -4973,14 +5698,23 @@ export default function TasksPage() {
     <div className="space-y-5">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-semibold tracking-tight">My Tasks</h1>
-        <Button icon={<Plus className="h-4 w-4" />} onClick={() => setCreating(true)}>Add Task</Button>
+        <Button icon={<Plus className="h-4 w-4" />} onClick={() => setCreating(true)}>
+          Add Task
+        </Button>
       </div>
 
-      <TaskFilters filters={rawFilters} onChange={setRawFilters} view={view} onViewChange={setView} />
+      <TaskFilters
+        filters={rawFilters}
+        onChange={setRawFilters}
+        view={view}
+        onViewChange={setView}
+      />
 
       {tasks.isLoading ? (
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
-          <CardSkeleton /><CardSkeleton /><CardSkeleton />
+          <CardSkeleton />
+          <CardSkeleton />
+          <CardSkeleton />
         </div>
       ) : tasks.isError ? (
         <ErrorState description="Couldn't load tasks." onRetry={() => tasks.refetch()} />
@@ -4994,7 +5728,8 @@ export default function TasksPage() {
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
           {tasks.data!.map((t) => (
             <TaskCard
-              key={t._id} task={t}
+              key={t._id}
+              task={t}
               onEdit={setEditing}
               onDelete={setConfirmDelete}
               onComplete={onComplete}
@@ -5005,7 +5740,13 @@ export default function TasksPage() {
       ) : (
         <div className="space-y-2">
           {tasks.data!.map((t) => (
-            <TaskRow key={t._id} task={t} onEdit={setEditing} onDelete={setConfirmDelete} onComplete={onComplete} />
+            <TaskRow
+              key={t._id}
+              task={t}
+              onEdit={setEditing}
+              onDelete={setConfirmDelete}
+              onComplete={onComplete}
+            />
           ))}
         </div>
       )}
@@ -5055,6 +5796,7 @@ git commit -m "feat(client): TasksPage with filters, search, grid/list views, mo
 ## Task 20: PomodoroPage — timer ring, mode tabs, task selector, history, estimate prompt
 
 **Files:**
+
 - Create: `client/src/components/pomodoro/{ProgressRing.tsx,PomodoroModeTabs.tsx,FocusTaskSelector.tsx,PomodoroHistoryList.tsx,PomodoroTimer.tsx,EstimateReachedDialog.tsx}`
 - Replace: `client/src/pages/PomodoroPage.tsx`
 - Modify: `client/src/store/pomodoroStore.ts` (already designed in Task 16; this task only consumes it)
@@ -5062,20 +5804,45 @@ git commit -m "feat(client): TasksPage with filters, search, grid/list views, mo
 - [ ] **Step 1: Write `client/src/components/pomodoro/ProgressRing.tsx`**
 
 ```tsx
-type Props = { size?: number; stroke?: number; progress: number; color?: string; children?: React.ReactNode };
+type Props = {
+  size?: number;
+  stroke?: number;
+  progress: number;
+  color?: string;
+  children?: React.ReactNode;
+};
 
-export function ProgressRing({ size = 240, stroke = 12, progress, color = 'rgb(99 102 241)', children }: Props) {
+export function ProgressRing({
+  size = 240,
+  stroke = 12,
+  progress,
+  color = 'rgb(99 102 241)',
+  children,
+}: Props) {
   const r = (size - stroke) / 2;
   const c = 2 * Math.PI * r;
   const offset = c * (1 - Math.max(0, Math.min(1, progress)));
   return (
     <div className="relative" style={{ width: size, height: size }}>
       <svg width={size} height={size} className="-rotate-90">
-        <circle cx={size / 2} cy={size / 2} r={r} stroke="rgb(var(--border))" strokeWidth={stroke} fill="none" />
         <circle
-          cx={size / 2} cy={size / 2} r={r}
-          stroke={color} strokeWidth={stroke} strokeLinecap="round" fill="none"
-          strokeDasharray={c} strokeDashoffset={offset}
+          cx={size / 2}
+          cy={size / 2}
+          r={r}
+          stroke="rgb(var(--border))"
+          strokeWidth={stroke}
+          fill="none"
+        />
+        <circle
+          cx={size / 2}
+          cy={size / 2}
+          r={r}
+          stroke={color}
+          strokeWidth={stroke}
+          strokeLinecap="round"
+          fill="none"
+          strokeDasharray={c}
+          strokeDashoffset={offset}
           style={{ transition: 'stroke-dashoffset 0.25s linear' }}
         />
       </svg>
@@ -5113,7 +5880,9 @@ export function PomodoroModeTabs({ mode, onChange, disabled }: Props) {
           onClick={() => onChange(t.key)}
           className={cn(
             'rounded-xl px-3 py-1.5 text-sm transition',
-            mode === t.key ? 'bg-primary-50 text-primary-700 dark:bg-primary-500/10' : 'text-text-muted hover:bg-bg',
+            mode === t.key
+              ? 'bg-primary-50 text-primary-700 dark:bg-primary-500/10'
+              : 'text-text-muted hover:bg-bg',
           )}
         >
           {t.label}
@@ -5165,7 +5934,10 @@ export function PomodoroHistoryList({ sessions }: { sessions: PomodoroSession[] 
   return (
     <ul className="space-y-2">
       {sessions.map((s) => (
-        <li key={s._id} className="flex items-center justify-between rounded-2xl border border-border bg-surface px-3 py-2 text-sm">
+        <li
+          key={s._id}
+          className="flex items-center justify-between rounded-2xl border border-border bg-surface px-3 py-2 text-sm"
+        >
           <span>
             <span className="font-medium">{s.mode}</span> · {s.durationMinutes} min
           </span>
@@ -5184,18 +5956,23 @@ import { Modal } from '@/components/common/Modal';
 import { Button } from '@/components/common/Button';
 
 type Props = {
-  open: boolean; taskTitle?: string;
-  onKeepGoing: () => void; onMarkComplete: () => void;
+  open: boolean;
+  taskTitle?: string;
+  onKeepGoing: () => void;
+  onMarkComplete: () => void;
 };
 
 export function EstimateReachedDialog({ open, taskTitle, onKeepGoing, onMarkComplete }: Props) {
   return (
     <Modal open={open} onClose={onKeepGoing} title="Estimate reached" size="sm">
       <p className="text-sm text-text-muted">
-        You've reached the estimated pomodoros for {taskTitle ? `"${taskTitle}"` : 'this task'}. Mark as completed?
+        You've reached the estimated pomodoros for {taskTitle ? `"${taskTitle}"` : 'this task'}.
+        Mark as completed?
       </p>
       <div className="mt-5 flex justify-end gap-2">
-        <Button variant="secondary" onClick={onKeepGoing}>Keep going</Button>
+        <Button variant="secondary" onClick={onKeepGoing}>
+          Keep going
+        </Button>
         <Button onClick={onMarkComplete}>Mark complete</Button>
       </div>
     </Modal>
@@ -5215,7 +5992,9 @@ import { unlockAudio } from '@/lib/audio';
 
 const fmt = (ms: number) => {
   const total = Math.max(0, Math.ceil(ms / 1000));
-  const m = Math.floor(total / 60).toString().padStart(2, '0');
+  const m = Math.floor(total / 60)
+    .toString()
+    .padStart(2, '0');
   const s = (total % 60).toString().padStart(2, '0');
   return `${m}:${s}`;
 };
@@ -5236,12 +6015,18 @@ export function PomodoroTimer({ taskTitle }: { taskTitle?: string | null }) {
   const skip = usePomodoroStore((s) => s.skip);
   const remaining = useRemainingMs();
 
-  const totalMs = (mode === 'Focus' ? durations.focus
-                  : mode === 'ShortBreak' ? durations.shortBreak
-                  : durations.longBreak) * 60_000;
+  const totalMs =
+    (mode === 'Focus'
+      ? durations.focus
+      : mode === 'ShortBreak'
+        ? durations.shortBreak
+        : durations.longBreak) * 60_000;
   const progress = 1 - remaining / totalMs;
 
-  const onStart = () => { unlockAudio(); start(); };
+  const onStart = () => {
+    unlockAudio();
+    start();
+  };
 
   return (
     <div className="flex flex-col items-center gap-6">
@@ -5254,13 +6039,21 @@ export function PomodoroTimer({ taskTitle }: { taskTitle?: string | null }) {
         </div>
       </ProgressRing>
       <div className="flex items-center gap-3">
-        <Button variant="secondary" icon={<RotateCcw className="h-4 w-4" />} onClick={reset}>Reset</Button>
+        <Button variant="secondary" icon={<RotateCcw className="h-4 w-4" />} onClick={reset}>
+          Reset
+        </Button>
         {status === 'running' ? (
-          <Button size="lg" icon={<Pause className="h-5 w-5" />} onClick={pause}>Pause</Button>
+          <Button size="lg" icon={<Pause className="h-5 w-5" />} onClick={pause}>
+            Pause
+          </Button>
         ) : (
-          <Button size="lg" icon={<Play className="h-5 w-5" />} onClick={onStart}>Start</Button>
+          <Button size="lg" icon={<Play className="h-5 w-5" />} onClick={onStart}>
+            Start
+          </Button>
         )}
-        <Button variant="secondary" icon={<SkipForward className="h-4 w-4" />} onClick={skip}>Skip</Button>
+        <Button variant="secondary" icon={<SkipForward className="h-4 w-4" />} onClick={skip}>
+          Skip
+        </Button>
       </div>
     </div>
   );
@@ -5338,8 +6131,14 @@ export default function PomodoroPage() {
         onMarkComplete={() => {
           if (!estimateTask) return ack();
           complete.mutate(estimateTask._id, {
-            onSuccess: () => { toast.success('Task completed'); ack(); },
-            onError: () => { toast.error('Failed to complete'); ack(); },
+            onSuccess: () => {
+              toast.success('Task completed');
+              ack();
+            },
+            onError: () => {
+              toast.error('Failed to complete');
+              ack();
+            },
           });
         }}
       />
@@ -5368,6 +6167,7 @@ git commit -m "feat(client): PomodoroPage — ring timer, mode tabs, task select
 ## Task 21: DashboardPage — summary cards + lists + mini chart
 
 **Files:**
+
 - Create: `client/src/components/dashboard/{SummaryCard.tsx,TodayTasks.tsx,UpcomingTasks.tsx,RecentPomodoros.tsx,CompletionMiniChart.tsx}`
 - Replace: `client/src/pages/DashboardPage.tsx`
 
@@ -5377,7 +6177,12 @@ git commit -m "feat(client): PomodoroPage — ring timer, mode tabs, task select
 import { type LucideIcon } from 'lucide-react';
 import { Card } from '@/components/common/Card';
 
-type Props = { icon: LucideIcon; label: string; value: string | number; tone?: 'default' | 'warn' | 'good' };
+type Props = {
+  icon: LucideIcon;
+  label: string;
+  value: string | number;
+  tone?: 'default' | 'warn' | 'good';
+};
 
 const toneClasses: Record<NonNullable<Props['tone']>, string> = {
   default: 'text-primary-600',
@@ -5417,7 +6222,8 @@ export function TodayTasks({ tasks, onEdit }: { tasks: Task[]; onEdit: (t: Task)
     <div className="space-y-2">
       {tasks.map((t) => (
         <TaskRow
-          key={t._id} task={t}
+          key={t._id}
+          task={t}
           onEdit={onEdit}
           onComplete={(t) => complete.mutate(t._id, { onError: () => toast.error('Failed') })}
           onDelete={(t) => remove.mutate(t._id)}
@@ -5438,7 +6244,11 @@ import { formatDateTime } from '@/utils/dateUtils';
 
 export function UpcomingTasks({ tasks, onClick }: { tasks: Task[]; onClick: (t: Task) => void }) {
   if (!tasks.length) {
-    return <Card><p className="text-sm text-text-muted">Nothing upcoming.</p></Card>;
+    return (
+      <Card>
+        <p className="text-sm text-text-muted">Nothing upcoming.</p>
+      </Card>
+    );
   }
   return (
     <Card>
@@ -5446,7 +6256,10 @@ export function UpcomingTasks({ tasks, onClick }: { tasks: Task[]; onClick: (t: 
       <ul className="divide-y divide-border">
         {tasks.map((t) => (
           <li key={t._id}>
-            <button onClick={() => onClick(t)} className="flex w-full items-center justify-between py-2 text-left">
+            <button
+              onClick={() => onClick(t)}
+              className="flex w-full items-center justify-between py-2 text-left"
+            >
               <div>
                 <div className="text-sm font-medium">{t.title}</div>
                 <div className="text-xs text-text-muted">{formatDateTime(t.deadline)}</div>
@@ -5478,7 +6291,9 @@ export function RecentPomodoros({ sessions }: { sessions: PomodoroSession[] }) {
         <ul className="divide-y divide-border">
           {sessions.map((s) => (
             <li key={s._id} className="flex items-center justify-between py-2 text-sm">
-              <span><span className="font-medium">{s.mode}</span> · {s.durationMinutes} min</span>
+              <span>
+                <span className="font-medium">{s.mode}</span> · {s.durationMinutes} min
+              </span>
               <span className="text-xs text-text-muted">{fromNow(s.startedAt)}</span>
             </li>
           ))}
@@ -5556,15 +6371,20 @@ export default function DashboardPage() {
       </div>
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <SummaryCard icon={ListTodo}      label="Total tasks"     value={d.totalTasks} />
-        <SummaryCard icon={CheckCircle}   label="Completed"        value={d.completedTasks} tone="good" />
-        <SummaryCard icon={Clock}         label="In progress"      value={d.inProgressTasks} />
-        <SummaryCard icon={AlertTriangle} label="Overdue"          value={d.overdueTasks} tone="warn" />
+        <SummaryCard icon={ListTodo} label="Total tasks" value={d.totalTasks} />
+        <SummaryCard icon={CheckCircle} label="Completed" value={d.completedTasks} tone="good" />
+        <SummaryCard icon={Clock} label="In progress" value={d.inProgressTasks} />
+        <SummaryCard icon={AlertTriangle} label="Overdue" value={d.overdueTasks} tone="warn" />
       </div>
 
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
-        <SummaryCard icon={Timer} label="Pomodoros today"  value={d.todayPomodoros} />
-        <SummaryCard icon={Flame} label="Focus time today" value={minutesToHM(d.todayFocusMinutes)} tone="good" />
+        <SummaryCard icon={Timer} label="Pomodoros today" value={d.todayPomodoros} />
+        <SummaryCard
+          icon={Flame}
+          label="Focus time today"
+          value={minutesToHM(d.todayFocusMinutes)}
+          tone="good"
+        />
       </div>
 
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
@@ -5606,6 +6426,7 @@ git commit -m "feat(client): DashboardPage with summary cards, lists, mini chart
 ## Task 22: CalendarPage — react-big-calendar + DayTasksPanel
 
 **Files:**
+
 - Create: `client/src/components/calendar/{CalendarView.tsx,DayTasksPanel.tsx}`
 - Replace: `client/src/pages/CalendarPage.tsx`
 - Modify: `client/src/index.css` (import react-big-calendar styles + dark overrides)
@@ -5615,14 +6436,36 @@ git commit -m "feat(client): DashboardPage with summary cards, lists, mini chart
 ```css
 @import 'react-big-calendar/lib/css/react-big-calendar.css';
 
-.rbc-calendar { background: rgb(var(--surface)); color: rgb(var(--text)); border-radius: 16px; padding: 8px; }
-.rbc-toolbar button { color: rgb(var(--text)); }
-.rbc-month-view, .rbc-time-view, .rbc-time-header, .rbc-header,
-.rbc-day-bg, .rbc-month-row { border-color: rgb(var(--border)) !important; }
-.rbc-off-range-bg { background: rgba(0,0,0,0.04); }
-.dark .rbc-off-range-bg { background: rgba(255,255,255,0.04); }
-.rbc-today { background: rgba(99,102,241,0.08); }
-.rbc-event { border: none; padding: 2px 6px; }
+.rbc-calendar {
+  background: rgb(var(--surface));
+  color: rgb(var(--text));
+  border-radius: 16px;
+  padding: 8px;
+}
+.rbc-toolbar button {
+  color: rgb(var(--text));
+}
+.rbc-month-view,
+.rbc-time-view,
+.rbc-time-header,
+.rbc-header,
+.rbc-day-bg,
+.rbc-month-row {
+  border-color: rgb(var(--border)) !important;
+}
+.rbc-off-range-bg {
+  background: rgba(0, 0, 0, 0.04);
+}
+.dark .rbc-off-range-bg {
+  background: rgba(255, 255, 255, 0.04);
+}
+.rbc-today {
+  background: rgba(99, 102, 241, 0.08);
+}
+.rbc-event {
+  border: none;
+  padding: 2px 6px;
+}
 ```
 
 - [ ] **Step 2: Write `client/src/components/calendar/CalendarView.tsx`**
@@ -5644,12 +6487,20 @@ const colorByPriority = (p: Task['priority']) =>
 type Props = {
   tasks: Task[];
   selectedDate: Date | null;
-  view: View; onViewChange: (v: View) => void;
+  view: View;
+  onViewChange: (v: View) => void;
   onSelectDay: (d: Date) => void;
   onSelectTask: (t: Task) => void;
 };
 
-export function CalendarView({ tasks, selectedDate, view, onViewChange, onSelectDay, onSelectTask }: Props) {
+export function CalendarView({
+  tasks,
+  selectedDate,
+  view,
+  onViewChange,
+  onSelectDay,
+  onSelectTask,
+}: Props) {
   const events: Event[] = tasks.map((t) => {
     const start = new Date(t.deadline);
     return { id: t._id, title: t.title, start, end: start, resource: t };
@@ -5668,7 +6519,8 @@ export function CalendarView({ tasks, selectedDate, view, onViewChange, onSelect
       onSelectEvent={(e) => onSelectTask((e as Event).resource)}
       dayPropGetter={(date) =>
         selectedDate && isSameDay(date, selectedDate)
-          ? { style: { background: 'rgba(99,102,241,0.12)' } } : {}
+          ? { style: { background: 'rgba(99,102,241,0.12)' } }
+          : {}
       }
       eventPropGetter={(e) => ({
         style: { backgroundColor: colorByPriority((e as Event).resource.priority), color: 'white' },
@@ -5695,7 +6547,11 @@ export function DayTasksPanel({ date, tasks, onEdit }: Props) {
   const remove = useDeleteTask();
   const complete = useMarkComplete();
   if (!date) {
-    return <Card><p className="text-sm text-text-muted">Select a day to view tasks.</p></Card>;
+    return (
+      <Card>
+        <p className="text-sm text-text-muted">Select a day to view tasks.</p>
+      </Card>
+    );
   }
   const items = tasks.filter((t) => isSameDay(parseISO(t.deadline), date));
   return (
@@ -5707,7 +6563,8 @@ export function DayTasksPanel({ date, tasks, onEdit }: Props) {
         <div className="space-y-2">
           {items.map((t) => (
             <TaskRow
-              key={t._id} task={t}
+              key={t._id}
+              task={t}
               onEdit={onEdit}
               onComplete={(t) => complete.mutate(t._id, { onError: () => toast.error('Failed') })}
               onDelete={(t) => remove.mutate(t._id)}
@@ -5785,6 +6642,7 @@ git commit -m "feat(client): CalendarPage with react-big-calendar and day tasks 
 ## Task 23: StatisticsPage — RangeSelector + 5 Recharts charts
 
 **Files:**
+
 - Create: `client/src/components/statistics/{RangeSelector.tsx,TaskCompletionChart.tsx,PomodoroChart.tsx,FocusMinutesChart.tsx,PriorityPie.tsx,StatusPie.tsx}`
 - Replace: `client/src/pages/StatisticsPage.tsx`
 
@@ -5800,7 +6658,13 @@ const opts: { v: StatRange; label: string }[] = [
   { v: 'month', label: 'This month' },
 ];
 
-export function RangeSelector({ value, onChange }: { value: StatRange; onChange: (v: StatRange) => void }) {
+export function RangeSelector({
+  value,
+  onChange,
+}: {
+  value: StatRange;
+  onChange: (v: StatRange) => void;
+}) {
   return (
     <div className="inline-flex rounded-2xl border border-border bg-surface p-1">
       {opts.map((o) => (
@@ -5809,7 +6673,9 @@ export function RangeSelector({ value, onChange }: { value: StatRange; onChange:
           onClick={() => onChange(o.v)}
           className={cn(
             'rounded-xl px-3 py-1.5 text-sm transition',
-            value === o.v ? 'bg-primary-50 text-primary-700 dark:bg-primary-500/10' : 'text-text-muted hover:bg-bg',
+            value === o.v
+              ? 'bg-primary-50 text-primary-700 dark:bg-primary-500/10'
+              : 'text-text-muted hover:bg-bg',
           )}
         >
           {o.label}
@@ -5839,7 +6705,7 @@ export function TaskCompletionChart({ data }: { data: TaskStatsResponse }) {
             <XAxis dataKey="label" fontSize={11} tickLine={false} axisLine={false} />
             <YAxis allowDecimals={false} fontSize={11} tickLine={false} axisLine={false} />
             <Tooltip />
-            <Bar dataKey="count" fill="rgb(99 102 241)" radius={[6,6,0,0]} />
+            <Bar dataKey="count" fill="rgb(99 102 241)" radius={[6, 6, 0, 0]} />
           </BarChart>
         </ResponsiveContainer>
       </div>
@@ -5867,7 +6733,7 @@ export function PomodoroChart({ data }: { data: DailyPomodoroPoint[] }) {
             <XAxis dataKey="label" fontSize={11} tickLine={false} axisLine={false} />
             <YAxis allowDecimals={false} fontSize={11} tickLine={false} axisLine={false} />
             <Tooltip />
-            <Bar dataKey="sessions" fill="rgb(22 163 74)" radius={[6,6,0,0]} />
+            <Bar dataKey="sessions" fill="rgb(22 163 74)" radius={[6, 6, 0, 0]} />
           </BarChart>
         </ResponsiveContainer>
       </div>
@@ -5895,7 +6761,13 @@ export function FocusMinutesChart({ data }: { data: DailyPomodoroPoint[] }) {
             <XAxis dataKey="label" fontSize={11} tickLine={false} axisLine={false} />
             <YAxis fontSize={11} tickLine={false} axisLine={false} />
             <Tooltip />
-            <Line type="monotone" dataKey="focusMinutes" stroke="rgb(99 102 241)" strokeWidth={2} dot />
+            <Line
+              type="monotone"
+              dataKey="focusMinutes"
+              stroke="rgb(99 102 241)"
+              strokeWidth={2}
+              dot
+            />
           </LineChart>
         </ResponsiveContainer>
       </div>
@@ -5921,7 +6793,9 @@ export function PriorityPie({ data }: { data: PriorityCount[] }) {
         <ResponsiveContainer>
           <PieChart>
             <Pie data={data} dataKey="count" nameKey="priority" outerRadius={80} label>
-              {data.map((d) => <Cell key={d.priority} fill={COLOR[d.priority]} />)}
+              {data.map((d) => (
+                <Cell key={d.priority} fill={COLOR[d.priority]} />
+              ))}
             </Pie>
             <Tooltip />
           </PieChart>
@@ -5939,7 +6813,11 @@ import { Cell, Pie, PieChart, ResponsiveContainer, Tooltip } from 'recharts';
 import type { StatusCount } from '@/types/statistics';
 import { Card } from '@/components/common/Card';
 
-const COLOR: Record<string, string> = { Todo: '#64748b', InProgress: '#2563eb', Completed: '#16a34a' };
+const COLOR: Record<string, string> = {
+  Todo: '#64748b',
+  InProgress: '#2563eb',
+  Completed: '#16a34a',
+};
 
 export function StatusPie({ data }: { data: StatusCount[] }) {
   return (
@@ -5949,7 +6827,9 @@ export function StatusPie({ data }: { data: StatusCount[] }) {
         <ResponsiveContainer>
           <PieChart>
             <Pie data={data} dataKey="count" nameKey="status" outerRadius={80} label>
-              {data.map((d) => <Cell key={d.status} fill={COLOR[d.status]} />)}
+              {data.map((d) => (
+                <Cell key={d.status} fill={COLOR[d.status]} />
+              ))}
             </Pie>
             <Tooltip />
           </PieChart>
@@ -5983,7 +6863,14 @@ export default function StatisticsPage() {
 
   if (taskStats.isLoading || pomoStats.isLoading) return <Loading />;
   if (taskStats.isError || pomoStats.isError) {
-    return <ErrorState onRetry={() => { taskStats.refetch(); pomoStats.refetch(); }} />;
+    return (
+      <ErrorState
+        onRetry={() => {
+          taskStats.refetch();
+          pomoStats.refetch();
+        }}
+      />
+    );
   }
 
   const noData =
@@ -5998,7 +6885,10 @@ export default function StatisticsPage() {
       </div>
 
       {noData ? (
-        <EmptyState title="Not enough data yet" description="Complete some tasks or focus sessions to see stats." />
+        <EmptyState
+          title="Not enough data yet"
+          description="Complete some tasks or focus sessions to see stats."
+        />
       ) : (
         <>
           <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
@@ -6008,7 +6898,7 @@ export default function StatisticsPage() {
           <FocusMinutesChart data={pomoStats.data!.daily} />
           <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
             <PriorityPie data={pomoStats.data!.byPriority} />
-            <StatusPie  data={pomoStats.data!.byStatus} />
+            <StatusPie data={pomoStats.data!.byStatus} />
           </div>
         </>
       )}
@@ -6037,6 +6927,7 @@ git commit -m "feat(client): StatisticsPage with 5 Recharts visualizations + ran
 ## Task 24: SettingsPage — 4 sub-forms (profile, password, durations, preferences)
 
 **Files:**
+
 - Create: `client/src/validators/settings.schema.ts`
 - Replace: `client/src/pages/SettingsPage.tsx`
 
@@ -6050,14 +6941,16 @@ export const profileSchema = z.object({
 });
 export type ProfileValues = z.infer<typeof profileSchema>;
 
-export const passwordSchema = z.object({
-  currentPassword: z.string().min(1),
-  newPassword: z.string().min(6),
-  confirmPassword: z.string().min(6),
-}).refine((d) => d.newPassword === d.confirmPassword, {
-  message: 'Passwords do not match',
-  path: ['confirmPassword'],
-});
+export const passwordSchema = z
+  .object({
+    currentPassword: z.string().min(1),
+    newPassword: z.string().min(6),
+    confirmPassword: z.string().min(6),
+  })
+  .refine((d) => d.newPassword === d.confirmPassword, {
+    message: 'Passwords do not match',
+    path: ['confirmPassword'],
+  });
 export type PasswordValues = z.infer<typeof passwordSchema>;
 
 export const durationsSchema = z.object({
@@ -6087,13 +6980,22 @@ import { Button } from '@/components/common/Button';
 import { Loading } from '@/components/common/Loading';
 import { useAuth } from '@/hooks/useAuth';
 import {
-  useChangePassword, useSettingsQuery, useUpdateProfile, useUpdateSettings,
+  useChangePassword,
+  useSettingsQuery,
+  useUpdateProfile,
+  useUpdateSettings,
 } from '@/hooks/queries/useSettingsQueries';
 import { useThemeStore } from '@/store/themeStore';
 import { usePomodoroStore } from '@/store/pomodoroStore';
 import {
-  profileSchema, passwordSchema, durationsSchema, preferencesSchema,
-  type ProfileValues, type PasswordValues, type DurationValues, type PreferencesValues,
+  profileSchema,
+  passwordSchema,
+  durationsSchema,
+  preferencesSchema,
+  type ProfileValues,
+  type PasswordValues,
+  type DurationValues,
+  type PreferencesValues,
 } from '@/validators/settings.schema';
 
 export default function SettingsPage() {
@@ -6150,16 +7052,23 @@ export default function SettingsPage() {
             updateProfile.mutate(v, {
               onSuccess: () => toast.success('Profile updated'),
               onError: () => toast.error('Failed'),
-            }))}
+            }),
+          )}
           className="space-y-3"
         >
-          <Input label="Full name" {...profile.register('fullName')} error={profile.formState.errors.fullName?.message} />
+          <Input
+            label="Full name"
+            {...profile.register('fullName')}
+            error={profile.formState.errors.fullName?.message}
+          />
           <div>
             <label className="text-sm font-medium">Email</label>
             <p className="mt-1 text-sm text-text-muted">{user?.email}</p>
           </div>
           <div className="flex justify-end">
-            <Button type="submit" loading={updateProfile.isPending}>Save</Button>
+            <Button type="submit" loading={updateProfile.isPending}>
+              Save
+            </Button>
           </div>
         </form>
       </Card>
@@ -6169,16 +7078,37 @@ export default function SettingsPage() {
         <form
           onSubmit={password.handleSubmit((v) =>
             changePassword.mutate(v, {
-              onSuccess: () => { toast.success('Password updated'); password.reset(); },
+              onSuccess: () => {
+                toast.success('Password updated');
+                password.reset();
+              },
               onError: (e: any) => toast.error(e?.response?.data?.error?.message ?? 'Failed'),
-            }))}
+            }),
+          )}
           className="space-y-3"
         >
-          <Input label="Current password" type="password" {...password.register('currentPassword')} error={password.formState.errors.currentPassword?.message} />
-          <Input label="New password" type="password" {...password.register('newPassword')} error={password.formState.errors.newPassword?.message} />
-          <Input label="Confirm new password" type="password" {...password.register('confirmPassword')} error={password.formState.errors.confirmPassword?.message} />
+          <Input
+            label="Current password"
+            type="password"
+            {...password.register('currentPassword')}
+            error={password.formState.errors.currentPassword?.message}
+          />
+          <Input
+            label="New password"
+            type="password"
+            {...password.register('newPassword')}
+            error={password.formState.errors.newPassword?.message}
+          />
+          <Input
+            label="Confirm new password"
+            type="password"
+            {...password.register('confirmPassword')}
+            error={password.formState.errors.confirmPassword?.message}
+          />
           <div className="flex justify-end">
-            <Button type="submit" loading={changePassword.isPending}>Update password</Button>
+            <Button type="submit" loading={changePassword.isPending}>
+              Update password
+            </Button>
           </div>
         </form>
       </Card>
@@ -6193,14 +7123,38 @@ export default function SettingsPage() {
                 hydrate(v);
               },
               onError: () => toast.error('Failed'),
-            }))}
+            }),
+          )}
           className="grid grid-cols-1 gap-3 sm:grid-cols-3"
         >
-          <Input label="Focus" type="number" min={1} max={120} {...durations.register('focusDuration')} error={durations.formState.errors.focusDuration?.message} />
-          <Input label="Short break" type="number" min={1} max={60} {...durations.register('shortBreakDuration')} error={durations.formState.errors.shortBreakDuration?.message} />
-          <Input label="Long break" type="number" min={1} max={60} {...durations.register('longBreakDuration')} error={durations.formState.errors.longBreakDuration?.message} />
+          <Input
+            label="Focus"
+            type="number"
+            min={1}
+            max={120}
+            {...durations.register('focusDuration')}
+            error={durations.formState.errors.focusDuration?.message}
+          />
+          <Input
+            label="Short break"
+            type="number"
+            min={1}
+            max={60}
+            {...durations.register('shortBreakDuration')}
+            error={durations.formState.errors.shortBreakDuration?.message}
+          />
+          <Input
+            label="Long break"
+            type="number"
+            min={1}
+            max={60}
+            {...durations.register('longBreakDuration')}
+            error={durations.formState.errors.longBreakDuration?.message}
+          />
           <div className="sm:col-span-3 flex justify-end">
-            <Button type="submit" loading={updateSettings.isPending}>Save</Button>
+            <Button type="submit" loading={updateSettings.isPending}>
+              Save
+            </Button>
           </div>
         </form>
       </Card>
@@ -6210,9 +7164,13 @@ export default function SettingsPage() {
         <form
           onSubmit={preferences.handleSubmit((v) =>
             updateSettings.mutate(v, {
-              onSuccess: () => { toast.success('Preferences saved'); setTheme(v.theme); },
+              onSuccess: () => {
+                toast.success('Preferences saved');
+                setTheme(v.theme);
+              },
               onError: () => toast.error('Failed'),
-            }))}
+            }),
+          )}
           className="space-y-3"
         >
           <div>
@@ -6227,10 +7185,13 @@ export default function SettingsPage() {
             </div>
           </div>
           <label className="flex items-center gap-2 text-sm">
-            <input type="checkbox" {...preferences.register('notificationEnabled')} /> Enable notifications
+            <input type="checkbox" {...preferences.register('notificationEnabled')} /> Enable
+            notifications
           </label>
           <div className="flex justify-end">
-            <Button type="submit" loading={updateSettings.isPending}>Save</Button>
+            <Button type="submit" loading={updateSettings.isPending}>
+              Save
+            </Button>
           </div>
         </form>
       </Card>
@@ -6259,6 +7220,7 @@ git commit -m "feat(client): SettingsPage with profile/password/durations/prefer
 ## Task 25: Notification bell + polling + click-through to task
 
 **Files:**
+
 - Create: `client/src/components/notifications/{NotificationPanel.tsx,NotificationItem.tsx,NotificationBell.tsx}`
 - Modify: `client/src/components/layout/Header.tsx` (mount NotificationBell)
 
@@ -6306,7 +7268,11 @@ export function NotificationItem({ n, onClick }: Props) {
 
 ```tsx
 import { useNavigate } from 'react-router-dom';
-import { useMarkAllNotifRead, useMarkNotifRead, useNotificationsQuery } from '@/hooks/queries/useNotificationQueries';
+import {
+  useMarkAllNotifRead,
+  useMarkNotifRead,
+  useNotificationsQuery,
+} from '@/hooks/queries/useNotificationQueries';
 import { NotificationItem } from './NotificationItem';
 import { Loading } from '@/components/common/Loading';
 import { EmptyState } from '@/components/common/EmptyState';
@@ -6337,15 +7303,19 @@ export function NotificationPanel({ onClose }: { onClose: () => void }) {
         </button>
       </div>
       <div className="max-h-96 overflow-auto">
-        {list.isLoading ? <Loading /> :
-          list.data && list.data.length > 0 ? (
-            <ul className="space-y-1 p-1">
-              {list.data.map((n) => (
-                <li key={n._id}><NotificationItem n={n} onClick={onClick} /></li>
-              ))}
-            </ul>
-          ) : <EmptyState title="You're all caught up" />
-        }
+        {list.isLoading ? (
+          <Loading />
+        ) : list.data && list.data.length > 0 ? (
+          <ul className="space-y-1 p-1">
+            {list.data.map((n) => (
+              <li key={n._id}>
+                <NotificationItem n={n} onClick={onClick} />
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <EmptyState title="You're all caught up" />
+        )}
       </div>
     </div>
   );
@@ -6401,7 +7371,7 @@ export function NotificationBell() {
 ```tsx
 import { NotificationBell } from '@/components/notifications/NotificationBell';
 // ... and in JSX, replace the comment with:
-<NotificationBell />
+<NotificationBell />;
 ```
 
 - [ ] **Step 5: Typecheck**
@@ -6424,29 +7394,33 @@ git commit -m "feat(client): notification bell with polling + panel + mark-read 
 ## Task 26: Final README + manual verification + smoke test
 
 **Files:**
+
 - Modify: `README.md`
 - Verify: backend + frontend run end-to-end
 
 - [ ] **Step 1: Replace root `README.md`**
 
 ```markdown
-# TaskFlow Clone
+# Task88 Clone
 
-Productivity web app: tasks, pomodoro timer, calendar, dashboard, statistics, settings, in-app notifications. Inspired by https://www.taskflow.pro.vn/.
+Productivity web app: tasks, pomodoro timer, calendar, dashboard, statistics, settings, in-app notifications. Inspired by https://www.Task88.pro.vn/.
 
 > Study Together is intentionally NOT implemented.
 
 ## Stack
+
 - **Frontend:** React 18 + Vite + TypeScript + Tailwind + React Query + Zustand + Recharts + react-big-calendar + sonner + lucide-react
 - **Backend:** Node.js 20 + Express + MongoDB (Mongoose) + JWT + bcrypt
 - **Tests:** Jest + Supertest + mongodb-memory-server (server), Vitest + Testing Library (client)
 
 ## Project layout
 ```
-server/   Express + Mongo API
-client/   React SPA
-docs/     Design specs and implementation plans
-```
+
+server/ Express + Mongo API
+client/ React SPA
+docs/ Design specs and implementation plans
+
+````
 
 ## Prerequisites
 - Node.js 20 or newer
@@ -6462,9 +7436,10 @@ cp .env.example .env
 npm install
 npm run seed:reset       # creates demo user + sample data
 npm run dev              # http://localhost:4000
-```
+````
 
 ### Frontend
+
 ```bash
 cd client
 cp .env.example .env
@@ -6473,65 +7448,71 @@ npm run dev              # http://localhost:5173
 ```
 
 Visit http://localhost:5173 and log in:
-- Email: `demo@taskflow.com`
+
+- Email: `demo@Task88.com`
 - Password: `123456`
 
 ## Environment variables
 
 ### `server/.env`
-| Var | Default | Description |
-|-----|---------|-------------|
-| `PORT` | `4000` | API port |
-| `MONGO_URI` | – | Mongo connection string |
-| `JWT_SECRET` | – | Required, ≥16 chars |
-| `JWT_EXPIRES_IN` | `7d` | JWT lifetime |
-| `CLIENT_ORIGIN` | `http://localhost:5173` | CORS allowlist |
-| `BCRYPT_COST` | `10` | bcrypt cost factor |
+
+| Var              | Default                 | Description             |
+| ---------------- | ----------------------- | ----------------------- |
+| `PORT`           | `4000`                  | API port                |
+| `MONGO_URI`      | –                       | Mongo connection string |
+| `JWT_SECRET`     | –                       | Required, ≥16 chars     |
+| `JWT_EXPIRES_IN` | `7d`                    | JWT lifetime            |
+| `CLIENT_ORIGIN`  | `http://localhost:5173` | CORS allowlist          |
+| `BCRYPT_COST`    | `10`                    | bcrypt cost factor      |
 
 ### `client/.env`
-| Var | Default | Description |
-|-----|---------|-------------|
-| `VITE_API_BASE_URL` | `/api` | API base; works with the Vite dev proxy |
+
+| Var                 | Default | Description                             |
+| ------------------- | ------- | --------------------------------------- |
+| `VITE_API_BASE_URL` | `/api`  | API base; works with the Vite dev proxy |
 
 ## API endpoints (summary)
 
-| Method | Path | Auth |
-|---|---|---|
-| POST | `/api/auth/register` | – |
-| POST | `/api/auth/login` | – |
-| GET  | `/api/auth/me` | ✓ |
-| GET / POST / PUT / DELETE | `/api/tasks(/...)` | ✓ |
-| PATCH | `/api/tasks/:id/status` and `/complete` and `/pomodoro/increment` | ✓ |
-| POST | `/api/pomodoro-sessions` | ✓ |
-| GET  | `/api/pomodoro-sessions/recent` | ✓ |
-| GET  | `/api/dashboard/summary` | ✓ |
-| GET  | `/api/statistics/tasks?range=...` | ✓ |
-| GET  | `/api/statistics/pomodoros?range=...` | ✓ |
-| GET / PUT | `/api/settings`, `/settings/profile`, `/settings/password` | ✓ |
-| GET / PATCH | `/api/notifications`, `/:id/read`, `/read-all` | ✓ |
+| Method                    | Path                                                              | Auth |
+| ------------------------- | ----------------------------------------------------------------- | ---- |
+| POST                      | `/api/auth/register`                                              | –    |
+| POST                      | `/api/auth/login`                                                 | –    |
+| GET                       | `/api/auth/me`                                                    | ✓    |
+| GET / POST / PUT / DELETE | `/api/tasks(/...)`                                                | ✓    |
+| PATCH                     | `/api/tasks/:id/status` and `/complete` and `/pomodoro/increment` | ✓    |
+| POST                      | `/api/pomodoro-sessions`                                          | ✓    |
+| GET                       | `/api/pomodoro-sessions/recent`                                   | ✓    |
+| GET                       | `/api/dashboard/summary`                                          | ✓    |
+| GET                       | `/api/statistics/tasks?range=...`                                 | ✓    |
+| GET                       | `/api/statistics/pomodoros?range=...`                             | ✓    |
+| GET / PUT                 | `/api/settings`, `/settings/profile`, `/settings/password`        | ✓    |
+| GET / PATCH               | `/api/notifications`, `/:id/read`, `/read-all`                    | ✓    |
 
 ## Scripts cheatsheet
 
-| Folder | Command | Purpose |
-|---|---|---|
-| server | `npm run dev` | Start API in watch mode |
-| server | `npm run start` | Start API in production mode |
-| server | `npm run seed:reset` | Wipe Mongo and seed demo data |
-| server | `npm test` | Run Jest test suite |
-| client | `npm run dev` | Start Vite dev server with API proxy |
-| client | `npm run build` | Build production bundle |
-| client | `npm test` | Run Vitest |
-| client | `npm run typecheck` | `tsc --noEmit` |
+| Folder | Command              | Purpose                              |
+| ------ | -------------------- | ------------------------------------ |
+| server | `npm run dev`        | Start API in watch mode              |
+| server | `npm run start`      | Start API in production mode         |
+| server | `npm run seed:reset` | Wipe Mongo and seed demo data        |
+| server | `npm test`           | Run Jest test suite                  |
+| client | `npm run dev`        | Start Vite dev server with API proxy |
+| client | `npm run build`      | Build production bundle              |
+| client | `npm test`           | Run Vitest                           |
+| client | `npm run typecheck`  | `tsc --noEmit`                       |
 
 ## Demo account
-`demo@taskflow.com` / `123456` (after `npm run seed:reset` in server).
+
+`demo@Task88.com` / `123456` (after `npm run seed:reset` in server).
 
 ## Security notes
+
 - JWT tokens are stored in `localStorage` per spec. This is vulnerable to XSS; for production deployments add a strict CSP, sanitize all user-provided HTML, and consider migrating to httpOnly cookies + CSRF.
 - Passwords are hashed with bcrypt (cost 10).
 - Every Mongoose query for user-owned resources filters by `userId`; tests verify cross-user 404 behavior.
 
 ## Not implemented (intentional)
+
 - Study Together (and any realtime collaboration)
 - Forgot password / email reset
 - E2E browser tests
@@ -6539,21 +7520,24 @@ Visit http://localhost:5173 and log in:
 - i18n (UI is English only)
 
 ## Tests
+
 ```bash
 cd server && npm test       # backend ~25 cases
 cd client && npm test       # frontend critical tests
 ```
 
 ## License
+
 MIT (or replace with your preferred license).
-```
+
+````
 
 - [ ] **Step 2: Run full backend suite**
 
 ```bash
 cd server && npm test
 # Expected: all suites green
-```
+````
 
 - [ ] **Step 3: Run frontend tests + typecheck + build**
 
@@ -6565,6 +7549,7 @@ cd ../client && npm test -- --run && npx tsc --noEmit && npm run build
 - [ ] **Step 4: Manual verification (run both servers, browse)**
 
 Open two terminals:
+
 ```bash
 # terminal 1
 cd server && npm run dev
@@ -6576,7 +7561,7 @@ cd client && npm run dev
 Then verify in browser at http://localhost:5173:
 
 - [ ] Register a new user; redirected to `/dashboard`
-- [ ] Logout, login as `demo@taskflow.com` / `123456`
+- [ ] Logout, login as `demo@Task88.com` / `123456`
 - [ ] **Tasks page**: create, edit, delete, mark complete, search, filter by status/priority/deadline, switch grid/list views
 - [ ] **Pomodoro page**: start a 25-min focus, pause, resume, skip; verify timer keeps counting after route change; complete a focus session and confirm `pomodoros recent` updates and task `completedPomodoros` increments
 - [ ] **Calendar page**: month view shows tasks at their deadline date; click a day → DayTasksPanel populates; click an event → modal opens
@@ -6607,4 +7592,4 @@ After implementation, run the following sanity checks:
 4. `git log --oneline` — commits map cleanly to tasks
 5. Confirm Study Together appears nowhere (`grep -ri "study together" .` should match only this README disclaimer)
 
-If any acceptance criterion in `docs/superpowers/specs/2026-05-27-taskflow-clone-design.md` §15 fails, open a follow-up task before declaring done.
+If any acceptance criterion in `docs/superpowers/specs/2026-05-27-Task88-clone-design.md` §15 fails, open a follow-up task before declaring done.

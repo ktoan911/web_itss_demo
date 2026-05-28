@@ -14,6 +14,6 @@ export const useThemeStore = create<ThemeState>()(
       setTheme: (t) => set({ theme: t }),
       toggle: () => set({ theme: get().theme === 'light' ? 'dark' : 'light' }),
     }),
-    { name: 'taskflow-theme' },
+    { name: 'Task88-theme' },
   ),
 );

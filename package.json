@@ -1,7 +1,7 @@
 {
-  "name": "taskflow-clone-monorepo",
+  "name": "Task88-clone-monorepo",
   "version": "1.0.0",
-  "description": "Productivity web app: tasks, pomodoro timer, calendar, dashboard, statistics, settings, in-app notifications. Inspired by https://www.taskflow.pro.vn/.",
+  "description": "Productivity web app: tasks, pomodoro timer, calendar, dashboard, statistics, settings, in-app notifications. Inspired by https://www.Task88.pro.vn/.",
   "main": "index.js",
   "directories": {
     "doc": "docs"

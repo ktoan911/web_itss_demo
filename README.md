@@ -1,6 +1,6 @@
-# TaskFlow Clone
+# Task88 Clone
 
-Productivity web app: tasks, pomodoro timer, calendar, dashboard, statistics, settings, in-app notifications. Inspired by https://www.taskflow.pro.vn/.
+Productivity web app: tasks, pomodoro timer, calendar, dashboard, statistics, settings, in-app notifications. Inspired by https://www.Task88.pro.vn/.
 
 > Study Together is intentionally NOT implemented.
 
@@ -47,7 +47,7 @@ npm run dev              # http://localhost:5173
 
 Visit http://localhost:5173 and log in:
 
-- Email: `demo@taskflow.com`
+- Email: `demo@Task88.com`
 - Password: `123456`
 
 ## Run with Docker
@@ -116,7 +116,7 @@ The client container reverse-proxies `/api` to the `server` service over the int
 
 ## Demo account
 
-`demo@taskflow.com` / `123456` (after `npm run seed:reset` in server).
+`demo@Task88.com` / `123456` (after `npm run seed:reset` in server).
 
 ## Security notes
 

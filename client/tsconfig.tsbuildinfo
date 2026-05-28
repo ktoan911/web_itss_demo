@@ -1,0 +1,1 @@
+{"root":["./src/App.tsx","./src/main.tsx","./src/test-setup.ts","./src/hooks/useTheme.ts","./src/lib/queryClient.ts","./src/store/authStore.ts","./src/store/themeStore.ts","./src/types/auth.ts","./src/types/notification.ts","./src/types/pomodoro.ts","./src/types/settings.ts","./src/types/statistics.ts","./src/types/task.ts"],"version":"6.0.3"}

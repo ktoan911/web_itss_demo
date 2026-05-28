@@ -5,15 +5,15 @@ import PublicOnlyRoute from './PublicOnlyRoute';
 import AppLayout from '@/components/layout/AppLayout';
 import { Loading } from '@/components/common/Loading';
 
-const LoginPage      = lazy(() => import('@/pages/LoginPage'));
-const RegisterPage   = lazy(() => import('@/pages/RegisterPage'));
-const DashboardPage  = lazy(() => import('@/pages/DashboardPage'));
-const TasksPage      = lazy(() => import('@/pages/TasksPage'));
-const PomodoroPage   = lazy(() => import('@/pages/PomodoroPage'));
-const CalendarPage   = lazy(() => import('@/pages/CalendarPage'));
+const LoginPage = lazy(() => import('@/pages/LoginPage'));
+const RegisterPage = lazy(() => import('@/pages/RegisterPage'));
+const DashboardPage = lazy(() => import('@/pages/DashboardPage'));
+const TasksPage = lazy(() => import('@/pages/TasksPage'));
+const PomodoroPage = lazy(() => import('@/pages/PomodoroPage'));
+const CalendarPage = lazy(() => import('@/pages/CalendarPage'));
 const StatisticsPage = lazy(() => import('@/pages/StatisticsPage'));
-const SettingsPage   = lazy(() => import('@/pages/SettingsPage'));
-const NotFoundPage   = lazy(() => import('@/pages/NotFoundPage'));
+const SettingsPage = lazy(() => import('@/pages/SettingsPage'));
+const NotFoundPage = lazy(() => import('@/pages/NotFoundPage'));
 
 export default function AppRouter() {
   return (
@@ -24,10 +24,10 @@ export default function AppRouter() {
           <Route path="/register" element={<RegisterPage />} />
         </Route>
         <Route element={<ProtectedRoute />}>
+          <Route path="/pomodoro" element={<PomodoroPage />} />
           <Route element={<AppLayout />}>
             <Route path="/dashboard" element={<DashboardPage />} />
             <Route path="/tasks" element={<TasksPage />} />
-            <Route path="/pomodoro" element={<PomodoroPage />} />
             <Route path="/calendar" element={<CalendarPage />} />
             <Route path="/statistics" element={<StatisticsPage />} />
             <Route path="/settings" element={<SettingsPage />} />

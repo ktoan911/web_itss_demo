@@ -1,6 +1,7 @@
 import { Task } from '../models/Task.js';
 import { AppError } from '../utils/AppError.js';
 import { deadlineFilterToQuery } from '../utils/dateRange.js';
+import { notificationService } from './notification.service.js';
 
 const sortMap = {
   deadline: { deadline: 1 },
@@ -46,6 +47,14 @@ export const taskService = {
     if (status === 'Completed') update.completedAt = new Date();
     const task = await Task.findOneAndUpdate({ _id: id, userId }, { $set: update }, { new: true });
     if (!task) throw notFound();
+    if (status === 'Completed') {
+      await notificationService.create(userId, {
+        title: 'Task completed',
+        message: `"${task.title}" marked as completed.`,
+        type: 'task_completed',
+        taskId: task._id,
+      });
+    }
     return task;
   },
 
@@ -56,6 +65,12 @@ export const taskService = {
     task.status = 'Completed';
     task.completedAt = new Date();
     await task.save();
+    await notificationService.create(userId, {
+      title: 'Task completed',
+      message: `"${task.title}" marked as completed.`,
+      type: 'task_completed',
+      taskId: task._id,
+    });
     return task;
   },
 
@@ -65,6 +80,18 @@ export const taskService = {
     task.completedPomodoros += 1;
     if (task.status === 'Todo') task.status = 'InProgress';
     await task.save();
+    if (
+      task.completedPomodoros >= task.estimatedPomodoros &&
+      task.status !== 'Completed'
+    ) {
+      await notificationService.createDeduped(userId, {
+        title: 'Estimated pomodoros reached',
+        message: `You've reached the estimated pomodoros for "${task.title}".`,
+        type: 'estimated_reached',
+        taskId: task._id,
+        withinMs: 365 * 86_400_000, // effectively once per task
+      });
+    }
     return task;
   },
 };

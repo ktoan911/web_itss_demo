@@ -3,7 +3,6 @@ import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import {
   ArrowLeft,
-  ListMusic,
   Maximize2,
   Minimize2,
   Pause,
@@ -13,16 +12,17 @@ import {
   StickyNote,
   Volume2,
   VolumeX,
-  Waves,
 } from 'lucide-react';
 import { useRecentSessionsQuery } from '@/hooks/queries/usePomodoroQueries';
 import { useTasksQuery, useMarkComplete } from '@/hooks/queries/useTaskQueries';
 import { useSettingsQuery } from '@/hooks/queries/useSettingsQueries';
 import { usePomodoroStore } from '@/store/pomodoroStore';
+import { useSoundStore } from '@/store/soundStore';
 import { useRemainingMs } from '@/hooks/usePomodoroEngine';
 import { unlockAudio } from '@/lib/audio';
 import type { PomodoroMode } from '@/types/pomodoro';
 import { EstimateReachedDialog } from '@/components/pomodoro/EstimateReachedDialog';
+import { SoundControls } from '@/components/pomodoro/SoundControls';
 
 const BACKGROUNDS = [
   '/backgrounds/forest1.jpg',
@@ -66,6 +66,8 @@ const fmtTime = (ms: number) => {
   return `${m}:${s}`;
 };
 
+const TEXT_SHADOW = '0 2px 12px rgba(0,0,0,0.85), 0 0 4px rgba(0,0,0,0.6)';
+
 export default function PomodoroPage() {
   const navigate = useNavigate();
   const tasks = useTasksQuery({ status: undefined, sortBy: 'deadline' });
@@ -85,12 +87,13 @@ export default function PomodoroPage() {
   const estimateTaskId = usePomodoroStore((s) => s.estimateReachedTaskId);
   const ack = usePomodoroStore((s) => s.acknowledgeEstimate);
 
+  const masterMuted = useSoundStore((s) => s.masterMuted);
+  const toggleMaster = useSoundStore((s) => s.toggleMaster);
+
   const remaining = useRemainingMs();
 
   const [bgIndex] = useState(() => Math.floor(Math.random() * BACKGROUNDS.length));
   const [quote] = useState(() => QUOTES[Math.floor(Math.random() * QUOTES.length)]);
-  const [muted, setMuted] = useState(false);
-  const [taskInput, setTaskInput] = useState('');
   const [showTaskPicker, setShowTaskPicker] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
 
@@ -105,10 +108,6 @@ export default function PomodoroPage() {
     !!estimateTask &&
     estimateTask.status !== 'Completed' &&
     estimateTask.completedPomodoros >= estimateTask.estimatedPomodoros;
-
-  useEffect(() => {
-    if (selectedTask) setTaskInput(selectedTask.title);
-  }, [selectedTask]);
 
   useEffect(() => {
     const onChange = () => setIsFullscreen(!!document.fullscreenElement);
@@ -151,32 +150,38 @@ export default function PomodoroPage() {
         backgroundPosition: 'center',
       }}
     >
-      <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-black/20 to-black/50" />
+      <div className="absolute inset-0 bg-gradient-to-b from-black/55 via-black/30 to-black/65" />
 
       <button
         onClick={() => navigate('/dashboard')}
         aria-label="Quay lại"
-        className="absolute left-6 top-6 z-20 flex items-center gap-2 rounded-full bg-black/30 px-3 py-2 text-sm backdrop-blur transition hover:bg-black/50"
+        className="absolute left-6 top-6 z-20 flex items-center gap-2 rounded-full bg-black/40 px-3 py-2 text-sm backdrop-blur transition hover:bg-black/60"
       >
         <ArrowLeft className="h-4 w-4" />
       </button>
 
-      <div className="absolute left-20 top-7 z-10 flex items-center gap-3">
-        <span className="text-2xl font-semibold tracking-tight">TaskFlow</span>
-        <span className="hidden text-[11px] uppercase tracking-[0.2em] text-white/70 sm:inline">
+      <div
+        className="absolute left-20 top-7 z-10 flex items-center gap-3"
+        style={{ textShadow: TEXT_SHADOW }}
+      >
+        <span className="text-2xl font-semibold tracking-tight">Task88</span>
+        <span className="hidden text-[11px] uppercase tracking-[0.2em] text-white/80 sm:inline">
           Focus Workspace
         </span>
       </div>
 
-      <div className="absolute right-6 top-6 z-10 max-w-sm text-right">
-        <p className="text-sm italic text-white/85">{quote.text}</p>
-        <p className="mt-1 text-xs text-white/60">— {quote.author}</p>
+      <div
+        className="absolute right-6 top-6 z-10 max-w-sm text-right"
+        style={{ textShadow: TEXT_SHADOW }}
+      >
+        <p className="text-sm italic text-white">{quote.text}</p>
+        <p className="mt-1 text-xs text-white/80">— {quote.author}</p>
       </div>
 
       <div className="relative z-10 flex h-full flex-col items-center justify-center px-4">
         <div className="w-full max-w-xl text-center">
           {showTaskPicker ? (
-            <div className="mx-auto w-full max-w-md rounded-2xl bg-black/40 p-3 backdrop-blur">
+            <div className="mx-auto w-full max-w-md rounded-2xl bg-black/55 p-3 shadow-xl backdrop-blur">
               <select
                 value={selectedTaskId ?? ''}
                 onChange={(e) => {
@@ -198,32 +203,38 @@ export default function PomodoroPage() {
           ) : (
             <button
               onClick={() => setShowTaskPicker(true)}
-              className="mx-auto block text-base font-light text-white/80 transition hover:text-white"
+              className="mx-auto block rounded-full bg-black/30 px-5 py-2 text-lg font-medium text-white backdrop-blur-sm transition hover:bg-black/45"
+              style={{ textShadow: TEXT_SHADOW }}
             >
-              {taskInput || 'What are you working on?'}
+              {selectedTask ? selectedTask.title : 'What are you working on?'}
             </button>
           )}
         </div>
 
-        <div className="mt-6 select-none text-center font-light tabular-nums tracking-tight">
+        <div
+          className="mt-6 select-none text-center font-light tabular-nums tracking-tight"
+          style={{ textShadow: '0 4px 24px rgba(0,0,0,0.55)' }}
+        >
           <div className="text-[clamp(7rem,18vw,16rem)] leading-none">{fmtTime(remaining)}</div>
         </div>
 
-        <p className="mt-6 text-sm text-white/80">{MODE_LABELS[mode]}</p>
+        <p className="mt-6 text-sm text-white" style={{ textShadow: TEXT_SHADOW }}>
+          {MODE_LABELS[mode]}
+        </p>
 
         <div className="mt-8 flex items-center gap-6">
           <button
-            onClick={() => setMuted((v) => !v)}
-            aria-label={muted ? 'Bật âm' : 'Tắt âm'}
-            className="rounded-full bg-black/25 p-3 text-white/85 backdrop-blur transition hover:bg-black/40"
+            onClick={toggleMaster}
+            aria-label={masterMuted ? 'Bật âm' : 'Tắt âm'}
+            className="rounded-full bg-black/30 p-3 text-white backdrop-blur transition hover:bg-black/50"
           >
-            {muted ? <VolumeX className="h-5 w-5" /> : <Volume2 className="h-5 w-5" />}
+            {masterMuted ? <VolumeX className="h-5 w-5" /> : <Volume2 className="h-5 w-5" />}
           </button>
 
           <button
             onClick={reset}
             aria-label="Đặt lại"
-            className="rounded-full bg-black/25 p-3 text-white/85 backdrop-blur transition hover:bg-black/40"
+            className="rounded-full bg-black/30 p-3 text-white backdrop-blur transition hover:bg-black/50"
           >
             <RotateCcw className="h-5 w-5" />
           </button>
@@ -239,7 +250,7 @@ export default function PomodoroPage() {
           <button
             onClick={skip}
             aria-label="Bỏ qua"
-            className="rounded-full bg-black/25 p-3 text-white/85 backdrop-blur transition hover:bg-black/40"
+            className="rounded-full bg-black/30 p-3 text-white backdrop-blur transition hover:bg-black/50"
           >
             <SkipForward className="h-5 w-5" />
           </button>
@@ -247,7 +258,7 @@ export default function PomodoroPage() {
           <button
             onClick={toggleFullscreen}
             aria-label={isFullscreen ? 'Thoát toàn màn hình' : 'Toàn màn hình'}
-            className="rounded-full bg-black/25 p-3 text-white/85 backdrop-blur transition hover:bg-black/40"
+            className="rounded-full bg-black/30 p-3 text-white backdrop-blur transition hover:bg-black/50"
           >
             {isFullscreen ? <Minimize2 className="h-5 w-5" /> : <Maximize2 className="h-5 w-5" />}
           </button>
@@ -261,7 +272,7 @@ export default function PomodoroPage() {
               className={`rounded-full px-3 py-1 text-xs backdrop-blur transition ${
                 mode === m
                   ? 'bg-white/25 text-white'
-                  : 'bg-black/20 text-white/70 hover:bg-black/35'
+                  : 'bg-black/30 text-white/85 hover:bg-black/45'
               }`}
             >
               {MODE_LABELS[m]}
@@ -272,28 +283,13 @@ export default function PomodoroPage() {
 
       <button
         aria-label="Ghi chú"
-        className="absolute bottom-6 left-6 z-10 rounded-full bg-black/30 p-3 text-white/85 backdrop-blur transition hover:bg-black/50"
+        className="absolute bottom-6 left-6 z-10 rounded-full bg-black/30 p-3 text-white backdrop-blur transition hover:bg-black/50"
         onClick={() => toast.info('Ghi chú phiên (chưa khả dụng)')}
       >
         <StickyNote className="h-5 w-5" />
       </button>
 
-      <div className="absolute bottom-6 right-6 z-10 flex items-center gap-3">
-        <button
-          aria-label="Âm thanh nền"
-          className="rounded-full bg-black/30 p-3 text-white/85 backdrop-blur transition hover:bg-black/50"
-          onClick={() => toast.info('Âm thanh nền (chưa khả dụng)')}
-        >
-          <Waves className="h-5 w-5" />
-        </button>
-        <button
-          aria-label="Nhạc"
-          className="rounded-full bg-black/30 p-3 text-white/85 backdrop-blur transition hover:bg-black/50"
-          onClick={() => toast.info('Nhạc tập trung (chưa khả dụng)')}
-        >
-          <ListMusic className="h-5 w-5" />
-        </button>
-      </div>
+      <SoundControls />
 
       <EstimateReachedDialog
         open={showEstimate}

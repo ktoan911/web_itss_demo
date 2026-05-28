@@ -4,8 +4,11 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
+    "predev": "node scripts/build-sounds-manifest.mjs",
     "dev": "vite",
+    "prebuild": "node scripts/build-sounds-manifest.mjs",
     "build": "tsc -b && vite build",
+    "sounds:manifest": "node scripts/build-sounds-manifest.mjs",
     "lint": "eslint .",
     "preview": "vite preview",
     "test": "vitest"

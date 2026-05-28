@@ -3,6 +3,7 @@ import cors from 'cors';
 import helmet from 'helmet';
 import mongoSanitize from 'express-mongo-sanitize';
 import { env } from './config/env.js';
+import { errorHandler, notFound } from './middlewares/error.middleware.js';
 
 export function buildApp() {
   const app = express();
@@ -13,7 +14,9 @@ export function buildApp() {
 
   app.get('/api/health', (_req, res) => res.json({ ok: true, service: 'taskflow-api' }));
 
-  // routes mounted in Task 5+
-  // error handler mounted in Task 3
+  // ROUTES_MOUNT — added in subsequent tasks
+
+  app.use(notFound);
+  app.use(errorHandler);
   return app;
 }

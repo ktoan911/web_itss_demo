@@ -1,6 +1,7 @@
 import { useLocation } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { ThemeToggle } from './ThemeToggle';
+import { NotificationBell } from '@/components/notifications/NotificationBell';
 import { getInitials } from '@/utils/formatters';
 import { useState } from 'react';
 
@@ -36,7 +37,7 @@ export function Header({ onAddTask, onMenu }: { onAddTask?: () => void; onMenu?:
             + Add Task
           </button>
         )}
-        {/* Notification bell mounted in Task 25 */}
+        <NotificationBell />
         <ThemeToggle />
         <button
           onClick={() => setOpen((v) => !v)}

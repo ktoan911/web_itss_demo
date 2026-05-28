@@ -2,6 +2,7 @@ import { User } from '../models/User.js';
 import { hashPassword, verifyPassword } from '../utils/passwordHasher.js';
 import { signToken } from './jwt.service.js';
 import { AppError } from '../utils/AppError.js';
+import { settingsService } from './settings.service.js';
 
 const toClientUser = (u) => ({ id: u._id.toString(), fullName: u.fullName, email: u.email });
 
@@ -11,7 +12,12 @@ export const authService = {
     if (exists) throw new AppError('Email already registered', 409, 'EMAIL_TAKEN');
     const passwordHash = await hashPassword(password);
     const user = await User.create({ fullName, email, passwordHash });
-    // UserSetting auto-create wired in Task 6 by importing settingsService
+    try {
+      await settingsService.ensureForUser(user._id);
+    } catch (err) {
+      await User.deleteOne({ _id: user._id });
+      throw err;
+    }
     const token = signToken({ id: user._id.toString(), email: user.email });
     return { token, user: toClientUser(user) };
   },

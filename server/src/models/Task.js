@@ -28,19 +28,17 @@ taskSchema.virtual('isOverdue').get(function () {
   return this.deadline < new Date() && this.status !== 'Completed';
 });
 
-taskSchema.pre('save', function (next) {
+taskSchema.pre('save', function () {
   if (this.isModified('priority')) this.priorityRank = rankOf(this.priority);
-  next();
 });
 
-taskSchema.pre('findOneAndUpdate', function (next) {
+taskSchema.pre('findOneAndUpdate', function () {
   const update = this.getUpdate() || {};
   const setBlock = update.$set || update;
   if (setBlock.priority) {
     if (update.$set) update.$set.priorityRank = rankOf(setBlock.priority);
     else update.priorityRank = rankOf(setBlock.priority);
   }
-  next();
 });
 
 taskSchema.index({ userId: 1, deadline: 1 });

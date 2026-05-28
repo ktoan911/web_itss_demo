@@ -16,6 +16,7 @@ export const taskService = {
     const filter = { userId, ...deadlineFilterToQuery(query.deadlineFilter) };
     if (query.status)   filter.status = query.status;
     if (query.priority) filter.priority = query.priority;
+    if (query.tag)      filter.tags = query.tag;
     if (query.search)   filter.$text = { $search: query.search };
     return Task.find(filter).sort(sortMap[query.sortBy ?? 'deadline']);
   },

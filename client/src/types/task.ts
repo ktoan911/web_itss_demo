@@ -6,7 +6,7 @@ export type Task = {
   userId: string;
   title: string;
   description?: string;
-  deadline: string;          // ISO
+  deadline: string; // ISO
   priority: Priority;
   status: TaskStatus;
   estimatedPomodoros: number;
@@ -15,6 +15,7 @@ export type Task = {
   createdAt: string;
   updatedAt: string;
   isOverdue: boolean;
+  tags: string[];
 };
 
 export type TaskListQuery = {
@@ -23,6 +24,7 @@ export type TaskListQuery = {
   priority?: Priority;
   deadlineFilter?: 'today' | 'upcoming' | 'overdue' | 'completed';
   sortBy?: 'deadline' | 'priority' | 'newest';
+  tag?: string;
 };
 
 export type TaskCreateInput = {
@@ -31,5 +33,6 @@ export type TaskCreateInput = {
   deadline: string;
   priority: Priority;
   estimatedPomodoros: number;
+  tags?: string[];
 };
 export type TaskUpdateInput = Partial<TaskCreateInput>;

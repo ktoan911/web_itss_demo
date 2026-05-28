@@ -5,15 +5,33 @@ import { Button } from '@/components/common/Button';
 import { formatDateTime } from '@/utils/dateUtils';
 
 type Props = {
-  task: Task; onEdit: (t: Task) => void; onDelete: (t: Task) => void; onComplete: (t: Task) => void;
+  task: Task;
+  onEdit: (t: Task) => void;
+  onDelete: (t: Task) => void;
+  onComplete: (t: Task) => void;
+  onTagClick?: (tag: string) => void;
 };
 
-export function TaskRow({ task, onEdit, onDelete, onComplete }: Props) {
+export function TaskRow({ task, onEdit, onDelete, onComplete, onTagClick }: Props) {
   return (
     <div className="flex items-center justify-between gap-3 rounded-2xl border border-border bg-surface px-4 py-3">
-      <div className="flex-1 min-w-0">
+      <div className="min-w-0 flex-1">
         <div className="flex items-center gap-2">
           <h4 className="truncate text-sm font-medium">{task.title}</h4>
+          {task.tags && task.tags.length > 0 && (
+            <div className="flex flex-wrap gap-1">
+              {task.tags.map((tag) => (
+                <button
+                  key={tag}
+                  type="button"
+                  onClick={() => onTagClick?.(tag)}
+                  className="inline-flex items-center rounded-full bg-primary-50 px-2 py-0.5 text-xs text-primary-700 transition hover:bg-primary-100 dark:bg-primary-500/10 dark:hover:bg-primary-500/20"
+                >
+                  #{tag}
+                </button>
+              ))}
+            </div>
+          )}
           <PriorityBadge priority={task.priority} />
           <StatusBadge status={task.status} />
           {task.isOverdue && <OverdueBadge />}
@@ -24,10 +42,28 @@ export function TaskRow({ task, onEdit, onDelete, onComplete }: Props) {
       </div>
       <div className="flex shrink-0 items-center gap-1">
         {task.status !== 'Completed' && (
-          <Button size="sm" variant="ghost" icon={<Check className="h-4 w-4" />} onClick={() => onComplete(task)} aria-label="Complete" />
+          <Button
+            size="sm"
+            variant="ghost"
+            icon={<Check className="h-4 w-4" />}
+            onClick={() => onComplete(task)}
+            aria-label="Complete"
+          />
         )}
-        <Button size="sm" variant="ghost" icon={<Edit2 className="h-4 w-4" />} onClick={() => onEdit(task)} aria-label="Edit" />
-        <Button size="sm" variant="ghost" icon={<Trash2 className="h-4 w-4" />} onClick={() => onDelete(task)} aria-label="Delete" />
+        <Button
+          size="sm"
+          variant="ghost"
+          icon={<Edit2 className="h-4 w-4" />}
+          onClick={() => onEdit(task)}
+          aria-label="Edit"
+        />
+        <Button
+          size="sm"
+          variant="ghost"
+          icon={<Trash2 className="h-4 w-4" />}
+          onClick={() => onDelete(task)}
+          aria-label="Delete"
+        />
       </div>
     </div>
   );

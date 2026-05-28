@@ -13,6 +13,7 @@ const taskSchema = new mongoose.Schema(
     estimatedPomodoros:  { type: Number, default: 1, min: 1 },
     completedPomodoros:  { type: Number, default: 0, min: 0 },
     completedAt:         { type: Date, default: null },
+    tags:                { type: [String], default: [], index: true },
   },
   {
     timestamps: true,
@@ -44,6 +45,7 @@ taskSchema.pre('findOneAndUpdate', function () {
 taskSchema.index({ userId: 1, deadline: 1 });
 taskSchema.index({ userId: 1, status: 1 });
 taskSchema.index({ userId: 1, priorityRank: -1 });
+taskSchema.index({ userId: 1, tags: 1 });
 taskSchema.index({ title: 'text', description: 'text' });
 
 export const Task = mongoose.model('Task', taskSchema);

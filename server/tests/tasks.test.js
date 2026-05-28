@@ -86,4 +86,22 @@ describe('Tasks CRUD', () => {
     const res = await a.get('/api/tasks/not-an-id');
     expect(res.status).toBe(400);
   });
+
+  it('creates task with tags and lists them', async () => {
+    const a = await createAuthedAgent(app);
+    const create = await a.post('/api/tasks').send(baseTask({ tags: ['work', 'urgent'] }));
+    expect(create.status).toBe(201);
+    expect(create.body.tags).toEqual(['work', 'urgent']);
+    const list = await a.get('/api/tasks');
+    expect(list.body[0].tags).toEqual(['work', 'urgent']);
+  });
+
+  it('filters by tag', async () => {
+    const a = await createAuthedAgent(app);
+    await a.post('/api/tasks').send(baseTask({ title: 'Tagged', tags: ['work'] }));
+    await a.post('/api/tasks').send(baseTask({ title: 'Plain' }));
+    const r = await a.get('/api/tasks?tag=work');
+    expect(r.body).toHaveLength(1);
+    expect(r.body[0].title).toBe('Tagged');
+  });
 });

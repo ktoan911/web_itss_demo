@@ -11,34 +11,72 @@ type Props = {
   onDelete: (t: Task) => void;
   onComplete: (t: Task) => void;
   onClick?: (t: Task) => void;
+  onTagClick?: (tag: string) => void;
 };
 
-export function TaskCard({ task, onEdit, onDelete, onComplete, onClick }: Props) {
+export function TaskCard({ task, onEdit, onDelete, onComplete, onClick, onTagClick }: Props) {
   return (
     <Card>
       <div className="flex items-start justify-between gap-2">
         <button onClick={() => onClick?.(task)} className="flex-1 text-left">
           <h3 className="line-clamp-1 text-sm font-semibold">{task.title}</h3>
-          {task.description && <p className="mt-1 line-clamp-2 text-xs text-text-muted">{task.description}</p>}
+          {task.description && (
+            <p className="mt-1 line-clamp-2 text-xs text-text-muted">{task.description}</p>
+          )}
         </button>
         <PriorityBadge priority={task.priority} />
       </div>
+      {task.tags && task.tags.length > 0 && (
+        <div className="mt-2 flex flex-wrap gap-1">
+          {task.tags.map((tag) => (
+            <button
+              key={tag}
+              type="button"
+              onClick={() => onTagClick?.(tag)}
+              className="inline-flex items-center rounded-full bg-primary-50 px-2 py-0.5 text-xs text-primary-700 transition hover:bg-primary-100 dark:bg-primary-500/10 dark:hover:bg-primary-500/20"
+            >
+              #{tag}
+            </button>
+          ))}
+        </div>
+      )}
       <div className="mt-3 flex flex-wrap items-center gap-2 text-xs text-text-muted">
         <Clock className="h-3.5 w-3.5" />
         <span>{formatDateTime(task.deadline)}</span>
         <span>·</span>
-        <span>⏱ {task.completedPomodoros}/{task.estimatedPomodoros}</span>
+        <span>
+          ⏱ {task.completedPomodoros}/{task.estimatedPomodoros}
+        </span>
         <StatusBadge status={task.status} />
         {task.isOverdue && <OverdueBadge />}
       </div>
       <div className="mt-4 flex flex-wrap gap-2">
         {task.status !== 'Completed' && (
-          <Button size="sm" variant="secondary" icon={<Check className="h-4 w-4" />} onClick={() => onComplete(task)}>
+          <Button
+            size="sm"
+            variant="secondary"
+            icon={<Check className="h-4 w-4" />}
+            onClick={() => onComplete(task)}
+          >
             Complete
           </Button>
         )}
-        <Button size="sm" variant="ghost" icon={<Edit2 className="h-4 w-4" />} onClick={() => onEdit(task)}>Edit</Button>
-        <Button size="sm" variant="ghost" icon={<Trash2 className="h-4 w-4" />} onClick={() => onDelete(task)}>Delete</Button>
+        <Button
+          size="sm"
+          variant="ghost"
+          icon={<Edit2 className="h-4 w-4" />}
+          onClick={() => onEdit(task)}
+        >
+          Edit
+        </Button>
+        <Button
+          size="sm"
+          variant="ghost"
+          icon={<Trash2 className="h-4 w-4" />}
+          onClick={() => onDelete(task)}
+        >
+          Delete
+        </Button>
       </div>
     </Card>
   );

@@ -8,6 +8,7 @@ export const taskCreateSchema = z.object({
   deadline: z.coerce.date(),
   priority: z.enum(['Low', 'Medium', 'High']),
   estimatedPomodoros: z.coerce.number().int().min(1).default(1),
+  tags: z.array(z.string().min(1).max(40)).max(20).optional().default([]),
 });
 
 export const taskUpdateSchema = taskCreateSchema.partial();
@@ -18,6 +19,7 @@ export const taskListQuerySchema = z.object({
   priority: z.enum(['Low', 'Medium', 'High']).optional(),
   deadlineFilter: z.enum(['today', 'upcoming', 'overdue', 'completed']).optional(),
   sortBy: z.enum(['deadline', 'priority', 'newest']).default('deadline'),
+  tag: z.string().optional(),
 }).strict();
 
 export const taskIdParam = z.object({ id: objectId });

@@ -1,6 +1,8 @@
 import { buildApp } from '../src/app.js';
 import { createAuthedAgent } from './helpers/createAuthedAgent.js';
 import { notificationService } from '../src/services/notification.service.js';
+import { runOverdueChecker } from '../src/jobs/overdueChecker.js';
+import { runDeadlineSoonReminder } from '../src/jobs/deadlineSoonReminder.js';
 
 const app = buildApp();
 
@@ -48,5 +50,32 @@ describe('Notifications', () => {
       title: 't', message: 'm', type: 'task_completed',
     });
     expect(n).toBeNull();
+  });
+});
+
+describe('Cron job logic', () => {
+  it('overdueChecker creates notification once per task', async () => {
+    const a = await createAuthedAgent(app);
+    await a.post('/api/tasks').send({
+      title: 'past', deadline: new Date(Date.now() - 86_400_000).toISOString(),
+      priority: 'High', estimatedPomodoros: 1,
+    });
+    const n1 = await runOverdueChecker();
+    const n2 = await runOverdueChecker();
+    expect(n1).toBe(1);
+    expect(n2).toBe(1); // job sees same task, but dedup blocks 2nd notif
+    const list = await a.get('/api/notifications');
+    expect(list.body.filter((n) => n.type === 'task_overdue')).toHaveLength(1);
+  });
+
+  it('deadlineSoonReminder fires for tasks within next hour', async () => {
+    const a = await createAuthedAgent(app);
+    const inHalfHour = new Date(Date.now() + 30 * 60_000).toISOString();
+    await a.post('/api/tasks').send({
+      title: 'soon', deadline: inHalfHour, priority: 'High', estimatedPomodoros: 1,
+    });
+    await runDeadlineSoonReminder();
+    const list = await a.get('/api/notifications');
+    expect(list.body.some((n) => n.type === 'deadline_soon')).toBe(true);
   });
 });

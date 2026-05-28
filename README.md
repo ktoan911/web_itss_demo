@@ -128,7 +128,6 @@ The client container reverse-proxies `/api` to the `server` service over the int
 
 - Study Together (and any realtime collaboration)
 - Forgot password / email reset
-- E2E browser tests
 - i18n (UI is English only)
 
 ## Tests
@@ -141,6 +140,32 @@ cd client && npm test       # frontend critical tests
 ## Pre-commit
 
 Husky runs Prettier on staged files via lint-staged. Disabled for first-time clones until you run `npm install` at the repo root.
+
+## E2E tests (Playwright)
+
+One smoke test covering register → create task → mark complete → dashboard.
+
+First-time setup:
+
+```bash
+npm install
+npm run e2e:install   # downloads chromium (~150 MB)
+```
+
+Run (requires both servers to be running locally):
+
+```bash
+# terminal 1
+cd server && npm run dev
+
+# terminal 2
+cd client && npm run dev
+
+# terminal 3 (repo root)
+npm run e2e
+```
+
+For interactive debug: `npm run e2e:ui`.
 
 ## License
 

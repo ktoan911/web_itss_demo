@@ -9,8 +9,9 @@ import { EmptyState } from '@/components/common/EmptyState';
 import { ConfirmDialog } from '@/components/common/ConfirmDialog';
 import { TaskCard } from '@/components/tasks/TaskCard';
 import { TaskRow } from '@/components/tasks/TaskRow';
-import { TaskFilters } from '@/components/tasks/TaskFilters';
+import { TaskFilters, type View } from '@/components/tasks/TaskFilters';
 import { TaskFormModal } from '@/components/tasks/TaskFormModal';
+import { KanbanBoard } from '@/components/tasks/KanbanBoard';
 import {
   useTasksQuery,
   useDeleteTask,
@@ -38,7 +39,7 @@ export default function TasksPage() {
     () => ({ ...rawFilters, search: debouncedSearch }),
     [rawFilters, debouncedSearch],
   );
-  const [view, setView] = useState<'grid' | 'list'>('grid');
+  const [view, setView] = useState<View>('grid');
   const [editing, setEditing] = useState<Task | null>(null);
   const [creating, setCreating] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState<Task | null>(null);
@@ -253,6 +254,16 @@ export default function TasksPage() {
             />
           ))}
         </div>
+      ) : view === 'kanban' ? (
+        <KanbanBoard
+          tasks={tasks.data!}
+          onEdit={setEditing}
+          onDelete={setConfirmDelete}
+          onComplete={onComplete}
+          onTagClick={setTag}
+          selected={selectedIds}
+          onToggleSelect={toggleSelect}
+        />
       ) : (
         <div className="space-y-2">
           {tasks.data!.map((t) => (

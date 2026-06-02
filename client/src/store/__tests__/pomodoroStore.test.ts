@@ -55,9 +55,11 @@ describe('pomodoroStore', () => {
       focusDuration: 50,
       shortBreakDuration: 10,
       longBreakDuration: 20,
+      notifySoundEnabled: false,
     });
     expect(usePomodoroStore.getState().durations.focus).toBe(50);
     expect(usePomodoroStore.getState().remainingMs).toBe(50 * 60_000);
+    expect(usePomodoroStore.getState().soundEnabled).toBe(false);
   });
 
   it('reset returns to idle with full remaining', () => {
@@ -78,7 +80,7 @@ describe('pomodoroStore', () => {
 
   it('auto-starts the next session when a session completes', async () => {
     usePomodoroStore.getState().start();
-    // chạy hết phiên Focus 25 phút → complete() chuyển mode và tự start phiên nghỉ
+    // run out the 25-min Focus session → complete() switches mode and auto-starts the break
     await vi.advanceTimersByTimeAsync(25 * 60_000 + 300);
     const s = usePomodoroStore.getState();
     expect(s.mode).toBe('ShortBreak');

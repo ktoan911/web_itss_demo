@@ -20,14 +20,14 @@ export function SoundControls() {
         <ChannelButton
           channel="ambient"
           icon={<Waves className="h-5 w-5" />}
-          title="Âm thanh nền"
+          title="Ambient sound"
         />
       )}
       {manifest.music.length > 0 && (
         <ChannelButton
           channel="music"
           icon={<ListMusic className="h-5 w-5" />}
-          title="Nhạc tập trung"
+          title="Focus music"
         />
       )}
     </div>
@@ -83,7 +83,7 @@ function ChannelButton({
           <div className="mb-2 flex items-center justify-between">
             <span className="text-sm font-medium">{title}</span>
             <button
-              aria-label="Đóng"
+              aria-label="Close"
               onClick={() => setOpen(false)}
               className="rounded-full p-1 text-white/70 hover:bg-white/10 hover:text-white"
             >
@@ -112,7 +112,7 @@ function ChannelButton({
               value={volume}
               onChange={(e) => setVolume(channel, Number(e.target.value))}
               className="h-1 flex-1 cursor-pointer accent-white"
-              aria-label="Âm lượng"
+              aria-label="Volume"
             />
             <span className="w-8 text-right text-xs tabular-nums text-white/70">
               {Math.round(volume * 100)}

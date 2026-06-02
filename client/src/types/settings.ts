@@ -8,6 +8,7 @@ export type Settings = {
   longBreakDuration: number;
   theme: 'light' | 'dark';
   notificationEnabled: boolean;
+  notifySoundEnabled: boolean;
   backgroundUrls: string[];
   backgroundMode: BackgroundMode;
   backgroundSelected: string;
@@ -21,6 +22,7 @@ export type SettingsUpdateInput = Partial<
     | 'longBreakDuration'
     | 'theme'
     | 'notificationEnabled'
+    | 'notifySoundEnabled'
     | 'backgroundUrls'
     | 'backgroundMode'
     | 'backgroundSelected'

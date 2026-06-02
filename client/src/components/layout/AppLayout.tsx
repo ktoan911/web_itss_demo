@@ -18,8 +18,12 @@ export default function AppLayout() {
   const loc = useLocation();
   const [drawerOpen, setDrawerOpen] = useState(false);
 
-  useEffect(() => { if (me) setUser(me); }, [me, setUser]);
-  useEffect(() => { if (isError) navigate('/login'); }, [isError, navigate]);
+  useEffect(() => {
+    if (me) setUser(me);
+  }, [me, setUser]);
+  useEffect(() => {
+    if (isError) navigate('/login');
+  }, [isError, navigate]);
   useEffect(() => {
     if (settings) {
       setTheme(settings.theme);
@@ -27,10 +31,13 @@ export default function AppLayout() {
         focusDuration: settings.focusDuration,
         shortBreakDuration: settings.shortBreakDuration,
         longBreakDuration: settings.longBreakDuration,
+        notifySoundEnabled: settings.notifySoundEnabled,
       });
     }
   }, [settings, setTheme, hydrate]);
-  useEffect(() => { setDrawerOpen(false); }, [loc.pathname]);
+  useEffect(() => {
+    setDrawerOpen(false);
+  }, [loc.pathname]);
 
   return (
     <div className="flex h-full">

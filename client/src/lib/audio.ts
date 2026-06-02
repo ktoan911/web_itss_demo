@@ -12,19 +12,19 @@ function getCtx(): AudioContext | null {
   return ctx;
 }
 
-// Gọi trong một user gesture (vd: click "Bắt đầu") để mở khoá autoplay của trình duyệt.
+// Call inside a user gesture (e.g. clicking "Start") to unlock browser autoplay.
 export async function unlockAudio() {
   const c = getCtx();
   if (c && c.state === 'suspended') {
     try {
       await c.resume();
     } catch {
-      // trình duyệt chưa cho phép phát — sẽ thử lại ở lần phát sau
+      // browser hasn't allowed playback yet — retried on the next play
     }
   }
 }
 
-// Một nốt chuông mềm: sóng sin + bao biên độ để tránh tiếng "tách" đầu/cuối.
+// A soft chime note: sine wave + amplitude envelope to avoid clicks at start/end.
 function tone(c: AudioContext, freq: number, startAt: number, duration: number, peak = 0.25) {
   const osc = c.createOscillator();
   const gain = c.createGain();
@@ -41,9 +41,9 @@ function tone(c: AudioContext, freq: number, startAt: number, duration: number, 
 
 export type NotifyKind = 'focus' | 'break';
 
-// Âm báo khi hết giờ, tổng hợp bằng Web Audio API (không cần file mp3, chạy offline).
-// - 'focus': vừa hết phiên tập trung, tới giờ nghỉ → giai điệu đi lên nhẹ nhàng.
-// - 'break': vừa hết giờ nghỉ, quay lại làm việc → hai tiếng "ping" rõ hơn.
+// End-of-timer chime, synthesized with the Web Audio API (no mp3 file, works offline).
+// - 'focus': a focus session just ended, break time → gentle rising melody.
+// - 'break': a break just ended, back to work → two clearer "ping" tones.
 export function playNotify(kind: NotifyKind = 'focus') {
   const c = getCtx();
   if (!c) return;

@@ -1,5 +1,5 @@
-// Ảnh nền mặc định đi kèm app (nằm trong client/public/backgrounds).
-// Dùng chung giữa PomodoroPage và BackgroundGallery.
+// Default backgrounds shipped with the app (under client/public/backgrounds).
+// Shared between PomodoroPage and BackgroundGallery.
 export const DEFAULT_BACKGROUNDS = [
   '/backgrounds/forest1.jpg',
   '/backgrounds/forest2.jpg',
@@ -10,3 +10,6 @@ export const DEFAULT_BACKGROUNDS = [
 ];
 
 export const SEQ_INDEX_KEY = 'pomodoro:bgSeqIndex';
+
+// Interval (ms) for auto-rotating the background in random/sequence mode within a session.
+export const BG_ROTATE_MS = 60_000;

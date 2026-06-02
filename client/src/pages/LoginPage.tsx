@@ -6,6 +6,7 @@ import { loginSchema, type LoginValues } from '@/validators/auth.schema';
 import { useLogin } from '@/hooks/queries/useAuthQueries';
 import { Input } from '@/components/common/Input';
 import { Button } from '@/components/common/Button';
+import { getApiErrorMessage } from '@/utils/apiError';
 
 export default function LoginPage() {
   const {
@@ -25,7 +26,7 @@ export default function LoginPage() {
         toast.success(`Welcome back, ${data.user.fullName.split(' ')[0]}`);
         navigate('/dashboard');
       },
-      onError: (err: any) => toast.error(err?.response?.data?.error?.message ?? 'Login failed'),
+      onError: (err: any) => toast.error(getApiErrorMessage(err, 'Login failed')),
     });
 
   return (

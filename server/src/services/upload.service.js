@@ -4,7 +4,7 @@ import { AppError } from '../utils/AppError.js';
 const IMGBB_ENDPOINT = 'https://api.imgbb.com/1/upload';
 
 export const uploadService = {
-  // Nhận base64 ảnh (có hoặc không có prefix data URI), đẩy lên imgbb, trả về URL hiển thị.
+  // Accepts base64 image data (with or without the data URI prefix), uploads to imgbb, returns the display URL.
   async uploadImage(base64) {
     if (!env.IMGBB_API_KEY) {
       throw new AppError('Image upload is not configured on the server', 503);
@@ -13,8 +13,8 @@ export const uploadService = {
       throw new AppError('Missing image data', 400);
     }
 
-    // imgbb chỉ nhận phần payload base64 thuần, bỏ tiền tố "data:image/png;base64,".
-    // Không có dấu phẩy thì indexOf trả -1 → slice(0) giữ nguyên chuỗi.
+    // imgbb only accepts the raw base64 payload, so strip the "data:image/png;base64," prefix.
+    // With no comma, indexOf returns -1 → slice(0) keeps the whole string.
     const payload = base64.slice(base64.indexOf(',') + 1);
 
     const form = new FormData();

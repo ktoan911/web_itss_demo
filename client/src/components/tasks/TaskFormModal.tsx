@@ -8,6 +8,7 @@ import { Input } from '@/components/common/Input';
 import { Textarea } from '@/components/common/Textarea';
 import { Button } from '@/components/common/Button';
 import { useCreateTask, useUpdateTask } from '@/hooks/queries/useTaskQueries';
+import { getApiErrorMessage } from '@/utils/apiError';
 import type { Task } from '@/types/task';
 
 type Props = {
@@ -79,7 +80,7 @@ export function TaskFormModal({ open, onClose, task }: Props) {
       toast.success(msg);
       onClose();
     };
-    const fail = (err: any) => toast.error(err?.response?.data?.error?.message ?? 'Save failed');
+    const fail = (err: any) => toast.error(getApiErrorMessage(err, 'Save failed'));
     if (isEdit && task)
       update.mutate({ id: task._id, body }, { onSuccess: success('Task updated'), onError: fail });
     else create.mutate(body, { onSuccess: success('Task created'), onError: fail });

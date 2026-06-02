@@ -8,13 +8,23 @@ import { Button } from '@/components/common/Button';
 import { Loading } from '@/components/common/Loading';
 import { useAuth } from '@/hooks/useAuth';
 import {
-  useChangePassword, useSettingsQuery, useUpdateProfile, useUpdateSettings,
+  useChangePassword,
+  useSettingsQuery,
+  useUpdateProfile,
+  useUpdateSettings,
 } from '@/hooks/queries/useSettingsQueries';
 import { useThemeStore } from '@/store/themeStore';
 import { usePomodoroStore } from '@/store/pomodoroStore';
+import { getApiErrorMessage } from '@/utils/apiError';
 import {
-  profileSchema, passwordSchema, durationsSchema, preferencesSchema,
-  type ProfileValues, type PasswordValues, type DurationValues, type PreferencesValues,
+  profileSchema,
+  passwordSchema,
+  durationsSchema,
+  preferencesSchema,
+  type ProfileValues,
+  type PasswordValues,
+  type DurationValues,
+  type PreferencesValues,
 } from '@/validators/settings.schema';
 
 export default function SettingsPage() {
@@ -61,7 +71,7 @@ export default function SettingsPage() {
   if (settings.isLoading) return <Loading />;
 
   return (
-    <div className="space-y-5 max-w-2xl">
+    <div className="max-w-2xl space-y-5">
       <h1 className="text-2xl font-semibold tracking-tight">Settings</h1>
 
       <Card>
@@ -71,16 +81,23 @@ export default function SettingsPage() {
             updateProfile.mutate(v, {
               onSuccess: () => toast.success('Profile updated'),
               onError: () => toast.error('Failed'),
-            }))}
+            }),
+          )}
           className="space-y-3"
         >
-          <Input label="Full name" {...profile.register('fullName')} error={profile.formState.errors.fullName?.message} />
+          <Input
+            label="Full name"
+            {...profile.register('fullName')}
+            error={profile.formState.errors.fullName?.message}
+          />
           <div>
             <label className="text-sm font-medium">Email</label>
             <p className="mt-1 text-sm text-text-muted">{user?.email}</p>
           </div>
           <div className="flex justify-end">
-            <Button type="submit" loading={updateProfile.isPending}>Save</Button>
+            <Button type="submit" loading={updateProfile.isPending}>
+              Save
+            </Button>
           </div>
         </form>
       </Card>
@@ -90,16 +107,37 @@ export default function SettingsPage() {
         <form
           onSubmit={password.handleSubmit((v) =>
             changePassword.mutate(v, {
-              onSuccess: () => { toast.success('Password updated'); password.reset(); },
-              onError: (e: any) => toast.error(e?.response?.data?.error?.message ?? 'Failed'),
-            }))}
+              onSuccess: () => {
+                toast.success('Password updated');
+                password.reset();
+              },
+              onError: (e: any) => toast.error(getApiErrorMessage(e, 'Failed')),
+            }),
+          )}
           className="space-y-3"
         >
-          <Input label="Current password" type="password" {...password.register('currentPassword')} error={password.formState.errors.currentPassword?.message} />
-          <Input label="New password" type="password" {...password.register('newPassword')} error={password.formState.errors.newPassword?.message} />
-          <Input label="Confirm new password" type="password" {...password.register('confirmPassword')} error={password.formState.errors.confirmPassword?.message} />
+          <Input
+            label="Current password"
+            type="password"
+            {...password.register('currentPassword')}
+            error={password.formState.errors.currentPassword?.message}
+          />
+          <Input
+            label="New password"
+            type="password"
+            {...password.register('newPassword')}
+            error={password.formState.errors.newPassword?.message}
+          />
+          <Input
+            label="Confirm new password"
+            type="password"
+            {...password.register('confirmPassword')}
+            error={password.formState.errors.confirmPassword?.message}
+          />
           <div className="flex justify-end">
-            <Button type="submit" loading={changePassword.isPending}>Update password</Button>
+            <Button type="submit" loading={changePassword.isPending}>
+              Update password
+            </Button>
           </div>
         </form>
       </Card>
@@ -111,17 +149,41 @@ export default function SettingsPage() {
             updateSettings.mutate(v, {
               onSuccess: () => {
                 toast.success('Durations updated');
-                hydrate(v);
+                hydrate({ ...v, notifySoundEnabled: settings.data?.notifySoundEnabled ?? true });
               },
               onError: () => toast.error('Failed'),
-            }))}
+            }),
+          )}
           className="grid grid-cols-1 gap-3 sm:grid-cols-3"
         >
-          <Input label="Focus" type="number" min={1} max={120} {...durations.register('focusDuration', { valueAsNumber: true })} error={durations.formState.errors.focusDuration?.message} />
-          <Input label="Short break" type="number" min={1} max={60} {...durations.register('shortBreakDuration', { valueAsNumber: true })} error={durations.formState.errors.shortBreakDuration?.message} />
-          <Input label="Long break" type="number" min={1} max={60} {...durations.register('longBreakDuration', { valueAsNumber: true })} error={durations.formState.errors.longBreakDuration?.message} />
-          <div className="sm:col-span-3 flex justify-end">
-            <Button type="submit" loading={updateSettings.isPending}>Save</Button>
+          <Input
+            label="Focus"
+            type="number"
+            min={1}
+            max={120}
+            {...durations.register('focusDuration', { valueAsNumber: true })}
+            error={durations.formState.errors.focusDuration?.message}
+          />
+          <Input
+            label="Short break"
+            type="number"
+            min={1}
+            max={60}
+            {...durations.register('shortBreakDuration', { valueAsNumber: true })}
+            error={durations.formState.errors.shortBreakDuration?.message}
+          />
+          <Input
+            label="Long break"
+            type="number"
+            min={1}
+            max={60}
+            {...durations.register('longBreakDuration', { valueAsNumber: true })}
+            error={durations.formState.errors.longBreakDuration?.message}
+          />
+          <div className="flex justify-end sm:col-span-3">
+            <Button type="submit" loading={updateSettings.isPending}>
+              Save
+            </Button>
           </div>
         </form>
       </Card>
@@ -131,9 +193,13 @@ export default function SettingsPage() {
         <form
           onSubmit={preferences.handleSubmit((v) =>
             updateSettings.mutate(v, {
-              onSuccess: () => { toast.success('Preferences saved'); setTheme(v.theme); },
+              onSuccess: () => {
+                toast.success('Preferences saved');
+                setTheme(v.theme);
+              },
               onError: () => toast.error('Failed'),
-            }))}
+            }),
+          )}
           className="space-y-3"
         >
           <div>
@@ -148,10 +214,13 @@ export default function SettingsPage() {
             </div>
           </div>
           <label className="flex items-center gap-2 text-sm">
-            <input type="checkbox" {...preferences.register('notificationEnabled')} /> Enable notifications
+            <input type="checkbox" {...preferences.register('notificationEnabled')} /> Enable
+            notifications
           </label>
           <div className="flex justify-end">
-            <Button type="submit" loading={updateSettings.isPending}>Save</Button>
+            <Button type="submit" loading={updateSettings.isPending}>
+              Save
+            </Button>
           </div>
         </form>
       </Card>

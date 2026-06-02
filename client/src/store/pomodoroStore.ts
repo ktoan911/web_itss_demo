@@ -8,12 +8,6 @@ type Status = 'idle' | 'running' | 'paused';
 
 type Durations = { focus: number; shortBreak: number; longBreak: number };
 
-const SOUND_KEY = 'pomodoro:notifySound';
-const readSoundEnabled = () => {
-  if (typeof localStorage === 'undefined') return true;
-  return localStorage.getItem(SOUND_KEY) !== 'off';
-};
-
 type State = {
   mode: PomodoroMode;
   status: Status;
@@ -32,6 +26,7 @@ type State = {
     focusDuration: number;
     shortBreakDuration: number;
     longBreakDuration: number;
+    notifySoundEnabled: boolean;
   }) => void;
   setMode: (m: PomodoroMode) => void;
   selectTask: (id: string | null) => void;
@@ -115,7 +110,7 @@ export const usePomodoroStore = create<State>((set, get) => {
       });
     }
     if (soundEnabled) playNotify(finishedFocus ? 'focus' : 'break');
-    // Auto-start: phiên kế tiếp tự động đếm ngay, không cần bấm "Bắt đầu".
+    // Auto-start: the next session starts counting immediately, no need to press "Start".
     get().start();
   }
 
@@ -130,15 +125,20 @@ export const usePomodoroStore = create<State>((set, get) => {
     intervalId: null,
     focusCount: 0,
     estimateReachedTaskId: null,
-    soundEnabled: readSoundEnabled(),
+    soundEnabled: true,
 
-    hydrateFromSettings: ({ focusDuration, shortBreakDuration, longBreakDuration }) => {
+    hydrateFromSettings: ({
+      focusDuration,
+      shortBreakDuration,
+      longBreakDuration,
+      notifySoundEnabled,
+    }) => {
       const durations = {
         focus: focusDuration,
         shortBreak: shortBreakDuration,
         longBreak: longBreakDuration,
       };
-      set({ durations });
+      set({ durations, soundEnabled: notifySoundEnabled });
       if (get().status === 'idle')
         set({ remainingMs: minutesMs(durationFor({ mode: get().mode, durations })) });
     },
@@ -200,9 +200,7 @@ export const usePomodoroStore = create<State>((set, get) => {
 
     acknowledgeEstimate: () => set({ estimateReachedTaskId: null }),
 
-    setSoundEnabled: (v) => {
-      if (typeof localStorage !== 'undefined') localStorage.setItem(SOUND_KEY, v ? 'on' : 'off');
-      set({ soundEnabled: v });
-    },
+    // Optimistic local update; the caller persists notifySoundEnabled to server settings.
+    setSoundEnabled: (v) => set({ soundEnabled: v }),
   };
 });

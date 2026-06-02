@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import {
@@ -17,12 +17,12 @@ import {
 } from 'lucide-react';
 import { useRecentSessionsQuery } from '@/hooks/queries/usePomodoroQueries';
 import { useTasksQuery, useMarkComplete } from '@/hooks/queries/useTaskQueries';
-import { useSettingsQuery } from '@/hooks/queries/useSettingsQueries';
+import { useUpdateSettings } from '@/hooks/queries/useSettingsQueries';
 import { usePomodoroStore } from '@/store/pomodoroStore';
 import { useSoundStore } from '@/store/soundStore';
 import { useRemainingMs } from '@/hooks/usePomodoroEngine';
+import { useResolvedBackground } from '@/hooks/useBackgrounds';
 import { unlockAudio } from '@/lib/audio';
-import { DEFAULT_BACKGROUNDS, SEQ_INDEX_KEY } from '@/lib/backgrounds';
 import type { PomodoroMode } from '@/types/pomodoro';
 import { EstimateReachedDialog } from '@/components/pomodoro/EstimateReachedDialog';
 import { SoundControls } from '@/components/pomodoro/SoundControls';
@@ -47,9 +47,9 @@ const QUOTES = [
 ];
 
 const MODE_LABELS: Record<PomodoroMode, string> = {
-  Focus: 'Phiên tập trung',
-  ShortBreak: 'Nghỉ ngắn',
-  LongBreak: 'Nghỉ dài',
+  Focus: 'Focus session',
+  ShortBreak: 'Short break',
+  LongBreak: 'Long break',
 };
 
 const fmtTime = (ms: number) => {
@@ -67,8 +67,8 @@ export default function PomodoroPage() {
   const navigate = useNavigate();
   const tasks = useTasksQuery({ status: undefined, sortBy: 'deadline' });
   useRecentSessionsQuery();
-  const settings = useSettingsQuery();
   const complete = useMarkComplete();
+  const updateSettings = useUpdateSettings();
 
   const mode = usePomodoroStore((s) => s.mode);
   const status = usePomodoroStore((s) => s.status);
@@ -88,35 +88,7 @@ export default function PomodoroPage() {
   const setSoundEnabled = usePomodoroStore((s) => s.setSoundEnabled);
 
   const remaining = useRemainingMs();
-
-  const bgPool = useMemo(
-    () => [...DEFAULT_BACKGROUNDS, ...(settings.data?.backgroundUrls ?? [])],
-    [settings.data?.backgroundUrls],
-  );
-  const bgMode = settings.data?.backgroundMode ?? 'random';
-  const bgSelected = settings.data?.backgroundSelected ?? '';
-
-  // Chốt 1 ảnh nền khi mở trang. unchange: bám theo ảnh đã chọn; random/sequence:
-  // chọn đúng một lần/phiên (pickedRef), sequence lưu chỉ số kế tiếp vào localStorage.
-  const [background, setBackground] = useState<string | undefined>(undefined);
-  const pickedRef = useRef(false);
-  useEffect(() => {
-    if (!settings.data) return;
-    if (bgMode === 'unchange') {
-      setBackground(bgSelected || bgPool[0]);
-      return;
-    }
-    if (pickedRef.current) return;
-    pickedRef.current = true;
-    if (bgMode === 'sequence') {
-      const prev = Number(localStorage.getItem(SEQ_INDEX_KEY) ?? '-1');
-      const idx = (prev + 1) % bgPool.length;
-      localStorage.setItem(SEQ_INDEX_KEY, String(idx));
-      setBackground(bgPool[idx]);
-    } else {
-      setBackground(bgPool[Math.floor(Math.random() * bgPool.length)]);
-    }
-  }, [settings.data, bgMode, bgSelected, bgPool]);
+  const background = useResolvedBackground();
 
   const [quote] = useState(() => QUOTES[Math.floor(Math.random() * QUOTES.length)]);
   const [showTaskPicker, setShowTaskPicker] = useState(false);
@@ -163,8 +135,7 @@ export default function PomodoroPage() {
     }
   };
 
-  const playLabel =
-    status === 'running' ? 'Tạm dừng' : status === 'paused' ? 'Tiếp tục' : 'Bắt đầu';
+  const playLabel = status === 'running' ? 'Pause' : status === 'paused' ? 'Resume' : 'Start';
 
   return (
     <div
@@ -179,7 +150,7 @@ export default function PomodoroPage() {
 
       <button
         onClick={() => navigate('/dashboard')}
-        aria-label="Quay lại"
+        aria-label="Back"
         className="absolute left-6 top-6 z-20 flex items-center gap-2 rounded-full bg-black/40 px-3 py-2 text-sm backdrop-blur transition hover:bg-black/60"
       >
         <ArrowLeft className="h-4 w-4" />
@@ -217,7 +188,7 @@ export default function PomodoroPage() {
                 autoFocus
                 className="w-full rounded-xl bg-white/10 px-3 py-2 text-sm text-white outline-none [&>option]:bg-neutral-900"
               >
-                <option value="">Không chọn nhiệm vụ</option>
+                <option value="">No task selected</option>
                 {focusables.map((t) => (
                   <option key={t._id} value={t._id}>
                     {t.title} — {t.completedPomodoros}/{t.estimatedPomodoros}
@@ -250,8 +221,8 @@ export default function PomodoroPage() {
         <div className="mt-8 flex items-center gap-6">
           <button
             onClick={toggleMaster}
-            aria-label={masterMuted ? 'Bật nhạc nền' : 'Tắt nhạc nền'}
-            title={masterMuted ? 'Bật nhạc nền' : 'Tắt nhạc nền'}
+            aria-label={masterMuted ? 'Unmute music' : 'Mute music'}
+            title={masterMuted ? 'Unmute music' : 'Mute music'}
             className="rounded-full bg-black/30 p-3 text-white backdrop-blur transition hover:bg-black/50"
           >
             {masterMuted ? <VolumeX className="h-5 w-5" /> : <Volume2 className="h-5 w-5" />}
@@ -260,11 +231,15 @@ export default function PomodoroPage() {
           <button
             onClick={() => {
               const next = !soundEnabled;
-              setSoundEnabled(next);
-              toast.info(next ? 'Đã bật âm báo hết giờ' : 'Đã tắt âm báo hết giờ');
+              setSoundEnabled(next); // optimistic
+              updateSettings.mutate(
+                { notifySoundEnabled: next },
+                { onError: () => setSoundEnabled(!next) },
+              );
+              toast.info(next ? 'Timer sound on' : 'Timer sound off');
             }}
-            aria-label={soundEnabled ? 'Tắt âm báo hết giờ' : 'Bật âm báo hết giờ'}
-            title={soundEnabled ? 'Tắt âm báo hết giờ' : 'Bật âm báo hết giờ'}
+            aria-label={soundEnabled ? 'Turn off timer sound' : 'Turn on timer sound'}
+            title={soundEnabled ? 'Turn off timer sound' : 'Turn on timer sound'}
             className="rounded-full bg-black/30 p-3 text-white backdrop-blur transition hover:bg-black/50"
           >
             {soundEnabled ? <Bell className="h-5 w-5" /> : <BellOff className="h-5 w-5" />}
@@ -272,7 +247,7 @@ export default function PomodoroPage() {
 
           <button
             onClick={reset}
-            aria-label="Đặt lại"
+            aria-label="Reset"
             className="rounded-full bg-black/30 p-3 text-white backdrop-blur transition hover:bg-black/50"
           >
             <RotateCcw className="h-5 w-5" />
@@ -288,7 +263,7 @@ export default function PomodoroPage() {
 
           <button
             onClick={skip}
-            aria-label="Bỏ qua"
+            aria-label="Skip"
             className="rounded-full bg-black/30 p-3 text-white backdrop-blur transition hover:bg-black/50"
           >
             <SkipForward className="h-5 w-5" />
@@ -296,7 +271,7 @@ export default function PomodoroPage() {
 
           <button
             onClick={toggleFullscreen}
-            aria-label={isFullscreen ? 'Thoát toàn màn hình' : 'Toàn màn hình'}
+            aria-label={isFullscreen ? 'Exit fullscreen' : 'Fullscreen'}
             className="rounded-full bg-black/30 p-3 text-white backdrop-blur transition hover:bg-black/50"
           >
             {isFullscreen ? <Minimize2 className="h-5 w-5" /> : <Maximize2 className="h-5 w-5" />}
@@ -323,9 +298,9 @@ export default function PomodoroPage() {
       <div className="absolute bottom-6 left-6 z-10 flex items-center gap-3">
         <BackgroundGallery />
         <button
-          aria-label="Ghi chú"
+          aria-label="Notes"
           className="rounded-full bg-black/30 p-3 text-white backdrop-blur transition hover:bg-black/50"
-          onClick={() => toast.info('Ghi chú phiên (chưa khả dụng)')}
+          onClick={() => toast.info('Session notes (coming soon)')}
         >
           <StickyNote className="h-5 w-5" />
         </button>

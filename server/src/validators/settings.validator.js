@@ -6,6 +6,7 @@ export const settingsUpdateSchema = z.object({
   longBreakDuration: z.number().int().min(1).max(60).optional(),
   theme: z.enum(['light', 'dark']).optional(),
   notificationEnabled: z.boolean().optional(),
+  notifySoundEnabled: z.boolean().optional(),
   backgroundUrls: z.array(z.string().url()).max(50).optional(),
   backgroundMode: z.enum(['unchange', 'random', 'sequence']).optional(),
   backgroundSelected: z

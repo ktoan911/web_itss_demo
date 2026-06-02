@@ -9,6 +9,7 @@ const schema = z.object({
   CLIENT_ORIGIN: z.string().url().default('http://localhost:5173'),
   NODE_ENV: z.enum(['development', 'production', 'test']).default('development'),
   BCRYPT_COST: z.coerce.number().int().min(4).max(15).default(10),
+  IMGBB_API_KEY: z.string().optional(),
 });
 
 const parsed = schema.safeParse(process.env);

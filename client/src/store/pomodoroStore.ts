@@ -8,6 +8,12 @@ type Status = 'idle' | 'running' | 'paused';
 
 type Durations = { focus: number; shortBreak: number; longBreak: number };
 
+const SOUND_KEY = 'pomodoro:notifySound';
+const readSoundEnabled = () => {
+  if (typeof localStorage === 'undefined') return true;
+  return localStorage.getItem(SOUND_KEY) !== 'off';
+};
+
 type State = {
   mode: PomodoroMode;
   status: Status;
@@ -20,8 +26,13 @@ type State = {
   focusCount: number;
   // pending suggestion: when set, UI may show "task estimate reached" prompt
   estimateReachedTaskId: string | null;
+  soundEnabled: boolean;
 
-  hydrateFromSettings: (s: { focusDuration: number; shortBreakDuration: number; longBreakDuration: number }) => void;
+  hydrateFromSettings: (s: {
+    focusDuration: number;
+    shortBreakDuration: number;
+    longBreakDuration: number;
+  }) => void;
   setMode: (m: PomodoroMode) => void;
   selectTask: (id: string | null) => void;
   start: () => void;
@@ -29,15 +40,19 @@ type State = {
   reset: () => void;
   skip: () => void;
   acknowledgeEstimate: () => void;
+  setSoundEnabled: (v: boolean) => void;
 };
 
 const minutesMs = (m: number) => m * 60_000;
 
 const durationFor = (state: Pick<State, 'mode' | 'durations'>) => {
   switch (state.mode) {
-    case 'Focus': return state.durations.focus;
-    case 'ShortBreak': return state.durations.shortBreak;
-    case 'LongBreak': return state.durations.longBreak;
+    case 'Focus':
+      return state.durations.focus;
+    case 'ShortBreak':
+      return state.durations.shortBreak;
+    case 'LongBreak':
+      return state.durations.longBreak;
   }
 };
 
@@ -58,7 +73,8 @@ export const usePomodoroStore = create<State>((set, get) => {
 
   async function complete() {
     clearTick();
-    const { mode, durations, startedAt, selectedTaskId, focusCount } = get();
+    const { mode, durations, startedAt, selectedTaskId, focusCount, soundEnabled } = get();
+    const finishedFocus = mode === 'Focus';
     if (mode === 'Focus' && startedAt) {
       const newCount = focusCount + 1;
       try {
@@ -85,7 +101,9 @@ export const usePomodoroStore = create<State>((set, get) => {
         endsAt: null,
         startedAt: null,
         mode: nextMode,
-        remainingMs: minutesMs(nextMode === 'ShortBreak' ? durations.shortBreak : durations.longBreak),
+        remainingMs: minutesMs(
+          nextMode === 'ShortBreak' ? durations.shortBreak : durations.longBreak,
+        ),
         estimateReachedTaskId: selectedTaskId,
       });
     } else {
@@ -96,7 +114,9 @@ export const usePomodoroStore = create<State>((set, get) => {
         remainingMs: minutesMs(durations.focus),
       });
     }
-    playNotify();
+    if (soundEnabled) playNotify(finishedFocus ? 'focus' : 'break');
+    // Auto-start: phiên kế tiếp tự động đếm ngay, không cần bấm "Bắt đầu".
+    get().start();
   }
 
   return {
@@ -110,11 +130,17 @@ export const usePomodoroStore = create<State>((set, get) => {
     intervalId: null,
     focusCount: 0,
     estimateReachedTaskId: null,
+    soundEnabled: readSoundEnabled(),
 
     hydrateFromSettings: ({ focusDuration, shortBreakDuration, longBreakDuration }) => {
-      const durations = { focus: focusDuration, shortBreak: shortBreakDuration, longBreak: longBreakDuration };
+      const durations = {
+        focus: focusDuration,
+        shortBreak: shortBreakDuration,
+        longBreak: longBreakDuration,
+      };
       set({ durations });
-      if (get().status === 'idle') set({ remainingMs: minutesMs(durationFor({ mode: get().mode, durations })) });
+      if (get().status === 'idle')
+        set({ remainingMs: minutesMs(durationFor({ mode: get().mode, durations })) });
     },
 
     setMode: (m) => {
@@ -159,9 +185,8 @@ export const usePomodoroStore = create<State>((set, get) => {
     skip: () => {
       clearTick();
       const { mode, durations, focusCount } = get();
-      const nextMode: PomodoroMode = mode === 'Focus'
-        ? ((focusCount + 1) % 4 === 0 ? 'LongBreak' : 'ShortBreak')
-        : 'Focus';
+      const nextMode: PomodoroMode =
+        mode === 'Focus' ? ((focusCount + 1) % 4 === 0 ? 'LongBreak' : 'ShortBreak') : 'Focus';
       const nextFocusCount = mode === 'Focus' ? focusCount + 1 : focusCount;
       set({
         status: 'idle',
@@ -174,5 +199,10 @@ export const usePomodoroStore = create<State>((set, get) => {
     },
 
     acknowledgeEstimate: () => set({ estimateReachedTaskId: null }),
+
+    setSoundEnabled: (v) => {
+      if (typeof localStorage !== 'undefined') localStorage.setItem(SOUND_KEY, v ? 'on' : 'off');
+      set({ soundEnabled: v });
+    },
   };
 });

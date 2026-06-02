@@ -1,8 +1,10 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import {
   ArrowLeft,
+  Bell,
+  BellOff,
   Maximize2,
   Minimize2,
   Pause,
@@ -20,18 +22,11 @@ import { usePomodoroStore } from '@/store/pomodoroStore';
 import { useSoundStore } from '@/store/soundStore';
 import { useRemainingMs } from '@/hooks/usePomodoroEngine';
 import { unlockAudio } from '@/lib/audio';
+import { DEFAULT_BACKGROUNDS, SEQ_INDEX_KEY } from '@/lib/backgrounds';
 import type { PomodoroMode } from '@/types/pomodoro';
 import { EstimateReachedDialog } from '@/components/pomodoro/EstimateReachedDialog';
 import { SoundControls } from '@/components/pomodoro/SoundControls';
-
-const BACKGROUNDS = [
-  '/backgrounds/forest1.jpg',
-  '/backgrounds/forest2.jpg',
-  '/backgrounds/forest3.jpg',
-  '/backgrounds/forest4.jpg',
-  '/backgrounds/forest5.jpg',
-  '/backgrounds/forest6.jpg',
-];
+import { BackgroundGallery } from '@/components/pomodoro/BackgroundGallery';
 
 const QUOTES = [
   { text: 'Starve your distractions, feed your focus.', author: 'Unknown' },
@@ -72,7 +67,7 @@ export default function PomodoroPage() {
   const navigate = useNavigate();
   const tasks = useTasksQuery({ status: undefined, sortBy: 'deadline' });
   useRecentSessionsQuery();
-  useSettingsQuery();
+  const settings = useSettingsQuery();
   const complete = useMarkComplete();
 
   const mode = usePomodoroStore((s) => s.mode);
@@ -89,10 +84,40 @@ export default function PomodoroPage() {
 
   const masterMuted = useSoundStore((s) => s.masterMuted);
   const toggleMaster = useSoundStore((s) => s.toggleMaster);
+  const soundEnabled = usePomodoroStore((s) => s.soundEnabled);
+  const setSoundEnabled = usePomodoroStore((s) => s.setSoundEnabled);
 
   const remaining = useRemainingMs();
 
-  const [bgIndex] = useState(() => Math.floor(Math.random() * BACKGROUNDS.length));
+  const bgPool = useMemo(
+    () => [...DEFAULT_BACKGROUNDS, ...(settings.data?.backgroundUrls ?? [])],
+    [settings.data?.backgroundUrls],
+  );
+  const bgMode = settings.data?.backgroundMode ?? 'random';
+  const bgSelected = settings.data?.backgroundSelected ?? '';
+
+  // Chốt 1 ảnh nền khi mở trang. unchange: bám theo ảnh đã chọn; random/sequence:
+  // chọn đúng một lần/phiên (pickedRef), sequence lưu chỉ số kế tiếp vào localStorage.
+  const [background, setBackground] = useState<string | undefined>(undefined);
+  const pickedRef = useRef(false);
+  useEffect(() => {
+    if (!settings.data) return;
+    if (bgMode === 'unchange') {
+      setBackground(bgSelected || bgPool[0]);
+      return;
+    }
+    if (pickedRef.current) return;
+    pickedRef.current = true;
+    if (bgMode === 'sequence') {
+      const prev = Number(localStorage.getItem(SEQ_INDEX_KEY) ?? '-1');
+      const idx = (prev + 1) % bgPool.length;
+      localStorage.setItem(SEQ_INDEX_KEY, String(idx));
+      setBackground(bgPool[idx]);
+    } else {
+      setBackground(bgPool[Math.floor(Math.random() * bgPool.length)]);
+    }
+  }, [settings.data, bgMode, bgSelected, bgPool]);
+
   const [quote] = useState(() => QUOTES[Math.floor(Math.random() * QUOTES.length)]);
   const [showTaskPicker, setShowTaskPicker] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
@@ -145,7 +170,7 @@ export default function PomodoroPage() {
     <div
       className="relative h-screen w-screen overflow-hidden bg-black text-white"
       style={{
-        backgroundImage: `url(${BACKGROUNDS[bgIndex]})`,
+        backgroundImage: background ? `url(${background})` : undefined,
         backgroundSize: 'cover',
         backgroundPosition: 'center',
       }}
@@ -225,10 +250,24 @@ export default function PomodoroPage() {
         <div className="mt-8 flex items-center gap-6">
           <button
             onClick={toggleMaster}
-            aria-label={masterMuted ? 'Bật âm' : 'Tắt âm'}
+            aria-label={masterMuted ? 'Bật nhạc nền' : 'Tắt nhạc nền'}
+            title={masterMuted ? 'Bật nhạc nền' : 'Tắt nhạc nền'}
             className="rounded-full bg-black/30 p-3 text-white backdrop-blur transition hover:bg-black/50"
           >
             {masterMuted ? <VolumeX className="h-5 w-5" /> : <Volume2 className="h-5 w-5" />}
+          </button>
+
+          <button
+            onClick={() => {
+              const next = !soundEnabled;
+              setSoundEnabled(next);
+              toast.info(next ? 'Đã bật âm báo hết giờ' : 'Đã tắt âm báo hết giờ');
+            }}
+            aria-label={soundEnabled ? 'Tắt âm báo hết giờ' : 'Bật âm báo hết giờ'}
+            title={soundEnabled ? 'Tắt âm báo hết giờ' : 'Bật âm báo hết giờ'}
+            className="rounded-full bg-black/30 p-3 text-white backdrop-blur transition hover:bg-black/50"
+          >
+            {soundEnabled ? <Bell className="h-5 w-5" /> : <BellOff className="h-5 w-5" />}
           </button>
 
           <button
@@ -281,13 +320,16 @@ export default function PomodoroPage() {
         </div>
       </div>
 
-      <button
-        aria-label="Ghi chú"
-        className="absolute bottom-6 left-6 z-10 rounded-full bg-black/30 p-3 text-white backdrop-blur transition hover:bg-black/50"
-        onClick={() => toast.info('Ghi chú phiên (chưa khả dụng)')}
-      >
-        <StickyNote className="h-5 w-5" />
-      </button>
+      <div className="absolute bottom-6 left-6 z-10 flex items-center gap-3">
+        <BackgroundGallery />
+        <button
+          aria-label="Ghi chú"
+          className="rounded-full bg-black/30 p-3 text-white backdrop-blur transition hover:bg-black/50"
+          onClick={() => toast.info('Ghi chú phiên (chưa khả dụng)')}
+        >
+          <StickyNote className="h-5 w-5" />
+        </button>
+      </div>
 
       <SoundControls />
 

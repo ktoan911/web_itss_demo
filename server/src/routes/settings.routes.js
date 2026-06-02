@@ -1,17 +1,25 @@
-import { Router } from 'express';
+import { Router, json } from 'express';
 import { settingsController } from '../controllers/settings.controller.js';
 import { validate } from '../middlewares/validate.middleware.js';
 import { authRequired } from '../middlewares/auth.middleware.js';
 import {
-  settingsUpdateSchema, profileUpdateSchema, passwordChangeSchema,
+  settingsUpdateSchema,
+  profileUpdateSchema,
+  passwordChangeSchema,
 } from '../validators/settings.validator.js';
 
 const router = Router();
 router.use(authRequired);
 
-router.get('/',          settingsController.get);
-router.put('/',          validate({ body: settingsUpdateSchema }), settingsController.update);
-router.put('/profile',   validate({ body: profileUpdateSchema }),  settingsController.updateProfile);
-router.put('/password',  validate({ body: passwordChangeSchema }), settingsController.changePassword);
+router.get('/', settingsController.get);
+router.put('/', validate({ body: settingsUpdateSchema }), settingsController.update);
+router.put('/profile', validate({ body: profileUpdateSchema }), settingsController.updateProfile);
+router.put(
+  '/password',
+  validate({ body: passwordChangeSchema }),
+  settingsController.changePassword,
+);
+// Ảnh base64 lớn hơn giới hạn json 1mb toàn cục → cấp body parser riêng cho route này.
+router.post('/background-upload', json({ limit: '12mb' }), settingsController.uploadBackground);
 
 export default router;

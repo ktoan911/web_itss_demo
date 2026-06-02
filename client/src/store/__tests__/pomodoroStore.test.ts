@@ -4,19 +4,31 @@ import { usePomodoroStore } from '@/store/pomodoroStore';
 vi.mock('@/api/pomodoroApi', () => ({
   pomodoroApi: { create: vi.fn().mockResolvedValue({}), recent: vi.fn() },
 }));
-vi.mock('@/lib/audio', () => ({ playNotify: vi.fn(), preloadAudio: vi.fn(), unlockAudio: vi.fn() }));
+vi.mock('@/lib/audio', () => ({
+  playNotify: vi.fn(),
+  preloadAudio: vi.fn(),
+  unlockAudio: vi.fn(),
+}));
 vi.mock('@/lib/queryClient', () => ({ queryClient: { invalidateQueries: vi.fn() } }));
 
 const reset = () =>
   usePomodoroStore.setState({
-    mode: 'Focus', status: 'idle',
+    mode: 'Focus',
+    status: 'idle',
     durations: { focus: 25, shortBreak: 5, longBreak: 15 },
-    endsAt: null, remainingMs: 25 * 60_000,
-    startedAt: null, selectedTaskId: null, intervalId: null,
-    focusCount: 0, estimateReachedTaskId: null,
+    endsAt: null,
+    remainingMs: 25 * 60_000,
+    startedAt: null,
+    selectedTaskId: null,
+    intervalId: null,
+    focusCount: 0,
+    estimateReachedTaskId: null,
   });
 
-beforeEach(() => { vi.useFakeTimers(); reset(); });
+beforeEach(() => {
+  vi.useFakeTimers();
+  reset();
+});
 
 describe('pomodoroStore', () => {
   it('start sets endsAt and running', () => {
@@ -40,7 +52,9 @@ describe('pomodoroStore', () => {
 
   it('hydrateFromSettings updates durations and remainingMs when idle', () => {
     usePomodoroStore.getState().hydrateFromSettings({
-      focusDuration: 50, shortBreakDuration: 10, longBreakDuration: 20,
+      focusDuration: 50,
+      shortBreakDuration: 10,
+      longBreakDuration: 20,
     });
     expect(usePomodoroStore.getState().durations.focus).toBe(50);
     expect(usePomodoroStore.getState().remainingMs).toBe(50 * 60_000);
@@ -60,5 +74,15 @@ describe('pomodoroStore', () => {
     const s = usePomodoroStore.getState();
     expect(s.focusCount).toBe(1);
     expect(s.mode).toBe('ShortBreak');
+  });
+
+  it('auto-starts the next session when a session completes', async () => {
+    usePomodoroStore.getState().start();
+    // chạy hết phiên Focus 25 phút → complete() chuyển mode và tự start phiên nghỉ
+    await vi.advanceTimersByTimeAsync(25 * 60_000 + 300);
+    const s = usePomodoroStore.getState();
+    expect(s.mode).toBe('ShortBreak');
+    expect(s.status).toBe('running');
+    expect(s.endsAt).not.toBeNull();
   });
 });

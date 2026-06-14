@@ -9,6 +9,7 @@ export type Settings = {
   theme: 'light' | 'dark';
   notificationEnabled: boolean;
   notifySoundEnabled: boolean;
+  deadlineReminderHours: number;
   backgroundUrls: string[];
   backgroundMode: BackgroundMode;
   backgroundSelected: string;
@@ -23,6 +24,7 @@ export type SettingsUpdateInput = Partial<
     | 'theme'
     | 'notificationEnabled'
     | 'notifySoundEnabled'
+    | 'deadlineReminderHours'
     | 'backgroundUrls'
     | 'backgroundMode'
     | 'backgroundSelected'

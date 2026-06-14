@@ -27,3 +27,8 @@ export const preferencesSchema = z.object({
   notificationEnabled: z.boolean(),
 });
 export type PreferencesValues = z.infer<typeof preferencesSchema>;
+
+export const remindersSchema = z.object({
+  deadlineReminderHours: z.number().int().min(1).max(168),
+});
+export type RemindersValues = z.infer<typeof remindersSchema>;

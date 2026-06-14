@@ -21,10 +21,12 @@ import {
   passwordSchema,
   durationsSchema,
   preferencesSchema,
+  remindersSchema,
   type ProfileValues,
   type PasswordValues,
   type DurationValues,
   type PreferencesValues,
+  type RemindersValues,
 } from '@/validators/settings.schema';
 
 export default function SettingsPage() {
@@ -52,6 +54,10 @@ export default function SettingsPage() {
     resolver: zodResolver(preferencesSchema),
     defaultValues: { theme: 'light', notificationEnabled: true },
   });
+  const reminders = useForm<RemindersValues>({
+    resolver: zodResolver(remindersSchema),
+    defaultValues: { deadlineReminderHours: 24 },
+  });
 
   useEffect(() => {
     if (user) profile.reset({ fullName: user.fullName });
@@ -65,8 +71,9 @@ export default function SettingsPage() {
         theme: settings.data.theme,
         notificationEnabled: settings.data.notificationEnabled,
       });
+      reminders.reset({ deadlineReminderHours: settings.data.deadlineReminderHours });
     }
-  }, [user, settings.data, profile, durations, preferences]);
+  }, [user, settings.data, profile, durations, preferences, reminders]);
 
   if (settings.isLoading) return <Loading />;
 
@@ -181,6 +188,33 @@ export default function SettingsPage() {
             error={durations.formState.errors.longBreakDuration?.message}
           />
           <div className="flex justify-end sm:col-span-3">
+            <Button type="submit" loading={updateSettings.isPending}>
+              Save
+            </Button>
+          </div>
+        </form>
+      </Card>
+
+      <Card>
+        <h3 className="mb-4 text-sm font-semibold">Deadline reminders</h3>
+        <form
+          onSubmit={reminders.handleSubmit((v) =>
+            updateSettings.mutate(v, {
+              onSuccess: () => toast.success('Reminder window updated'),
+              onError: () => toast.error('Failed'),
+            }),
+          )}
+          className="space-y-3"
+        >
+          <Input
+            label="Remind me this many hours before a deadline"
+            type="number"
+            min={1}
+            max={168}
+            {...reminders.register('deadlineReminderHours', { valueAsNumber: true })}
+            error={reminders.formState.errors.deadlineReminderHours?.message}
+          />
+          <div className="flex justify-end">
             <Button type="submit" loading={updateSettings.isPending}>
               Save
             </Button>

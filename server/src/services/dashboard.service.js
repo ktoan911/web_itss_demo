@@ -1,5 +1,6 @@
 import { Task } from '../models/Task.js';
 import { PomodoroSession } from '../models/PomodoroSession.js';
+import { UserSetting } from '../models/UserSetting.js';
 import { startOfDay, endOfDay, subDays, format } from 'date-fns';
 import mongoose from 'mongoose';
 
@@ -12,11 +13,15 @@ export const dashboardService = {
     const todayEnd = endOfDay(now);
     const sevenDaysAgo = startOfDay(subDays(now, 6));
 
+    const setting = await UserSetting.findOne({ userId }).select('deadlineReminderHours');
+    const dueSoonHours = setting?.deadlineReminderHours ?? 24;
+    const dueSoonLimit = new Date(now.getTime() + dueSoonHours * 3_600_000);
+
     const [
       totalTasks, completedTasks, inProgressTasks, overdueTasks,
       todayPomodoros, todayFocusAgg,
       todayTasks, upcomingTasks, recentSessions,
-      completionDocs,
+      completionDocs, dueSoonTasks,
     ] = await Promise.all([
       Task.countDocuments({ userId }),
       Task.countDocuments({ userId, status: 'Completed' }),
@@ -49,6 +54,10 @@ export const dashboardService = {
             count: { $sum: 1 },
         } },
       ]),
+      Task.find({
+        userId, status: { $ne: 'Completed' },
+        deadline: { $gt: now, $lte: dueSoonLimit },
+      }).sort({ deadline: 1 }).limit(10),
     ]);
 
     const completionMap = Object.fromEntries(completionDocs.map((d) => [d._id, d.count]));
@@ -64,6 +73,7 @@ export const dashboardService = {
       todayFocusMinutes: todayFocusAgg[0]?.total || 0,
       todayTasks, upcomingTasks, recentSessions,
       completionChart,
+      dueSoonTasks, dueSoonHours,
     };
   },
 };

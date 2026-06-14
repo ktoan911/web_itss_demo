@@ -19,4 +19,18 @@ describe('GET /api/dashboard/summary', () => {
     expect(r.body.overdueTasks).toBe(1);
     expect(r.body.completionChart).toHaveLength(7);
   });
+
+  it('includes dueSoon data honoring the reminder window', async () => {
+    const a = await createAuthedAgent(app);
+    await a.put('/api/settings').send({ deadlineReminderHours: 24 });
+    // 2h out → due soon; 5 days out → not due soon.
+    const in2h = new Date(Date.now() + 2 * 3_600_000).toISOString();
+    await a.post('/api/tasks').send({ title: 'soon', deadline: in2h, priority: 'High', estimatedPomodoros: 1 });
+    await a.post('/api/tasks').send({ title: 'later', deadline: futureISO(5), priority: 'Low', estimatedPomodoros: 1 });
+
+    const r = await a.get('/api/dashboard/summary');
+    expect(r.body.dueSoonHours).toBe(24);
+    expect(r.body.dueSoonTasks.map((t) => t.title)).toContain('soon');
+    expect(r.body.dueSoonTasks.map((t) => t.title)).not.toContain('later');
+  });
 });

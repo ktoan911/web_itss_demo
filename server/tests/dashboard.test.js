@@ -39,4 +39,10 @@ describe('GET /api/dashboard/summary', () => {
     expect(r.body.dueSoonTasks.map((t) => t.title)).toContain('in30h');
     expect(r.body.dueSoonTasks.map((t) => t.title)).not.toContain('later');
   });
+
+  it('returns a streak number (0 by default)', async () => {
+    const a = await createAuthedAgent(app);
+    const r = await a.get('/api/dashboard/summary');
+    expect(r.body.streak).toBe(0);
+  });
 });

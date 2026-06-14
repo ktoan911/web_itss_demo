@@ -2,6 +2,7 @@ import { PomodoroSession } from '../models/PomodoroSession.js';
 import { Task } from '../models/Task.js';
 import { taskService } from './task.service.js';
 import { notificationService } from './notification.service.js';
+import { streakService } from './streak.service.js';
 import { AppError } from '../utils/AppError.js';
 
 export const pomodoroService = {
@@ -18,6 +19,7 @@ export const pomodoroService = {
         type: 'pomodoro_done',
         taskId: session.taskId,
       });
+      await streakService.bump(userId);
       if (session.taskId) {
         await taskService.incrementPomodoro(userId, session.taskId.toString());
       }

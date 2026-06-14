@@ -1,6 +1,7 @@
 import { Task } from '../models/Task.js';
 import { PomodoroSession } from '../models/PomodoroSession.js';
 import { UserSetting } from '../models/UserSetting.js';
+import { User } from '../models/User.js';
 import { startOfDay, endOfDay, subDays, format } from 'date-fns';
 import mongoose from 'mongoose';
 
@@ -16,6 +17,10 @@ export const dashboardService = {
     const setting = await UserSetting.findOne({ userId }).select('deadlineReminderHours');
     const dueSoonHours = setting?.deadlineReminderHours ?? 24;
     const dueSoonLimit = new Date(now.getTime() + dueSoonHours * 3_600_000);
+
+    const userDoc = await User.findById(userId).select('pomodoroStreak');
+    const streak = userDoc?.pomodoroStreak?.count ?? 0;
+
 
     const [
       totalTasks, completedTasks, inProgressTasks, overdueTasks,
@@ -74,6 +79,7 @@ export const dashboardService = {
       todayTasks, upcomingTasks, recentSessions,
       completionChart,
       dueSoonTasks, dueSoonHours,
+      streak,
     };
   },
 };

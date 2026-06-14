@@ -78,4 +78,29 @@ describe('Cron job logic', () => {
     const list = await a.get('/api/notifications');
     expect(list.body.some((n) => n.type === 'deadline_soon')).toBe(true);
   });
+
+  it('deadlineSoonReminder respects a user-configured threshold', async () => {
+    const a = await createAuthedAgent(app);
+    await a.put('/api/settings').send({ deadlineReminderHours: 48 });
+    // 30h out: outside the default 24h window but inside the configured 48h window.
+    const in30h = new Date(Date.now() + 30 * 3_600_000).toISOString();
+    await a.post('/api/tasks').send({
+      title: 'cfg', deadline: in30h, priority: 'High', estimatedPomodoros: 1,
+    });
+    await runDeadlineSoonReminder();
+    const list = await a.get('/api/notifications');
+    expect(list.body.some((n) => n.type === 'deadline_soon')).toBe(true);
+  });
+
+  it('deadlineSoonReminder skips tasks beyond the threshold', async () => {
+    const a = await createAuthedAgent(app);
+    // default 24h; task 30h out should NOT fire.
+    const in30h = new Date(Date.now() + 30 * 3_600_000).toISOString();
+    await a.post('/api/tasks').send({
+      title: 'far', deadline: in30h, priority: 'High', estimatedPomodoros: 1,
+    });
+    await runDeadlineSoonReminder();
+    const list = await a.get('/api/notifications');
+    expect(list.body.some((n) => n.type === 'deadline_soon')).toBe(false);
+  });
 });

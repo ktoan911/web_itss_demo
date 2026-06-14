@@ -172,7 +172,7 @@ export default function PomodoroPage() {
 
       {streak > 0 && (
         <div
-          className="absolute right-6 top-16 z-10 flex items-center gap-1 rounded-full bg-black/40 px-3 py-1 text-sm backdrop-blur"
+          className="absolute left-6 top-16 z-10 flex items-center gap-1 rounded-full bg-black/40 px-3 py-1 text-sm backdrop-blur"
           style={{ textShadow: TEXT_SHADOW }}
           title={`${streak}-day focus streak`}
         >

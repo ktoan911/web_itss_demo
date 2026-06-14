@@ -15,6 +15,7 @@ const settingSchema = new mongoose.Schema(
     theme: { type: String, enum: ['light', 'dark'], default: 'light' },
     notificationEnabled: { type: Boolean, default: true },
     notifySoundEnabled: { type: Boolean, default: true },
+    deadlineReminderHours: { type: Number, default: 24, min: 1, max: 168 },
     backgroundUrls: { type: [String], default: [] },
     backgroundMode: { type: String, enum: ['unchange', 'random', 'sequence'], default: 'random' },
     backgroundSelected: { type: String, default: '' },

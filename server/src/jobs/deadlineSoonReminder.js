@@ -3,12 +3,12 @@ import { UserSetting } from '../models/UserSetting.js';
 import { notificationService } from '../services/notification.service.js';
 
 const DEFAULT_HOURS = 24;
+const MAX_HOURS = 168;
 
 export async function runDeadlineSoonReminder(now = new Date()) {
-  // Pull all not-yet-due, incomplete tasks once, then filter per user threshold.
   const tasks = await Task.find({
     status: { $ne: 'Completed' },
-    deadline: { $gt: now },
+    deadline: { $gt: now, $lte: new Date(now.getTime() + MAX_HOURS * 3_600_000) },
   }).select('_id userId title deadline');
 
   const hoursByUser = new Map();

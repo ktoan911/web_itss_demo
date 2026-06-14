@@ -7,6 +7,7 @@ export const settingsUpdateSchema = z.object({
   theme: z.enum(['light', 'dark']).optional(),
   notificationEnabled: z.boolean().optional(),
   notifySoundEnabled: z.boolean().optional(),
+  deadlineReminderHours: z.number().int().min(1).max(168).optional(),
   backgroundUrls: z.array(z.string().url()).max(50).optional(),
   backgroundMode: z.enum(['unchange', 'random', 'sequence']).optional(),
   backgroundSelected: z

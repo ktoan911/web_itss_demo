@@ -5,6 +5,7 @@ import {
   ArrowLeft,
   Bell,
   BellOff,
+  Flame,
   Maximize2,
   Minimize2,
   Pause,
@@ -18,6 +19,7 @@ import {
 import { useRecentSessionsQuery } from '@/hooks/queries/usePomodoroQueries';
 import { useTasksQuery, useMarkComplete } from '@/hooks/queries/useTaskQueries';
 import { useUpdateSettings } from '@/hooks/queries/useSettingsQueries';
+import { useDashboardQuery } from '@/hooks/queries/useDashboardQuery';
 import { usePomodoroStore } from '@/store/pomodoroStore';
 import { useSoundStore } from '@/store/soundStore';
 import { useRemainingMs } from '@/hooks/usePomodoroEngine';
@@ -69,6 +71,8 @@ export default function PomodoroPage() {
   useRecentSessionsQuery();
   const complete = useMarkComplete();
   const updateSettings = useUpdateSettings();
+  const dash = useDashboardQuery();
+  const streak = dash.data?.streak ?? 0;
 
   const mode = usePomodoroStore((s) => s.mode);
   const status = usePomodoroStore((s) => s.status);
@@ -166,6 +170,17 @@ export default function PomodoroPage() {
         </span>
       </div>
 
+      {streak > 0 && (
+        <div
+          className="absolute left-6 top-16 z-10 flex items-center gap-1 rounded-full bg-black/40 px-3 py-1 text-sm backdrop-blur"
+          style={{ textShadow: TEXT_SHADOW }}
+          title={`${streak}-day focus streak`}
+        >
+          <Flame className="h-4 w-4 text-orange-400" />
+          <span className="font-medium">{streak}</span>
+        </div>
+      )}
+
       <div
         className="absolute right-6 top-6 z-10 max-w-sm text-right"
         style={{ textShadow: TEXT_SHADOW }}
@@ -254,6 +269,7 @@ export default function PomodoroPage() {
           </button>
 
           <button
+            data-tour="pomodoro-start"
             onClick={status === 'running' ? pause : onStart}
             className="flex items-center gap-2 rounded-full bg-red-600 px-8 py-3 text-base font-medium text-white shadow-lg transition hover:bg-red-700"
           >

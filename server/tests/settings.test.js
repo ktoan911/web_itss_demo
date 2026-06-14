@@ -19,6 +19,12 @@ describe('GET /api/settings', () => {
     const res = await request(app).get('/api/settings');
     expect(res.status).toBe(401);
   });
+
+  it('returns default deadlineReminderHours of 24', async () => {
+    const a = await createAuthedAgent(app);
+    const res = await a.get('/api/settings');
+    expect(res.body.deadlineReminderHours).toBe(24);
+  });
 });
 
 describe('PUT /api/settings', () => {
@@ -34,6 +40,19 @@ describe('PUT /api/settings', () => {
   it('rejects out-of-range duration', async () => {
     const a = await createAuthedAgent(app);
     const res = await a.put('/api/settings').send({ focusDuration: 999 });
+    expect(res.status).toBe(400);
+  });
+
+  it('updates deadlineReminderHours within range', async () => {
+    const a = await createAuthedAgent(app);
+    const res = await a.put('/api/settings').send({ deadlineReminderHours: 48 });
+    expect(res.status).toBe(200);
+    expect(res.body.deadlineReminderHours).toBe(48);
+  });
+
+  it('rejects out-of-range deadlineReminderHours', async () => {
+    const a = await createAuthedAgent(app);
+    const res = await a.put('/api/settings').send({ deadlineReminderHours: 500 });
     expect(res.status).toBe(400);
   });
 });

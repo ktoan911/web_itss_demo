@@ -5,6 +5,10 @@ const userSchema = new mongoose.Schema(
     fullName:     { type: String, required: true, trim: true, maxlength: 100 },
     email:        { type: String, required: true, lowercase: true, trim: true, unique: true, index: true },
     passwordHash: { type: String, required: true, select: false },
+    pomodoroStreak: {
+      count:         { type: Number, default: 0 },
+      lastFocusDate: { type: Date, default: null },
+    },
   },
   {
     timestamps: true,

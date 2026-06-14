@@ -13,6 +13,7 @@ export default function CalendarPage() {
   const tasks = useTasksQuery({ sortBy: 'deadline' });
   const [selectedDate, setSelectedDate] = useState<Date | null>(new Date());
   const [view, setView] = useState<View>('month');
+  const [date, setDate] = useState<Date>(new Date());
   const [editing, setEditing] = useState<Task | null>(null);
 
   if (tasks.isLoading) return <Loading />;
@@ -21,10 +22,12 @@ export default function CalendarPage() {
   return (
     <div className="space-y-5">
       <h1 className="text-2xl font-semibold tracking-tight">Calendar</h1>
-      <Card padded={false}>
+      <Card padded={false} data-tour="calendar">
         <div className="p-2">
           <CalendarView
             tasks={tasks.data ?? []}
+            date={date}
+            onNavigate={setDate}
             selectedDate={selectedDate}
             view={view}
             onViewChange={setView}

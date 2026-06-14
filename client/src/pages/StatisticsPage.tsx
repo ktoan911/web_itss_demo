@@ -29,7 +29,9 @@ export default function StatisticsPage() {
     <div className="space-y-5">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-semibold tracking-tight">Statistics</h1>
-        <RangeSelector value={range} onChange={setRange} />
+        <div data-tour="stats-range">
+          <RangeSelector value={range} onChange={setRange} />
+        </div>
       </div>
 
       {noData ? (

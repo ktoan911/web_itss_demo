@@ -22,15 +22,21 @@ describe('GET /api/dashboard/summary', () => {
 
   it('includes dueSoon data honoring the reminder window', async () => {
     const a = await createAuthedAgent(app);
-    await a.put('/api/settings').send({ deadlineReminderHours: 24 });
-    // 2h out → due soon; 5 days out → not due soon.
+    // Use a NON-default window (48h) so the assertion fails if the DB
+    // setting is never read (the fallback default is 24h).
+    await a.put('/api/settings').send({ deadlineReminderHours: 48 });
+    // 2h out → due soon; ~30h out → inside 48h but outside the 24h default;
+    // 5 days out → not due soon.
     const in2h = new Date(Date.now() + 2 * 3_600_000).toISOString();
+    const in30h = new Date(Date.now() + 30 * 3_600_000).toISOString();
     await a.post('/api/tasks').send({ title: 'soon', deadline: in2h, priority: 'High', estimatedPomodoros: 1 });
+    await a.post('/api/tasks').send({ title: 'in30h', deadline: in30h, priority: 'Medium', estimatedPomodoros: 1 });
     await a.post('/api/tasks').send({ title: 'later', deadline: futureISO(5), priority: 'Low', estimatedPomodoros: 1 });
 
     const r = await a.get('/api/dashboard/summary');
-    expect(r.body.dueSoonHours).toBe(24);
+    expect(r.body.dueSoonHours).toBe(48);
     expect(r.body.dueSoonTasks.map((t) => t.title)).toContain('soon');
+    expect(r.body.dueSoonTasks.map((t) => t.title)).toContain('in30h');
     expect(r.body.dueSoonTasks.map((t) => t.title)).not.toContain('later');
   });
 });

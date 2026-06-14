@@ -269,6 +269,7 @@ export default function PomodoroPage() {
           </button>
 
           <button
+            data-tour="pomodoro-start"
             onClick={status === 'running' ? pause : onStart}
             className="flex items-center gap-2 rounded-full bg-red-600 px-8 py-3 text-base font-medium text-white shadow-lg transition hover:bg-red-700"
           >

@@ -22,7 +22,7 @@ export default function CalendarPage() {
   return (
     <div className="space-y-5">
       <h1 className="text-2xl font-semibold tracking-tight">Calendar</h1>
-      <Card padded={false}>
+      <Card padded={false} data-tour="calendar">
         <div className="p-2">
           <CalendarView
             tasks={tasks.data ?? []}

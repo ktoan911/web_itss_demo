@@ -136,7 +136,11 @@ export default function TasksPage() {
     <div className="space-y-5">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-semibold tracking-tight">My Tasks</h1>
-        <Button icon={<Plus className="h-4 w-4" />} onClick={() => setCreating(true)}>
+        <Button
+          icon={<Plus className="h-4 w-4" />}
+          onClick={() => setCreating(true)}
+          data-tour="add-task"
+        >
           Add Task
         </Button>
       </div>
@@ -201,12 +205,14 @@ export default function TasksPage() {
         </div>
       )}
 
-      <TaskFilters
-        filters={rawFilters}
-        onChange={setRawFilters}
-        view={view}
-        onViewChange={setView}
-      />
+      <div data-tour="task-filters">
+        <TaskFilters
+          filters={rawFilters}
+          onChange={setRawFilters}
+          view={view}
+          onViewChange={setView}
+        />
+      </div>
 
       {filters.tag && (
         <div className="flex items-center gap-2">

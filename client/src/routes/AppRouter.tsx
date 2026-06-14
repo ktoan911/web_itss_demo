@@ -4,6 +4,7 @@ import ProtectedRoute from './ProtectedRoute';
 import PublicOnlyRoute from './PublicOnlyRoute';
 import AppLayout from '@/components/layout/AppLayout';
 import { Loading } from '@/components/common/Loading';
+import { TourBridge } from '@/components/common/TourBridge';
 
 const LoginPage = lazy(() => import('@/pages/LoginPage'));
 const RegisterPage = lazy(() => import('@/pages/RegisterPage'));
@@ -18,6 +19,7 @@ const NotFoundPage = lazy(() => import('@/pages/NotFoundPage'));
 export default function AppRouter() {
   return (
     <Suspense fallback={<Loading />}>
+      <TourBridge />
       <Routes>
         <Route element={<PublicOnlyRoute />}>
           <Route path="/login" element={<LoginPage />} />

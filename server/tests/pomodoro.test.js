@@ -66,26 +66,28 @@ describe('Pomodoro sessions', () => {
 describe('Pomodoro streak', () => {
   it('bumps the streak when a Focus session is completed', async () => {
     const a = await createAuthedAgent(app);
-    await a.post('/api/pomodoro-sessions').send({
+    const res = await a.post('/api/pomodoro-sessions').send({
       mode: 'Focus',
       durationMinutes: 25,
       startedAt: new Date(Date.now() - 25 * 60_000).toISOString(),
       endedAt: new Date().toISOString(),
       isCompleted: true,
     });
+    expect(res.status).toBe(201);
     const u = await User.findById(a.userId).select('pomodoroStreak');
     expect(u.pomodoroStreak.count).toBe(1);
   });
 
   it('does not bump for a break session', async () => {
     const a = await createAuthedAgent(app);
-    await a.post('/api/pomodoro-sessions').send({
+    const res = await a.post('/api/pomodoro-sessions').send({
       mode: 'ShortBreak',
       durationMinutes: 5,
       startedAt: new Date(Date.now() - 5 * 60_000).toISOString(),
       endedAt: new Date().toISOString(),
       isCompleted: true,
     });
+    expect(res.status).toBe(201);
     const u = await User.findById(a.userId).select('pomodoroStreak');
     expect(u.pomodoroStreak.count).toBe(0);
   });

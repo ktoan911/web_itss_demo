@@ -18,15 +18,11 @@ export const dashboardService = {
     const dueSoonHours = setting?.deadlineReminderHours ?? 24;
     const dueSoonLimit = new Date(now.getTime() + dueSoonHours * 3_600_000);
 
-    const userDoc = await User.findById(userId).select('pomodoroStreak');
-    const streak = userDoc?.pomodoroStreak?.count ?? 0;
-
-
     const [
       totalTasks, completedTasks, inProgressTasks, overdueTasks,
       todayPomodoros, todayFocusAgg,
       todayTasks, upcomingTasks, recentSessions,
-      completionDocs, dueSoonTasks,
+      completionDocs, dueSoonTasks, userDoc,
     ] = await Promise.all([
       Task.countDocuments({ userId }),
       Task.countDocuments({ userId, status: 'Completed' }),
@@ -63,7 +59,10 @@ export const dashboardService = {
         userId, status: { $ne: 'Completed' },
         deadline: { $gt: now, $lte: dueSoonLimit },
       }).sort({ deadline: 1 }).limit(10),
+      User.findById(userId).select('pomodoroStreak'),
     ]);
+
+    const streak = userDoc?.pomodoroStreak?.count ?? 0;
 
     const completionMap = Object.fromEntries(completionDocs.map((d) => [d._id, d.count]));
     const completionChart = [];

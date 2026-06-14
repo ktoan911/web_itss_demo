@@ -4,6 +4,7 @@ import { Loading } from '@/components/common/Loading';
 import { ErrorState } from '@/components/common/ErrorState';
 import { Card } from '@/components/common/Card';
 import { SummaryCard } from '@/components/dashboard/SummaryCard';
+import { StreakCard } from '@/components/dashboard/StreakCard';
 import { TodayTasks } from '@/components/dashboard/TodayTasks';
 import { UpcomingTasks } from '@/components/dashboard/UpcomingTasks';
 import { RecentPomodoros } from '@/components/dashboard/RecentPomodoros';
@@ -47,7 +48,8 @@ export default function DashboardPage() {
         <SummaryCard icon={AlertTriangle} label="Overdue"          value={d.overdueTasks} tone="warn" />
       </div>
 
-      <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+      <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
+        <StreakCard streak={d.streak} />
         <SummaryCard icon={Timer} label="Pomodoros today"  value={d.todayPomodoros} />
         <SummaryCard icon={Flame} label="Focus time today" value={minutesToHM(d.todayFocusMinutes)} tone="good" />
       </div>

@@ -12,7 +12,10 @@ export function DeadlineBanner({ overdueCount, dueSoonTasks, dueSoonHours, onSel
   if (overdueCount === 0 && dueSoonTasks.length === 0) return null;
 
   return (
-    <div className="rounded-3xl border border-amber-300 bg-amber-50 p-4 dark:border-amber-500/40 dark:bg-amber-500/10">
+    <div
+      data-tour="deadline-banner"
+      className="rounded-3xl border border-amber-300 bg-amber-50 p-4 dark:border-amber-500/40 dark:bg-amber-500/10"
+    >
       <div className="flex items-center gap-2 text-sm font-semibold text-amber-800 dark:text-amber-200">
         <AlertTriangle className="h-4 w-4" />
         Deadline reminders

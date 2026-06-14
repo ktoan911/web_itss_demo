@@ -10,6 +10,7 @@ import { UpcomingTasks } from '@/components/dashboard/UpcomingTasks';
 import { RecentPomodoros } from '@/components/dashboard/RecentPomodoros';
 import { CompletionMiniChart } from '@/components/dashboard/CompletionMiniChart';
 import { DeadlineBanner } from '@/components/dashboard/DeadlineBanner';
+import { InfoTooltip } from '@/components/common/InfoTooltip';
 import { TaskFormModal } from '@/components/tasks/TaskFormModal';
 import { useDashboardQuery } from '@/hooks/queries/useDashboardQuery';
 import { useAuth } from '@/hooks/useAuth';
@@ -56,7 +57,10 @@ export default function DashboardPage() {
 
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
         <Card>
-          <h3 className="mb-3 text-sm font-semibold">Today</h3>
+          <h3 className="mb-3 flex items-center gap-1.5 text-sm font-semibold">
+            Today
+            <InfoTooltip text="Tasks due today. Complete or edit them right here." />
+          </h3>
           <TodayTasks tasks={d.todayTasks} onEdit={setEditing} />
         </Card>
         <UpcomingTasks tasks={d.upcomingTasks} onClick={setEditing} />

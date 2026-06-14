@@ -6,6 +6,7 @@ import { Card } from '@/components/common/Card';
 import { Input } from '@/components/common/Input';
 import { Button } from '@/components/common/Button';
 import { Loading } from '@/components/common/Loading';
+import { InfoTooltip } from '@/components/common/InfoTooltip';
 import { useAuth } from '@/hooks/useAuth';
 import {
   useChangePassword,
@@ -195,8 +196,11 @@ export default function SettingsPage() {
         </form>
       </Card>
 
-      <Card>
-        <h3 className="mb-4 text-sm font-semibold">Deadline reminders</h3>
+      <Card data-tour="reminder-window">
+        <h3 className="mb-4 flex items-center gap-1.5 text-sm font-semibold">
+          Deadline reminders
+          <InfoTooltip text="We notify you this many hours before a task's deadline." />
+        </h3>
         <form
           onSubmit={reminders.handleSubmit((v) =>
             updateSettings.mutate(v, {

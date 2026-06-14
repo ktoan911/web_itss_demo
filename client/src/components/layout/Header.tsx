@@ -2,6 +2,7 @@ import { useLocation } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { ThemeToggle } from './ThemeToggle';
 import { NotificationBell } from '@/components/notifications/NotificationBell';
+import { HelpButton } from '@/components/common/HelpButton';
 import { getInitials } from '@/utils/formatters';
 import { useState } from 'react';
 
@@ -37,6 +38,7 @@ export function Header({ onAddTask, onMenu }: { onAddTask?: () => void; onMenu?:
             + Add Task
           </button>
         )}
+        <HelpButton />
         <NotificationBell />
         <ThemeToggle />
         <button

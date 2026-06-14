@@ -8,6 +8,7 @@ import { TodayTasks } from '@/components/dashboard/TodayTasks';
 import { UpcomingTasks } from '@/components/dashboard/UpcomingTasks';
 import { RecentPomodoros } from '@/components/dashboard/RecentPomodoros';
 import { CompletionMiniChart } from '@/components/dashboard/CompletionMiniChart';
+import { DeadlineBanner } from '@/components/dashboard/DeadlineBanner';
 import { TaskFormModal } from '@/components/tasks/TaskFormModal';
 import { useDashboardQuery } from '@/hooks/queries/useDashboardQuery';
 import { useAuth } from '@/hooks/useAuth';
@@ -31,6 +32,13 @@ export default function DashboardPage() {
         </h1>
         <p className="text-sm text-text-muted">{new Date().toDateString()}</p>
       </div>
+
+      <DeadlineBanner
+        overdueCount={d.overdueTasks}
+        dueSoonTasks={d.dueSoonTasks}
+        dueSoonHours={d.dueSoonHours}
+        onSelect={setEditing}
+      />
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <SummaryCard icon={ListTodo}      label="Total tasks"     value={d.totalTasks} />

@@ -1,6 +1,7 @@
 import { Calendar, dateFnsLocalizer, type View } from 'react-big-calendar';
 import { format, parse, startOfWeek, getDay, isSameDay } from 'date-fns';
 import { enUS } from 'date-fns/locale';
+import { useTranslation } from 'react-i18next';
 import type { Task } from '@/types/task';
 
 const locales = { 'en-US': enUS };
@@ -24,14 +25,31 @@ type Props = {
 export function CalendarView({
   tasks, date, onNavigate, selectedDate, view, onViewChange, onSelectDay, onSelectTask,
 }: Props) {
-  const events: Event[] = tasks.map((t) => {
-    const start = new Date(t.deadline);
-    return { id: t._id, title: t.title, start, end: start, resource: t };
+  const { t } = useTranslation('calendar');
+  const events: Event[] = tasks.map((task) => {
+    const start = new Date(task.deadline);
+    return { id: task._id, title: task.title, start, end: start, resource: task };
   });
+
+  const messages = {
+    today: t('toolbar.today'),
+    previous: t('toolbar.back'),
+    next: t('toolbar.next'),
+    month: t('views.month'),
+    week: t('views.week'),
+    day: t('views.day'),
+    agenda: t('views.agenda'),
+    date: t('messages.date'),
+    time: t('messages.time'),
+    event: t('messages.event'),
+    noEventsInRange: t('messages.noEventsInRange'),
+    showMore: (count: number) => t('messages.showMore', { count }),
+  };
 
   return (
     <Calendar
       localizer={localizer}
+      messages={messages}
       events={events}
       views={['month', 'week']}
       view={view}

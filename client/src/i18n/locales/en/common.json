@@ -1,0 +1,32 @@
+{
+  "actions": {
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "add": "Add",
+    "close": "Close",
+    "confirm": "Confirm",
+    "create": "Create",
+    "update": "Update",
+    "search": "Search",
+    "loading": "Loading...",
+    "retry": "Retry",
+    "back": "Back"
+  },
+  "language": {
+    "label": "Language",
+    "select": "Select language"
+  },
+  "state": {
+    "empty": "No data",
+    "error": "An error occurred",
+    "loading": "Loading...",
+    "somethingWrong": "Something went wrong"
+  },
+  "notFound": {
+    "title": "404",
+    "message": "Page not found.",
+    "backHome": "Go to dashboard"
+  }
+}

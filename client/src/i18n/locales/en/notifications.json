@@ -1,0 +1,17 @@
+{
+  "bell": {
+    "ariaLabel": "Notifications"
+  },
+  "panel": {
+    "title": "Notifications",
+    "markAllRead": "Mark all read",
+    "empty": "You're all caught up"
+  },
+  "types": {
+    "task_overdue": "Overdue",
+    "task_completed": "Completed",
+    "pomodoro_done": "Pomodoro",
+    "deadline_soon": "Deadline",
+    "estimated_reached": "Estimate"
+  }
+}

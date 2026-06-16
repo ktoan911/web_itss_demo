@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import type { View } from 'react-big-calendar';
 import { Card } from '@/components/common/Card';
 import { Loading } from '@/components/common/Loading';
@@ -10,6 +11,7 @@ import { useTasksQuery } from '@/hooks/queries/useTaskQueries';
 import type { Task } from '@/types/task';
 
 export default function CalendarPage() {
+  const { t } = useTranslation('calendar');
   const tasks = useTasksQuery({ sortBy: 'deadline' });
   const [selectedDate, setSelectedDate] = useState<Date | null>(new Date());
   const [view, setView] = useState<View>('month');
@@ -21,7 +23,7 @@ export default function CalendarPage() {
 
   return (
     <div className="space-y-5">
-      <h1 className="text-2xl font-semibold tracking-tight">Calendar</h1>
+      <h1 className="text-2xl font-semibold tracking-tight">{t('title')}</h1>
       <Card padded={false} data-tour="calendar">
         <div className="p-2">
           <CalendarView

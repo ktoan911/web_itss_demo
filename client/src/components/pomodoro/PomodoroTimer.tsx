@@ -1,4 +1,5 @@
 import { Pause, Play, RotateCcw, SkipForward } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { ProgressRing } from './ProgressRing';
 import { Button } from '@/components/common/Button';
 import { usePomodoroStore } from '@/store/pomodoroStore';
@@ -19,6 +20,7 @@ const colorByMode: Record<string, string> = {
 };
 
 export function PomodoroTimer({ taskTitle }: { taskTitle?: string | null }) {
+  const { t } = useTranslation('pomodoro');
   const status = usePomodoroStore((s) => s.status);
   const mode = usePomodoroStore((s) => s.mode);
   const durations = usePomodoroStore((s) => s.durations);
@@ -41,18 +43,18 @@ export function PomodoroTimer({ taskTitle }: { taskTitle?: string | null }) {
         <div className="text-center">
           <div className="text-5xl font-semibold tabular-nums">{fmt(remaining)}</div>
           <div className="mt-2 text-xs text-text-muted">
-            {taskTitle ? `Focusing on: ${taskTitle}` : 'No task selected'}
+            {taskTitle ? t('timer.focusingOn', { task: taskTitle }) : t('timer.noTask')}
           </div>
         </div>
       </ProgressRing>
       <div className="flex items-center gap-3">
-        <Button variant="secondary" icon={<RotateCcw className="h-4 w-4" />} onClick={reset}>Reset</Button>
+        <Button variant="secondary" icon={<RotateCcw className="h-4 w-4" />} onClick={reset}>{t('controls.reset')}</Button>
         {status === 'running' ? (
-          <Button size="lg" icon={<Pause className="h-5 w-5" />} onClick={pause}>Pause</Button>
+          <Button size="lg" icon={<Pause className="h-5 w-5" />} onClick={pause}>{t('controls.pause')}</Button>
         ) : (
-          <Button size="lg" icon={<Play className="h-5 w-5" />} onClick={onStart}>Start</Button>
+          <Button size="lg" icon={<Play className="h-5 w-5" />} onClick={onStart}>{t('controls.start')}</Button>
         )}
-        <Button variant="secondary" icon={<SkipForward className="h-4 w-4" />} onClick={skip}>Skip</Button>
+        <Button variant="secondary" icon={<SkipForward className="h-4 w-4" />} onClick={skip}>{t('controls.skip')}</Button>
       </div>
     </div>
   );

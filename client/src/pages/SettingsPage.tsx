@@ -1,5 +1,6 @@
 import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
+import { useTranslation } from 'react-i18next';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { toast } from 'sonner';
 import { Card } from '@/components/common/Card';
@@ -7,6 +8,7 @@ import { Input } from '@/components/common/Input';
 import { Button } from '@/components/common/Button';
 import { Loading } from '@/components/common/Loading';
 import { InfoTooltip } from '@/components/common/InfoTooltip';
+import { LanguageSwitcher } from '@/components/common/LanguageSwitcher';
 import { useAuth } from '@/hooks/useAuth';
 import {
   useChangePassword,
@@ -31,6 +33,7 @@ import {
 } from '@/validators/settings.schema';
 
 export default function SettingsPage() {
+  const { t } = useTranslation('settings');
   const { user } = useAuth();
   const settings = useSettingsQuery();
   const updateProfile = useUpdateProfile();
@@ -80,92 +83,92 @@ export default function SettingsPage() {
 
   return (
     <div className="max-w-2xl space-y-5">
-      <h1 className="text-2xl font-semibold tracking-tight">Settings</h1>
+      <h1 className="text-2xl font-semibold tracking-tight">{t('title')}</h1>
 
       <Card>
-        <h3 className="mb-4 text-sm font-semibold">Profile</h3>
+        <h3 className="mb-4 text-sm font-semibold">{t('profile.heading')}</h3>
         <form
           onSubmit={profile.handleSubmit((v) =>
             updateProfile.mutate(v, {
-              onSuccess: () => toast.success('Profile updated'),
-              onError: () => toast.error('Failed'),
+              onSuccess: () => toast.success(t('toast.profileUpdated')),
+              onError: () => toast.error(t('toast.profileFailed')),
             }),
           )}
           className="space-y-3"
         >
           <Input
-            label="Full name"
+            label={t('profile.fullName')}
             {...profile.register('fullName')}
             error={profile.formState.errors.fullName?.message}
           />
           <div>
-            <label className="text-sm font-medium">Email</label>
+            <label className="text-sm font-medium">{t('profile.email')}</label>
             <p className="mt-1 text-sm text-text-muted">{user?.email}</p>
           </div>
           <div className="flex justify-end">
             <Button type="submit" loading={updateProfile.isPending}>
-              Save
+              {t('profile.save')}
             </Button>
           </div>
         </form>
       </Card>
 
       <Card>
-        <h3 className="mb-4 text-sm font-semibold">Change password</h3>
+        <h3 className="mb-4 text-sm font-semibold">{t('password.heading')}</h3>
         <form
           onSubmit={password.handleSubmit((v) =>
             changePassword.mutate(v, {
               onSuccess: () => {
-                toast.success('Password updated');
+                toast.success(t('toast.passwordUpdated'));
                 password.reset();
               },
-              onError: (e: any) => toast.error(getApiErrorMessage(e, 'Failed')),
+              onError: (e: any) => toast.error(getApiErrorMessage(e, t('toast.passwordFailed'))),
             }),
           )}
           className="space-y-3"
         >
           <Input
-            label="Current password"
+            label={t('password.current')}
             type="password"
             {...password.register('currentPassword')}
             error={password.formState.errors.currentPassword?.message}
           />
           <Input
-            label="New password"
+            label={t('password.new')}
             type="password"
             {...password.register('newPassword')}
             error={password.formState.errors.newPassword?.message}
           />
           <Input
-            label="Confirm new password"
+            label={t('password.confirm')}
             type="password"
             {...password.register('confirmPassword')}
             error={password.formState.errors.confirmPassword?.message}
           />
           <div className="flex justify-end">
             <Button type="submit" loading={changePassword.isPending}>
-              Update password
+              {t('password.update')}
             </Button>
           </div>
         </form>
       </Card>
 
       <Card>
-        <h3 className="mb-4 text-sm font-semibold">Pomodoro durations (minutes)</h3>
+        <h3 className="mb-4 text-sm font-semibold">{t('durations.heading')}</h3>
         <form
           onSubmit={durations.handleSubmit((v) =>
             updateSettings.mutate(v, {
               onSuccess: () => {
-                toast.success('Durations updated');
+                toast.success(t('toast.durationsUpdated'));
                 hydrate({ ...v, notifySoundEnabled: settings.data?.notifySoundEnabled ?? true });
               },
-              onError: () => toast.error('Failed'),
+              onError: () => toast.error(t('toast.durationsFailed')),
             }),
           )}
           className="grid grid-cols-1 gap-3 sm:grid-cols-3"
         >
           <Input
-            label="Focus"
+            label={t('durations.focus')}
             type="number"
             min={1}
             max={120}
@@ -173,7 +176,7 @@ export default function SettingsPage() {
             error={durations.formState.errors.focusDuration?.message}
           />
           <Input
-            label="Short break"
+            label={t('durations.shortBreak')}
             type="number"
             min={1}
             max={60}
@@ -181,7 +184,7 @@ export default function SettingsPage() {
             error={durations.formState.errors.shortBreakDuration?.message}
           />
           <Input
-            label="Long break"
+            label={t('durations.longBreak')}
             type="number"
             min={1}
             max={60}
@@ -190,7 +193,7 @@ export default function SettingsPage() {
           />
           <div className="flex justify-end sm:col-span-3">
             <Button type="submit" loading={updateSettings.isPending}>
-              Save
+              {t('durations.save')}
             </Button>
           </div>
         </form>
@@ -198,20 +201,20 @@ export default function SettingsPage() {
 
       <Card data-tour="reminder-window">
         <h3 className="mb-4 flex items-center gap-1.5 text-sm font-semibold">
-          Deadline reminders
-          <InfoTooltip text="We notify you this many hours before a task's deadline." />
+          {t('reminders.heading')}
+          <InfoTooltip text={t('reminders.tooltip')} />
         </h3>
         <form
           onSubmit={reminders.handleSubmit((v) =>
             updateSettings.mutate(v, {
-              onSuccess: () => toast.success('Reminder window updated'),
-              onError: () => toast.error('Failed'),
+              onSuccess: () => toast.success(t('toast.reminderUpdated')),
+              onError: () => toast.error(t('toast.reminderFailed')),
             }),
           )}
           className="space-y-3"
         >
           <Input
-            label="Remind me this many hours before a deadline"
+            label={t('reminders.label')}
             type="number"
             min={1}
             max={168}
@@ -220,47 +223,54 @@ export default function SettingsPage() {
           />
           <div className="flex justify-end">
             <Button type="submit" loading={updateSettings.isPending}>
-              Save
+              {t('reminders.save')}
             </Button>
           </div>
         </form>
       </Card>
 
       <Card>
-        <h3 className="mb-4 text-sm font-semibold">Preferences</h3>
+        <h3 className="mb-4 text-sm font-semibold">{t('preferences.heading')}</h3>
         <form
           onSubmit={preferences.handleSubmit((v) =>
             updateSettings.mutate(v, {
               onSuccess: () => {
-                toast.success('Preferences saved');
+                toast.success(t('toast.preferencesSaved'));
                 setTheme(v.theme);
               },
-              onError: () => toast.error('Failed'),
+              onError: () => toast.error(t('toast.preferencesFailed')),
             }),
           )}
           className="space-y-3"
         >
           <div>
-            <label className="text-sm font-medium">Theme</label>
+            <label className="text-sm font-medium">{t('preferences.theme')}</label>
             <div className="mt-1 flex gap-3">
               <label className="flex items-center gap-2 text-sm">
-                <input type="radio" value="light" {...preferences.register('theme')} /> Light
+                <input type="radio" value="light" {...preferences.register('theme')} />{' '}
+                {t('preferences.light')}
               </label>
               <label className="flex items-center gap-2 text-sm">
-                <input type="radio" value="dark" {...preferences.register('theme')} /> Dark
+                <input type="radio" value="dark" {...preferences.register('theme')} />{' '}
+                {t('preferences.dark')}
               </label>
             </div>
           </div>
           <label className="flex items-center gap-2 text-sm">
-            <input type="checkbox" {...preferences.register('notificationEnabled')} /> Enable
-            notifications
+            <input type="checkbox" {...preferences.register('notificationEnabled')} />{' '}
+            {t('preferences.notifications')}
           </label>
           <div className="flex justify-end">
             <Button type="submit" loading={updateSettings.isPending}>
-              Save
+              {t('preferences.save')}
             </Button>
           </div>
         </form>
+      </Card>
+
+      <Card>
+        <h3 className="mb-4 text-sm font-semibold">{t('language.heading')}</h3>
+        <LanguageSwitcher variant="inline" />
       </Card>
     </div>
   );

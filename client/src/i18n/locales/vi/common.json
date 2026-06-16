@@ -1,0 +1,32 @@
+{
+  "actions": {
+    "save": "Lưu",
+    "cancel": "Hủy",
+    "delete": "Xóa",
+    "edit": "Sửa",
+    "add": "Thêm",
+    "close": "Đóng",
+    "confirm": "Xác nhận",
+    "create": "Tạo",
+    "update": "Cập nhật",
+    "search": "Tìm kiếm",
+    "loading": "Đang tải...",
+    "retry": "Thử lại",
+    "back": "Quay lại"
+  },
+  "language": {
+    "label": "Ngôn ngữ",
+    "select": "Chọn ngôn ngữ"
+  },
+  "state": {
+    "empty": "Không có dữ liệu",
+    "error": "Đã xảy ra lỗi",
+    "loading": "Đang tải...",
+    "somethingWrong": "Đã xảy ra lỗi"
+  },
+  "notFound": {
+    "title": "404",
+    "message": "Không tìm thấy trang.",
+    "backHome": "Về trang tổng quan"
+  }
+}

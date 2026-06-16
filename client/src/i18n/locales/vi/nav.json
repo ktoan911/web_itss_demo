@@ -1,0 +1,24 @@
+{
+  "brand": "Task88",
+  "items": {
+    "dashboard": "Tổng quan",
+    "tasks": "Công việc",
+    "pomodoro": "Pomodoro",
+    "calendar": "Lịch",
+    "statistics": "Thống kê",
+    "settings": "Cài đặt"
+  },
+  "titles": {
+    "dashboard": "Tổng quan",
+    "tasks": "Công việc của tôi",
+    "pomodoro": "Pomodoro",
+    "calendar": "Lịch",
+    "statistics": "Thống kê",
+    "settings": "Cài đặt"
+  },
+  "logout": "Đăng xuất",
+  "addTask": "+ Thêm việc",
+  "openMenu": "Mở menu",
+  "userMenu": "Menu người dùng",
+  "toggleTheme": "Đổi giao diện sáng/tối"
+}

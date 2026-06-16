@@ -1,0 +1,17 @@
+{
+  "bell": {
+    "ariaLabel": "通知"
+  },
+  "panel": {
+    "title": "通知",
+    "markAllRead": "すべて既読にする",
+    "empty": "未読の通知はありません"
+  },
+  "types": {
+    "task_overdue": "期限切れ",
+    "task_completed": "完了",
+    "pomodoro_done": "ポモドーロ",
+    "deadline_soon": "期限間近",
+    "estimated_reached": "見積達成"
+  }
+}

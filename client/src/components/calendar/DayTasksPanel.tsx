@@ -5,29 +5,31 @@ import { TaskRow } from '@/components/tasks/TaskRow';
 import { EmptyState } from '@/components/common/EmptyState';
 import { useDeleteTask, useMarkComplete } from '@/hooks/queries/useTaskQueries';
 import { toast } from 'sonner';
+import { useTranslation } from 'react-i18next';
 
 type Props = { date: Date | null; tasks: Task[]; onEdit: (t: Task) => void };
 
 export function DayTasksPanel({ date, tasks, onEdit }: Props) {
+  const { t } = useTranslation('calendar');
   const remove = useDeleteTask();
   const complete = useMarkComplete();
   if (!date) {
-    return <Card><p className="text-sm text-text-muted">Select a day to view tasks.</p></Card>;
+    return <Card><p className="text-sm text-text-muted">{t('panel.selectDay')}</p></Card>;
   }
-  const items = tasks.filter((t) => isSameDay(parseISO(t.deadline), date));
+  const items = tasks.filter((task) => isSameDay(parseISO(task.deadline), date));
   return (
     <Card>
-      <h3 className="mb-3 text-sm font-semibold">Tasks on {format(date, 'MMM d, yyyy')}</h3>
+      <h3 className="mb-3 text-sm font-semibold">{t('panel.tasksOnDate', { date: format(date, 'MMM d, yyyy') })}</h3>
       {items.length === 0 ? (
-        <EmptyState title="No tasks on this day" />
+        <EmptyState title={t('panel.empty')} />
       ) : (
         <div className="space-y-2">
-          {items.map((t) => (
+          {items.map((task) => (
             <TaskRow
-              key={t._id} task={t}
+              key={task._id} task={task}
               onEdit={onEdit}
-              onComplete={(t) => complete.mutate(t._id, { onError: () => toast.error('Failed') })}
-              onDelete={(t) => remove.mutate(t._id)}
+              onComplete={(task) => complete.mutate(task._id, { onError: () => toast.error(t('toast.completeFailed')) })}
+              onDelete={(task) => remove.mutate(task._id)}
             />
           ))}
         </div>

@@ -1,0 +1,29 @@
+{
+  "title": "Calendar",
+  "views": {
+    "month": "Month",
+    "week": "Week",
+    "day": "Day",
+    "agenda": "Agenda"
+  },
+  "toolbar": {
+    "today": "Today",
+    "back": "Back",
+    "next": "Next"
+  },
+  "messages": {
+    "date": "Date",
+    "time": "Time",
+    "event": "Event",
+    "noEventsInRange": "There are no events in this range.",
+    "showMore": "+{{count}} more"
+  },
+  "panel": {
+    "selectDay": "Select a day to view tasks.",
+    "tasksOnDate": "Tasks on {{date}}",
+    "empty": "No tasks on this day"
+  },
+  "toast": {
+    "completeFailed": "Failed"
+  }
+}

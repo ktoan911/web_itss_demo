@@ -1,0 +1,24 @@
+{
+  "brand": "Task88",
+  "items": {
+    "dashboard": "ダッシュボード",
+    "tasks": "タスク",
+    "pomodoro": "ポモドーロ",
+    "calendar": "カレンダー",
+    "statistics": "統計",
+    "settings": "設定"
+  },
+  "titles": {
+    "dashboard": "ダッシュボード",
+    "tasks": "マイタスク",
+    "pomodoro": "ポモドーロ",
+    "calendar": "カレンダー",
+    "statistics": "統計",
+    "settings": "設定"
+  },
+  "logout": "ログアウト",
+  "addTask": "+ タスク追加",
+  "openMenu": "メニューを開く",
+  "userMenu": "ユーザーメニュー",
+  "toggleTheme": "ライト/ダークを切り替え"
+}

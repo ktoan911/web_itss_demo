@@ -1,14 +1,16 @@
 import { Bar, BarChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
+import { useTranslation } from 'react-i18next';
 import { Card } from '@/components/common/Card';
 import { format, parseISO } from 'date-fns';
 
 type Point = { date: string; count: number };
 
 export function CompletionMiniChart({ data }: { data: Point[] }) {
+  const { t } = useTranslation('dashboard');
   const formatted = data.map((d) => ({ ...d, label: format(parseISO(d.date), 'EEE') }));
   return (
     <Card>
-      <h3 className="mb-3 text-sm font-semibold">Last 7 days completion</h3>
+      <h3 className="mb-3 text-sm font-semibold">{t('completionChart.title')}</h3>
       <div className="h-32">
         <ResponsiveContainer width="100%" height="100%">
           <BarChart data={formatted}>

@@ -1,0 +1,102 @@
+{
+  "modes": {
+    "focus": "Tập trung",
+    "shortBreak": "Nghỉ ngắn",
+    "longBreak": "Nghỉ dài"
+  },
+  "modeStatus": {
+    "focus": "Phiên tập trung",
+    "shortBreak": "Nghỉ ngắn",
+    "longBreak": "Nghỉ dài"
+  },
+  "workspace": {
+    "subtitle": "Không gian tập trung"
+  },
+  "streak": {
+    "title": "Chuỗi tập trung {{count}} ngày"
+  },
+  "taskPicker": {
+    "noTask": "Chưa chọn công việc",
+    "prompt": "Bạn đang làm gì?"
+  },
+  "confirm": {
+    "switchReset": "Chuyển đổi sẽ đặt lại bộ đếm giờ. Tiếp tục?"
+  },
+  "controls": {
+    "start": "Bắt đầu",
+    "pause": "Tạm dừng",
+    "resume": "Tiếp tục",
+    "reset": "Đặt lại",
+    "skip": "Bỏ qua",
+    "back": "Quay lại",
+    "notes": "Ghi chú",
+    "fullscreen": "Toàn màn hình",
+    "exitFullscreen": "Thoát toàn màn hình",
+    "muteMusic": "Tắt tiếng nhạc",
+    "unmuteMusic": "Bật tiếng nhạc",
+    "timerSoundOn": "Bật âm thanh báo giờ",
+    "timerSoundOff": "Tắt âm thanh báo giờ"
+  },
+  "toast": {
+    "timerSoundOn": "Đã bật âm thanh báo giờ",
+    "timerSoundOff": "Đã tắt âm thanh báo giờ",
+    "notesComingSoon": "Ghi chú phiên (sắp ra mắt)",
+    "taskCompleted": "Đã hoàn thành công việc",
+    "failedComplete": "Không thể hoàn thành"
+  },
+  "selector": {
+    "label": "Tập trung vào",
+    "noTask": "Không có công việc"
+  },
+  "timer": {
+    "focusingOn": "Đang tập trung vào: {{task}}",
+    "noTask": "Chưa chọn công việc"
+  },
+  "history": {
+    "empty": "Chưa có phiên nào.",
+    "minutes": "{{count}} phút"
+  },
+  "sound": {
+    "ambient": "Âm thanh nền",
+    "music": "Nhạc tập trung",
+    "close": "Đóng",
+    "volume": "Âm lượng"
+  },
+  "background": {
+    "change": "Đổi hình nền",
+    "title": "Thư viện hình nền",
+    "uploading": "Đang tải lên…",
+    "uploadImage": "Tải ảnh lên",
+    "useImage": "Dùng ảnh này",
+    "useImageFixed": "Dùng ảnh này (chuyển sang chế độ Cố định)",
+    "deleteImage": "Xóa ảnh",
+    "modes": {
+      "fixed": {
+        "label": "Cố định",
+        "desc": "Chạm vào ảnh để dùng làm hình nền cố định."
+      },
+      "random": {
+        "label": "Ngẫu nhiên",
+        "desc": "Một ảnh ngẫu nhiên từ thư viện mỗi phút."
+      },
+      "sequence": {
+        "label": "Tuần tự",
+        "desc": "Lần lượt qua các ảnh trong thư viện mỗi phút."
+      }
+    },
+    "toast": {
+      "noValidImages": "Không có ảnh hợp lệ",
+      "uploaded": "Đã tải lên {{count}} ảnh",
+      "uploadFailed": "Tải lên thất bại"
+    }
+  },
+  "dialog": {
+    "estimateReached": {
+      "title": "Đã đạt ước lượng",
+      "thisTask": "công việc này",
+      "body": "Bạn đã đạt số pomodoro ước lượng cho {{task}}. Đánh dấu hoàn thành?",
+      "keepGoing": "Tiếp tục",
+      "markComplete": "Đánh dấu hoàn thành"
+    }
+  }
+}

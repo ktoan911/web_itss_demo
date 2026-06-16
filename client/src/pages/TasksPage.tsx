@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Plus, X } from 'lucide-react';
 import { toast } from 'sonner';
 import { useSearchParams } from 'react-router-dom';
@@ -26,6 +27,7 @@ import type { Task, TaskListQuery } from '@/types/task';
 type Priority = 'Low' | 'Medium' | 'High';
 
 export default function TasksPage() {
+  const { t: tr } = useTranslation('tasks');
   const [searchParams, setSearchParams] = useSearchParams();
   const urlTag = searchParams.get('tag') ?? undefined;
   const [rawFilters, setRawFilters] = useState<TaskListQuery>({ sortBy: 'deadline', tag: urlTag });
@@ -69,8 +71,8 @@ export default function TasksPage() {
 
   const onComplete = (t: Task) =>
     complete.mutate(t._id, {
-      onSuccess: () => toast.success('Task completed'),
-      onError: () => toast.error('Failed to complete task'),
+      onSuccess: () => toast.success(tr('toast.completed')),
+      onError: () => toast.error(tr('toast.completeFailed')),
     });
 
   const setTag = (tag: string | undefined) => {
@@ -103,10 +105,10 @@ export default function TasksPage() {
   const runBulkComplete = () =>
     bulkComplete.mutate(selectionIds, {
       onSuccess: (r) => {
-        toast.success(`Completed ${r.count} task${r.count === 1 ? '' : 's'}`);
+        toast.success(tr('toast.bulkCompleted', { count: r.count }));
         clearSelection();
       },
-      onError: () => toast.error('Failed to complete tasks'),
+      onError: () => toast.error(tr('toast.bulkCompleteFailed')),
     });
 
   const runBulkPriority = (priority: Priority) => {
@@ -115,10 +117,10 @@ export default function TasksPage() {
       { ids: selectionIds, priority },
       {
         onSuccess: (r) => {
-          toast.success(`Updated ${r.count} task${r.count === 1 ? '' : 's'}`);
+          toast.success(tr('toast.bulkPriorityUpdated', { count: r.count }));
           clearSelection();
         },
-        onError: () => toast.error('Failed to change priority'),
+        onError: () => toast.error(tr('toast.priorityFailed')),
       },
     );
   };
@@ -126,36 +128,36 @@ export default function TasksPage() {
   const runBulkDelete = () =>
     bulkDelete.mutate(selectionIds, {
       onSuccess: (r) => {
-        toast.success(`Deleted ${r.count} task${r.count === 1 ? '' : 's'}`);
+        toast.success(tr('toast.bulkDeleted', { count: r.count }));
         clearSelection();
       },
-      onError: () => toast.error('Failed to delete tasks'),
+      onError: () => toast.error(tr('toast.bulkDeleteFailed')),
     });
 
   return (
     <div className="space-y-5">
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-semibold tracking-tight">My Tasks</h1>
+        <h1 className="text-2xl font-semibold tracking-tight">{tr('page.title')}</h1>
         <Button
           icon={<Plus className="h-4 w-4" />}
           onClick={() => setCreating(true)}
           data-tour="add-task"
         >
-          Add Task
+          {tr('page.addTask')}
         </Button>
       </div>
 
       {selectedIds.size > 0 && (
         <div className="border-primary-300 sticky top-0 z-20 flex flex-wrap items-center gap-2 rounded-2xl border bg-primary-50 px-4 py-2 shadow-sm dark:border-primary-500/40 dark:bg-primary-500/10">
           <span className="text-sm font-medium text-primary-700 dark:text-primary-200">
-            {selectedIds.size} selected
+            {tr('selection.count', { count: selectedIds.size })}
           </span>
           <button
             type="button"
             onClick={allVisibleSelected ? clearSelection : selectAllVisible}
             className="text-xs text-primary-700 underline-offset-2 hover:underline dark:text-primary-200"
           >
-            {allVisibleSelected ? 'Clear' : 'Select all visible'}
+            {allVisibleSelected ? tr('selection.clear') : tr('selection.selectAll')}
           </button>
           <div className="ml-auto flex flex-wrap items-center gap-2">
             <Button
@@ -164,7 +166,7 @@ export default function TasksPage() {
               onClick={runBulkComplete}
               loading={bulkComplete.isPending}
             >
-              Mark complete
+              {tr('selection.markComplete')}
             </Button>
             <div className="relative">
               <Button
@@ -173,7 +175,7 @@ export default function TasksPage() {
                 onClick={() => setPriorityMenuOpen((v) => !v)}
                 loading={bulkPriority.isPending}
               >
-                Set priority
+                {tr('selection.setPriority')}
               </Button>
               {priorityMenuOpen && (
                 <div className="absolute right-0 z-30 mt-1 w-32 overflow-hidden rounded-xl border border-border bg-surface shadow-lg">
@@ -184,7 +186,7 @@ export default function TasksPage() {
                       onClick={() => runBulkPriority(p)}
                       className="block w-full px-3 py-2 text-left text-sm hover:bg-bg"
                     >
-                      {p}
+                      {tr(`priority.${p}`)}
                     </button>
                   ))}
                 </div>
@@ -196,10 +198,10 @@ export default function TasksPage() {
               onClick={() => setConfirmBulkDelete(true)}
               loading={bulkDelete.isPending}
             >
-              Delete
+              {tr('selection.delete')}
             </Button>
             <Button size="sm" variant="ghost" onClick={clearSelection}>
-              Cancel
+              {tr('selection.cancel')}
             </Button>
           </div>
         </div>
@@ -217,11 +219,11 @@ export default function TasksPage() {
       {filters.tag && (
         <div className="flex items-center gap-2">
           <span className="inline-flex items-center gap-2 rounded-full bg-primary-50 px-3 py-1 text-xs text-primary-700 dark:bg-primary-500/10">
-            Filtered by tag: <strong>#{filters.tag}</strong>
+            {tr('tag.filteredBy')} <strong>#{filters.tag}</strong>
             <button
               type="button"
               onClick={() => setTag(undefined)}
-              aria-label="Clear tag filter"
+              aria-label={tr('tag.clearFilter')}
               className="rounded-full p-0.5 hover:bg-primary-100 dark:hover:bg-primary-500/20"
             >
               <X className="h-3 w-3" />
@@ -237,12 +239,12 @@ export default function TasksPage() {
           <CardSkeleton />
         </div>
       ) : tasks.isError ? (
-        <ErrorState description="Couldn't load tasks." onRetry={() => tasks.refetch()} />
+        <ErrorState description={tr('error.load')} onRetry={() => tasks.refetch()} />
       ) : tasks.data && tasks.data.length === 0 ? (
         <EmptyState
-          title="No tasks yet"
-          description="Click + Add Task to get started."
-          action={<Button onClick={() => setCreating(true)}>Add Task</Button>}
+          title={tr('empty.title')}
+          description={tr('empty.description')}
+          action={<Button onClick={() => setCreating(true)}>{tr('page.addTask')}</Button>}
         />
       ) : view === 'grid' ? (
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
@@ -295,22 +297,22 @@ export default function TasksPage() {
         onConfirm={() => {
           if (!confirmDelete) return;
           remove.mutate(confirmDelete._id, {
-            onSuccess: () => toast.success('Task deleted'),
-            onError: () => toast.error('Failed to delete'),
+            onSuccess: () => toast.success(tr('toast.deleted')),
+            onError: () => toast.error(tr('toast.deleteFailed')),
           });
         }}
-        title="Delete this task?"
+        title={tr('confirm.deleteTitle')}
         description={confirmDelete?.title}
-        confirmText="Delete"
+        confirmText={tr('confirm.deleteConfirm')}
         danger
       />
       <ConfirmDialog
         open={confirmBulkDelete}
         onClose={() => setConfirmBulkDelete(false)}
         onConfirm={runBulkDelete}
-        title={`Delete ${selectedIds.size} task${selectedIds.size === 1 ? '' : 's'}?`}
-        description="This action cannot be undone."
-        confirmText="Delete"
+        title={tr('confirm.bulkDeleteTitle', { count: selectedIds.size })}
+        description={tr('confirm.bulkDeleteDescription')}
+        confirmText={tr('confirm.deleteConfirm')}
         danger
       />
     </div>

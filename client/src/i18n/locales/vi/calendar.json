@@ -1,0 +1,29 @@
+{
+  "title": "Lịch",
+  "views": {
+    "month": "Tháng",
+    "week": "Tuần",
+    "day": "Ngày",
+    "agenda": "Lịch trình"
+  },
+  "toolbar": {
+    "today": "Hôm nay",
+    "back": "Trước",
+    "next": "Tiếp"
+  },
+  "messages": {
+    "date": "Ngày",
+    "time": "Giờ",
+    "event": "Sự kiện",
+    "noEventsInRange": "Không có sự kiện nào trong khoảng thời gian này.",
+    "showMore": "+ {{count}} sự kiện khác"
+  },
+  "panel": {
+    "selectDay": "Chọn một ngày để xem công việc.",
+    "tasksOnDate": "Công việc ngày {{date}}",
+    "empty": "Không có công việc nào trong ngày này"
+  },
+  "toast": {
+    "completeFailed": "Thất bại"
+  }
+}

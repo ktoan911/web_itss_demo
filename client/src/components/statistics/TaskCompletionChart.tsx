@@ -1,13 +1,15 @@
 import { Bar, BarChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
 import { format, parseISO } from 'date-fns';
+import { useTranslation } from 'react-i18next';
 import type { TaskStatsResponse } from '@/types/statistics';
 import { Card } from '@/components/common/Card';
 
 export function TaskCompletionChart({ data }: { data: TaskStatsResponse }) {
+  const { t } = useTranslation('statistics');
   const fmt = data.map((d) => ({ ...d, label: format(parseISO(d.date), 'MMM d') }));
   return (
     <Card>
-      <h3 className="mb-3 text-sm font-semibold">Tasks completed</h3>
+      <h3 className="mb-3 text-sm font-semibold">{t('charts.tasksCompleted')}</h3>
       <div className="h-64">
         <ResponsiveContainer>
           <BarChart data={fmt}>

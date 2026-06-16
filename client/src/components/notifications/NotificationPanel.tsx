@@ -1,4 +1,5 @@
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import type { Notification } from '@/types/notification';
 import { useMarkAllNotifRead, useMarkNotifRead, useNotificationsQuery } from '@/hooks/queries/useNotificationQueries';
 import { NotificationItem } from './NotificationItem';
@@ -6,6 +7,7 @@ import { Loading } from '@/components/common/Loading';
 import { EmptyState } from '@/components/common/EmptyState';
 
 export function NotificationPanel({ onClose }: { onClose: () => void }) {
+  const { t } = useTranslation('notifications');
   const list = useNotificationsQuery();
   const markRead = useMarkNotifRead();
   const markAllRead = useMarkAllNotifRead();
@@ -22,12 +24,12 @@ export function NotificationPanel({ onClose }: { onClose: () => void }) {
   return (
     <div className="absolute right-0 top-12 z-40 w-80 rounded-3xl border border-border bg-surface p-2 shadow-md">
       <div className="flex items-center justify-between px-2 py-1">
-        <span className="text-sm font-semibold">Notifications</span>
+        <span className="text-sm font-semibold">{t('panel.title')}</span>
         <button
           className="text-xs text-text-muted hover:text-text"
           onClick={() => markAllRead.mutate()}
         >
-          Mark all read
+          {t('panel.markAllRead')}
         </button>
       </div>
       <div className="max-h-96 overflow-auto">
@@ -38,7 +40,7 @@ export function NotificationPanel({ onClose }: { onClose: () => void }) {
                 <li key={n._id}><NotificationItem n={n} onClick={onClick} /></li>
               ))}
             </ul>
-          ) : <EmptyState title="You're all caught up" />
+          ) : <EmptyState title={t('panel.empty')} />
         }
       </div>
     </div>

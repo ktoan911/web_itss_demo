@@ -1,13 +1,15 @@
 import { Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
 import { format, parseISO } from 'date-fns';
+import { useTranslation } from 'react-i18next';
 import type { DailyPomodoroPoint } from '@/types/statistics';
 import { Card } from '@/components/common/Card';
 
 export function FocusMinutesChart({ data }: { data: DailyPomodoroPoint[] }) {
+  const { t } = useTranslation('statistics');
   const fmt = data.map((d) => ({ ...d, label: format(parseISO(d.date), 'MMM d') }));
   return (
     <Card>
-      <h3 className="mb-3 text-sm font-semibold">Focus minutes</h3>
+      <h3 className="mb-3 text-sm font-semibold">{t('charts.focusMinutes')}</h3>
       <div className="h-64">
         <ResponsiveContainer>
           <LineChart data={fmt}>

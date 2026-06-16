@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import { Check, Clock, Edit2, Trash2 } from 'lucide-react';
 import type { Task } from '@/types/task';
 import { Card } from '@/components/common/Card';
@@ -27,6 +28,7 @@ export function TaskCard({
   selected,
   onToggleSelect,
 }: Props) {
+  const { t } = useTranslation('tasks');
   return (
     <Card className={cn(selected && 'ring-2 ring-primary-500')}>
       <div className="flex items-start justify-between gap-2">
@@ -37,7 +39,7 @@ export function TaskCard({
               checked={!!selected}
               onChange={() => onToggleSelect(task._id)}
               onClick={(e) => e.stopPropagation()}
-              aria-label={`Select task ${task.title}`}
+              aria-label={t('card.selectAria', { title: task.title })}
               className="mt-1 h-4 w-4 cursor-pointer rounded border-border text-primary-600 focus:ring-primary-500"
             />
           )}
@@ -82,7 +84,7 @@ export function TaskCard({
             icon={<Check className="h-4 w-4" />}
             onClick={() => onComplete(task)}
           >
-            Complete
+            {t('card.complete')}
           </Button>
         )}
         <Button
@@ -91,7 +93,7 @@ export function TaskCard({
           icon={<Edit2 className="h-4 w-4" />}
           onClick={() => onEdit(task)}
         >
-          Edit
+          {t('card.edit')}
         </Button>
         <Button
           size="sm"
@@ -99,7 +101,7 @@ export function TaskCard({
           icon={<Trash2 className="h-4 w-4" />}
           onClick={() => onDelete(task)}
         >
-          Delete
+          {t('card.delete')}
         </Button>
       </div>
     </Card>

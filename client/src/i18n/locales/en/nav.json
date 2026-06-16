@@ -1,0 +1,24 @@
+{
+  "brand": "Task88",
+  "items": {
+    "dashboard": "Dashboard",
+    "tasks": "Tasks",
+    "pomodoro": "Pomodoro",
+    "calendar": "Calendar",
+    "statistics": "Statistics",
+    "settings": "Settings"
+  },
+  "titles": {
+    "dashboard": "Dashboard",
+    "tasks": "My Tasks",
+    "pomodoro": "Pomodoro",
+    "calendar": "Calendar",
+    "statistics": "Statistics",
+    "settings": "Settings"
+  },
+  "logout": "Logout",
+  "addTask": "+ Add Task",
+  "openMenu": "Open menu",
+  "userMenu": "User menu",
+  "toggleTheme": "Toggle light/dark theme"
+}

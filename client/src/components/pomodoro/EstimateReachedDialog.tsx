@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import { Modal } from '@/components/common/Modal';
 import { Button } from '@/components/common/Button';
 
@@ -7,14 +8,17 @@ type Props = {
 };
 
 export function EstimateReachedDialog({ open, taskTitle, onKeepGoing, onMarkComplete }: Props) {
+  const { t } = useTranslation('pomodoro');
   return (
-    <Modal open={open} onClose={onKeepGoing} title="Estimate reached" size="sm">
+    <Modal open={open} onClose={onKeepGoing} title={t('dialog.estimateReached.title')} size="sm">
       <p className="text-sm text-text-muted">
-        You've reached the estimated pomodoros for {taskTitle ? `"${taskTitle}"` : 'this task'}. Mark as completed?
+        {t('dialog.estimateReached.body', {
+          task: taskTitle ? `"${taskTitle}"` : t('dialog.estimateReached.thisTask'),
+        })}
       </p>
       <div className="mt-5 flex justify-end gap-2">
-        <Button variant="secondary" onClick={onKeepGoing}>Keep going</Button>
-        <Button onClick={onMarkComplete}>Mark complete</Button>
+        <Button variant="secondary" onClick={onKeepGoing}>{t('dialog.estimateReached.keepGoing')}</Button>
+        <Button onClick={onMarkComplete}>{t('dialog.estimateReached.markComplete')}</Button>
       </div>
     </Modal>
   );

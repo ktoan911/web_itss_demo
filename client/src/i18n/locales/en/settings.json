@@ -1,0 +1,52 @@
+{
+  "title": "Settings",
+  "profile": {
+    "heading": "Profile",
+    "fullName": "Full name",
+    "email": "Email",
+    "save": "Save"
+  },
+  "password": {
+    "heading": "Change password",
+    "current": "Current password",
+    "new": "New password",
+    "confirm": "Confirm new password",
+    "update": "Update password"
+  },
+  "durations": {
+    "heading": "Pomodoro durations (minutes)",
+    "focus": "Focus",
+    "shortBreak": "Short break",
+    "longBreak": "Long break",
+    "save": "Save"
+  },
+  "reminders": {
+    "heading": "Deadline reminders",
+    "tooltip": "We notify you this many hours before a task's deadline.",
+    "label": "Remind me this many hours before a deadline",
+    "save": "Save"
+  },
+  "preferences": {
+    "heading": "Preferences",
+    "theme": "Theme",
+    "light": "Light",
+    "dark": "Dark",
+    "notifications": "Enable notifications",
+    "save": "Save"
+  },
+  "language": {
+    "heading": "Language"
+  },
+  "toast": {
+    "profileUpdated": "Profile updated",
+    "profileFailed": "Failed",
+    "passwordUpdated": "Password updated",
+    "passwordFailed": "Failed",
+    "durationsUpdated": "Durations updated",
+    "durationsFailed": "Failed",
+    "reminderUpdated": "Reminder window updated",
+    "reminderFailed": "Failed",
+    "preferencesSaved": "Preferences saved",
+    "preferencesFailed": "Failed"
+  }
+}

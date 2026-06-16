@@ -1,0 +1,102 @@
+{
+  "modes": {
+    "focus": "集中",
+    "shortBreak": "小休憩",
+    "longBreak": "長休憩"
+  },
+  "modeStatus": {
+    "focus": "集中セッション",
+    "shortBreak": "小休憩",
+    "longBreak": "長休憩"
+  },
+  "workspace": {
+    "subtitle": "集中ワークスペース"
+  },
+  "streak": {
+    "title": "{{count}}日連続の集中"
+  },
+  "taskPicker": {
+    "noTask": "タスクが選択されていません",
+    "prompt": "今、何に取り組んでいますか？"
+  },
+  "confirm": {
+    "switchReset": "切り替えるとタイマーがリセットされます。続行しますか？"
+  },
+  "controls": {
+    "start": "開始",
+    "pause": "一時停止",
+    "resume": "再開",
+    "reset": "リセット",
+    "skip": "スキップ",
+    "back": "戻る",
+    "notes": "メモ",
+    "fullscreen": "全画面表示",
+    "exitFullscreen": "全画面表示を終了",
+    "muteMusic": "音楽をミュート",
+    "unmuteMusic": "音楽のミュートを解除",
+    "timerSoundOn": "タイマー音をオンにする",
+    "timerSoundOff": "タイマー音をオフにする"
+  },
+  "toast": {
+    "timerSoundOn": "タイマー音をオンにしました",
+    "timerSoundOff": "タイマー音をオフにしました",
+    "notesComingSoon": "セッションメモ（近日公開）",
+    "taskCompleted": "タスクを完了しました",
+    "failedComplete": "完了できませんでした"
+  },
+  "selector": {
+    "label": "集中するタスク",
+    "noTask": "タスクなし"
+  },
+  "timer": {
+    "focusingOn": "集中中: {{task}}",
+    "noTask": "タスクが選択されていません"
+  },
+  "history": {
+    "empty": "まだセッションがありません。",
+    "minutes": "{{count}}分"
+  },
+  "sound": {
+    "ambient": "環境音",
+    "music": "集中用音楽",
+    "close": "閉じる",
+    "volume": "音量"
+  },
+  "background": {
+    "change": "背景を変更",
+    "title": "背景ライブラリ",
+    "uploading": "アップロード中…",
+    "uploadImage": "画像をアップロード",
+    "useImage": "この画像を使用",
+    "useImageFixed": "この画像を使用（固定モードに切り替わります）",
+    "deleteImage": "画像を削除",
+    "modes": {
+      "fixed": {
+        "label": "固定",
+        "desc": "画像をタップして固定背景として使用します。"
+      },
+      "random": {
+        "label": "ランダム",
+        "desc": "1分ごとにライブラリからランダムな画像を表示します。"
+      },
+      "sequence": {
+        "label": "順番",
+        "desc": "1分ごとにライブラリの画像を順番に切り替えます。"
+      }
+    },
+    "toast": {
+      "noValidImages": "有効な画像がありません",
+      "uploaded": "{{count}}枚の画像をアップロードしました",
+      "uploadFailed": "アップロードに失敗しました"
+    }
+  },
+  "dialog": {
+    "estimateReached": {
+      "title": "見積もりに到達しました",
+      "thisTask": "このタスク",
+      "body": "{{task}}の見積もりポモドーロ数に達しました。完了としてマークしますか？",
+      "keepGoing": "続ける",
+      "markComplete": "完了にする"
+    }
+  }
+}

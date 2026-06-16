@@ -1,0 +1,29 @@
+{
+  "title": "カレンダー",
+  "views": {
+    "month": "月",
+    "week": "週",
+    "day": "日",
+    "agenda": "予定一覧"
+  },
+  "toolbar": {
+    "today": "今日",
+    "back": "前へ",
+    "next": "次へ"
+  },
+  "messages": {
+    "date": "日付",
+    "time": "時刻",
+    "event": "イベント",
+    "noEventsInRange": "この期間にイベントはありません。",
+    "showMore": "他 {{count}} 件"
+  },
+  "panel": {
+    "selectDay": "タスクを表示する日を選択してください。",
+    "tasksOnDate": "{{date}} のタスク",
+    "empty": "この日のタスクはありません"
+  },
+  "toast": {
+    "completeFailed": "失敗しました"
+  }
+}

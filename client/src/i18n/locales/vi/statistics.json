@@ -1,0 +1,29 @@
+{
+  "title": "Thống kê",
+  "empty": {
+    "title": "Chưa có đủ dữ liệu",
+    "description": "Hoàn thành một vài công việc hoặc phiên tập trung để xem thống kê."
+  },
+  "range": {
+    "7days": "7 ngày",
+    "30days": "30 ngày",
+    "month": "Tháng này"
+  },
+  "charts": {
+    "tasksCompleted": "Công việc đã hoàn thành",
+    "pomodorosCompleted": "Pomodoro đã hoàn thành",
+    "focusMinutes": "Số phút tập trung",
+    "tasksByPriority": "Công việc theo độ ưu tiên",
+    "tasksByStatus": "Công việc theo trạng thái"
+  },
+  "priority": {
+    "low": "Thấp",
+    "medium": "Trung bình",
+    "high": "Cao"
+  },
+  "status": {
+    "todo": "Cần làm",
+    "in_progress": "Đang làm",
+    "done": "Hoàn thành"
+  }
+}

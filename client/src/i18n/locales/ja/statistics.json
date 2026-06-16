@@ -1,0 +1,29 @@
+{
+  "title": "統計",
+  "empty": {
+    "title": "まだデータが十分ではありません",
+    "description": "タスクや集中セッションを完了すると統計が表示されます。"
+  },
+  "range": {
+    "7days": "7日間",
+    "30days": "30日間",
+    "month": "今月"
+  },
+  "charts": {
+    "tasksCompleted": "完了したタスク",
+    "pomodorosCompleted": "完了したポモドーロ",
+    "focusMinutes": "集中時間（分）",
+    "tasksByPriority": "優先度別のタスク",
+    "tasksByStatus": "ステータス別のタスク"
+  },
+  "priority": {
+    "low": "低",
+    "medium": "中",
+    "high": "高"
+  },
+  "status": {
+    "todo": "未着手",
+    "in_progress": "進行中",
+    "done": "完了"
+  }
+}

@@ -1,4 +1,5 @@
 import { AlertTriangle, Clock } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import type { Task } from '@/types/task';
 
 type Props = {
@@ -9,6 +10,7 @@ type Props = {
 };
 
 export function DeadlineBanner({ overdueCount, dueSoonTasks, dueSoonHours, onSelect }: Props) {
+  const { t } = useTranslation('dashboard');
   if (overdueCount === 0 && dueSoonTasks.length === 0) return null;
 
   return (
@@ -18,29 +20,29 @@ export function DeadlineBanner({ overdueCount, dueSoonTasks, dueSoonHours, onSel
     >
       <div className="flex items-center gap-2 text-sm font-semibold text-amber-800 dark:text-amber-200">
         <AlertTriangle className="h-4 w-4" />
-        Deadline reminders
+        {t('deadlineBanner.title')}
       </div>
       <div className="mt-2 space-y-2 text-sm text-amber-900 dark:text-amber-100">
         {overdueCount > 0 && (
           <p>
-            You have <strong>{overdueCount}</strong> overdue task
-            {overdueCount === 1 ? '' : 's'}.
+            {t('deadlineBanner.overduePrefix')} <strong>{overdueCount}</strong>{' '}
+            {t('deadlineBanner.overdueSuffix', { count: overdueCount })}
           </p>
         )}
         {dueSoonTasks.length > 0 && (
           <div>
             <p className="mb-1 flex items-center gap-1">
               <Clock className="h-3.5 w-3.5" />
-              Due within the next {dueSoonHours}h:
+              {t('deadlineBanner.dueSoon', { hours: dueSoonHours })}
             </p>
             <ul className="space-y-1">
-              {dueSoonTasks.map((t) => (
-                <li key={t._id}>
+              {dueSoonTasks.map((task) => (
+                <li key={task._id}>
                   <button
-                    onClick={() => onSelect(t)}
+                    onClick={() => onSelect(task)}
                     className="underline-offset-2 hover:underline"
                   >
-                    {t.title}
+                    {task.title}
                   </button>
                 </li>
               ))}

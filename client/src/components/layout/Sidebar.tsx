@@ -8,19 +8,21 @@ import {
   Settings as SettingsIcon,
   LogOut,
 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { useAuth } from '@/hooks/useAuth';
 import { cn } from '@/utils/cn';
 
 const items = [
-  { to: '/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
-  { to: '/tasks', icon: ListTodo, label: 'Tasks' },
-  { to: '/pomodoro', icon: Timer, label: 'Pomodoro' },
-  { to: '/calendar', icon: Calendar, label: 'Calendar' },
-  { to: '/statistics', icon: BarChart3, label: 'Statistics' },
-  { to: '/settings', icon: SettingsIcon, label: 'Settings' },
-];
+  { to: '/dashboard', icon: LayoutDashboard, key: 'dashboard' },
+  { to: '/tasks', icon: ListTodo, key: 'tasks' },
+  { to: '/pomodoro', icon: Timer, key: 'pomodoro' },
+  { to: '/calendar', icon: Calendar, key: 'calendar' },
+  { to: '/statistics', icon: BarChart3, key: 'statistics' },
+  { to: '/settings', icon: SettingsIcon, key: 'settings' },
+] as const;
 
 export function Sidebar({ onNavigate }: { onNavigate?: () => void }) {
+  const { t } = useTranslation('nav');
   const { logout } = useAuth();
   const navigate = useNavigate();
   const handleLogout = () => {
@@ -32,7 +34,7 @@ export function Sidebar({ onNavigate }: { onNavigate?: () => void }) {
     <aside className="flex h-full w-64 shrink-0 flex-col border-r border-border bg-surface p-4">
       <div className="mb-6 flex items-center gap-2 px-2">
         <Timer className="h-6 w-6 text-primary-600" />
-        <span className="text-lg font-semibold">Task88</span>
+        <span className="text-lg font-semibold">{t('brand')}</span>
       </div>
       <nav className="flex-1 space-y-1">
         {items.map((it) => (
@@ -50,7 +52,7 @@ export function Sidebar({ onNavigate }: { onNavigate?: () => void }) {
             }
           >
             <it.icon className="h-4 w-4" />
-            <span>{it.label}</span>
+            <span>{t(`items.${it.key}`)}</span>
           </NavLink>
         ))}
       </nav>
@@ -58,7 +60,7 @@ export function Sidebar({ onNavigate }: { onNavigate?: () => void }) {
         onClick={handleLogout}
         className="mt-4 flex items-center gap-3 rounded-2xl px-3 py-2 text-sm text-text-muted hover:bg-bg"
       >
-        <LogOut className="h-4 w-4" /> Logout
+        <LogOut className="h-4 w-4" /> {t('logout')}
       </button>
     </aside>
   );

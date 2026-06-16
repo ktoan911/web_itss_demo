@@ -10,6 +10,7 @@ import {
   Upload,
 } from 'lucide-react';
 import { toast } from 'sonner';
+import { useTranslation } from 'react-i18next';
 import { useUpdateSettings } from '@/hooks/queries/useSettingsQueries';
 import { useBackgrounds } from '@/hooks/useBackgrounds';
 import { settingsApi } from '@/api/settingsApi';
@@ -18,28 +19,14 @@ import { getApiErrorMessage } from '@/utils/apiError';
 import { Modal } from '@/components/common/Modal';
 import type { BackgroundMode, SettingsUpdateInput } from '@/types/settings';
 
-const MODE_OPTIONS: { value: BackgroundMode; label: string; desc: string; icon: ReactNode }[] = [
-  {
-    value: 'unchange',
-    label: 'Fixed',
-    desc: 'Tap an image to use it as a fixed background.',
-    icon: <Pin className="h-4 w-4" />,
-  },
-  {
-    value: 'random',
-    label: 'Random',
-    desc: 'A random image from the library every minute.',
-    icon: <Shuffle className="h-4 w-4" />,
-  },
-  {
-    value: 'sequence',
-    label: 'Sequence',
-    desc: 'Cycles through the library in order every minute.',
-    icon: <Repeat className="h-4 w-4" />,
-  },
+const MODE_OPTIONS: { value: BackgroundMode; key: string; icon: ReactNode }[] = [
+  { value: 'unchange', key: 'fixed', icon: <Pin className="h-4 w-4" /> },
+  { value: 'random', key: 'random', icon: <Shuffle className="h-4 w-4" /> },
+  { value: 'sequence', key: 'sequence', icon: <Repeat className="h-4 w-4" /> },
 ];
 
 export function BackgroundGallery() {
+  const { t } = useTranslation('pomodoro');
   const [open, setOpen] = useState(false);
   const [uploading, setUploading] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
@@ -59,7 +46,7 @@ export function BackgroundGallery() {
     if (!files || files.length === 0) return;
     const images = Array.from(files).filter((f) => f.type.startsWith('image/'));
     if (!images.length) {
-      toast.error('No valid images');
+      toast.error(t('background.toast.noValidImages'));
       return;
     }
     setUploading(true);
@@ -72,10 +59,10 @@ export function BackgroundGallery() {
       );
       update.mutate(
         { backgroundUrls: [...uploaded, ...urls] },
-        { onSuccess: () => toast.success(`Uploaded ${urls.length} image(s)`) },
+        { onSuccess: () => toast.success(t('background.toast.uploaded', { count: urls.length })) },
       );
     } catch (e) {
-      toast.error(getApiErrorMessage(e, 'Upload failed'));
+      toast.error(getApiErrorMessage(e, t('background.toast.uploadFailed')));
     } finally {
       setUploading(false);
       if (fileRef.current) fileRef.current.value = '';
@@ -92,8 +79,8 @@ export function BackgroundGallery() {
     <>
       <button
         onClick={() => setOpen(true)}
-        aria-label="Change background"
-        title="Change background"
+        aria-label={t('background.change')}
+        title={t('background.change')}
         className="rounded-full bg-black/30 p-3 text-white backdrop-blur transition hover:bg-black/50"
       >
         <ImageIcon className="h-5 w-5" />
@@ -102,7 +89,7 @@ export function BackgroundGallery() {
       <Modal
         open={open}
         onClose={() => setOpen(false)}
-        title="Background library"
+        title={t('background.title')}
         size="xl"
         panelClassName="border border-white/10 bg-neutral-900/95 text-white shadow-2xl"
         closeClassName="text-white/70 hover:bg-white/10 hover:text-white"
@@ -112,7 +99,7 @@ export function BackgroundGallery() {
             <button
               key={o.value}
               onClick={() => setMode(o.value)}
-              title={o.desc}
+              title={t(`background.modes.${o.key}.desc`)}
               className={`flex items-center gap-2 rounded-full px-4 py-2 text-sm transition ${
                 mode === o.value
                   ? 'bg-white text-neutral-900'
@@ -120,13 +107,13 @@ export function BackgroundGallery() {
               }`}
             >
               {o.icon}
-              {o.label}
+              {t(`background.modes.${o.key}.label`)}
             </button>
           ))}
         </div>
 
         <p className="mb-3 text-xs text-white/60">
-          {MODE_OPTIONS.find((o) => o.value === mode)?.desc}
+          {t(`background.modes.${MODE_OPTIONS.find((o) => o.value === mode)?.key ?? 'fixed'}.desc`)}
         </p>
 
         <input
@@ -147,12 +134,12 @@ export function BackgroundGallery() {
             {uploading ? (
               <>
                 <Loader2 className="h-6 w-6 animate-spin" />
-                <span className="text-xs">Uploading…</span>
+                <span className="text-xs">{t('background.uploading')}</span>
               </>
             ) : (
               <>
                 <Upload className="h-6 w-6" />
-                <span className="text-xs">Upload image</span>
+                <span className="text-xs">{t('background.uploadImage')}</span>
               </>
             )}
           </button>
@@ -165,11 +152,7 @@ export function BackgroundGallery() {
                 <button
                   onClick={() => pick(url)}
                   className="h-full w-full"
-                  title={
-                    mode === 'unchange'
-                      ? 'Use this image'
-                      : 'Use this image (switches to Fixed mode)'
-                  }
+                  title={mode === 'unchange' ? t('background.useImage') : t('background.useImageFixed')}
                 >
                   <img src={url} alt="" className="h-full w-full object-cover" />
                   <span
@@ -186,8 +169,8 @@ export function BackgroundGallery() {
                 {isUploaded && (
                   <button
                     onClick={() => removeUploaded(url)}
-                    aria-label="Delete image"
-                    title="Delete image"
+                    aria-label={t('background.deleteImage')}
+                    title={t('background.deleteImage')}
                     className="absolute left-2 top-2 rounded-full bg-black/60 p-1.5 text-white opacity-0 transition hover:bg-red-600 group-hover:opacity-100"
                   >
                     <Trash2 className="h-4 w-4" />

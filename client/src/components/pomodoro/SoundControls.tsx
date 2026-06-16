@@ -1,10 +1,12 @@
 import { useEffect, useRef, useState } from 'react';
 import { ListMusic, Pause, Play, Volume2, Waves, X } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { useSoundStore, type SoundTrack } from '@/store/soundStore';
 
 type Channel = 'ambient' | 'music';
 
 export function SoundControls() {
+  const { t } = useTranslation('pomodoro');
   const loadManifest = useSoundStore((s) => s.loadManifest);
   const manifest = useSoundStore((s) => s.manifest);
 
@@ -20,14 +22,14 @@ export function SoundControls() {
         <ChannelButton
           channel="ambient"
           icon={<Waves className="h-5 w-5" />}
-          title="Ambient sound"
+          title={t('sound.ambient')}
         />
       )}
       {manifest.music.length > 0 && (
         <ChannelButton
           channel="music"
           icon={<ListMusic className="h-5 w-5" />}
-          title="Focus music"
+          title={t('sound.music')}
         />
       )}
     </div>
@@ -44,6 +46,7 @@ function ChannelButton({
   title: string;
 }) {
   const [open, setOpen] = useState(false);
+  const { t } = useTranslation('pomodoro');
   const ref = useRef<HTMLDivElement>(null);
   const tracks = useSoundStore((s) =>
     channel === 'ambient' ? s.manifest.ambient : s.manifest.music,
@@ -83,7 +86,7 @@ function ChannelButton({
           <div className="mb-2 flex items-center justify-between">
             <span className="text-sm font-medium">{title}</span>
             <button
-              aria-label="Close"
+              aria-label={t('sound.close')}
               onClick={() => setOpen(false)}
               className="rounded-full p-1 text-white/70 hover:bg-white/10 hover:text-white"
             >
@@ -112,7 +115,7 @@ function ChannelButton({
               value={volume}
               onChange={(e) => setVolume(channel, Number(e.target.value))}
               className="h-1 flex-1 cursor-pointer accent-white"
-              aria-label="Volume"
+              aria-label={t('sound.volume')}
             />
             <span className="w-8 text-right text-xs tabular-nums text-white/70">
               {Math.round(volume * 100)}

@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { toast } from 'sonner';
@@ -24,6 +25,7 @@ const toLocalInput = (iso: string) => {
 };
 
 export function TaskFormModal({ open, onClose, task }: Props) {
+  const { t } = useTranslation('tasks');
   const create = useCreateTask();
   const update = useUpdateTask();
   const isEdit = !!task;
@@ -80,41 +82,41 @@ export function TaskFormModal({ open, onClose, task }: Props) {
       toast.success(msg);
       onClose();
     };
-    const fail = (err: any) => toast.error(getApiErrorMessage(err, 'Save failed'));
+    const fail = (err: any) => toast.error(getApiErrorMessage(err, t('toast.saveFailed')));
     if (isEdit && task)
-      update.mutate({ id: task._id, body }, { onSuccess: success('Task updated'), onError: fail });
-    else create.mutate(body, { onSuccess: success('Task created'), onError: fail });
+      update.mutate({ id: task._id, body }, { onSuccess: success(t('toast.updated')), onError: fail });
+    else create.mutate(body, { onSuccess: success(t('toast.created')), onError: fail });
   };
 
   return (
-    <Modal open={open} onClose={onClose} title={isEdit ? 'Edit task' : 'New task'} size="md">
+    <Modal open={open} onClose={onClose} title={isEdit ? t('form.titleEdit') : t('form.titleNew')} size="md">
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-        <Input label="Title" {...register('title')} error={errors.title?.message} />
+        <Input label={t('form.fieldTitle')} {...register('title')} error={errors.title?.message} />
         <Textarea
-          label="Description"
+          label={t('form.fieldDescription')}
           {...register('description')}
           error={errors.description?.message}
         />
         <Input
-          label="Deadline"
+          label={t('form.fieldDeadline')}
           type="datetime-local"
           {...register('deadline')}
           error={errors.deadline?.message}
         />
         <div className="grid grid-cols-2 gap-3">
           <div>
-            <label className="text-sm font-medium">Priority</label>
+            <label className="text-sm font-medium">{t('form.fieldPriority')}</label>
             <select
               className="mt-1 block w-full rounded-2xl border border-border bg-surface px-3 py-2 text-sm"
               {...register('priority')}
             >
-              <option value="Low">Low</option>
-              <option value="Medium">Medium</option>
-              <option value="High">High</option>
+              <option value="Low">{t('priority.Low')}</option>
+              <option value="Medium">{t('priority.Medium')}</option>
+              <option value="High">{t('priority.High')}</option>
             </select>
           </div>
           <Input
-            label="Est. Pomodoros"
+            label={t('form.fieldEstimatedPomodoros')}
             type="number"
             min={1}
             {...register('estimatedPomodoros', { valueAsNumber: true })}
@@ -122,19 +124,19 @@ export function TaskFormModal({ open, onClose, task }: Props) {
           />
         </div>
         <div>
-          <label className="text-sm font-medium">Tags</label>
+          <label className="text-sm font-medium">{t('form.fieldTags')}</label>
           <div className="mt-1 rounded-2xl border border-border bg-surface p-2">
             <div className="flex flex-wrap gap-1">
-              {tags.map((t) => (
+              {tags.map((tag) => (
                 <span
-                  key={t}
+                  key={tag}
                   className="inline-flex items-center gap-1 rounded-full bg-primary-50 px-2 py-0.5 text-xs text-primary-700 dark:bg-primary-500/10"
                 >
-                  {t}
+                  {tag}
                   <button
                     type="button"
-                    onClick={() => setTags((prev) => prev.filter((x) => x !== t))}
-                    aria-label="Remove"
+                    onClick={() => setTags((prev) => prev.filter((x) => x !== tag))}
+                    aria-label={t('form.removeTag')}
                     className="text-primary-700/70 hover:text-primary-700"
                   >
                     ×
@@ -152,19 +154,19 @@ export function TaskFormModal({ open, onClose, task }: Props) {
                     setTagInput('');
                   }
                 }}
-                placeholder="Add tag and press Enter"
+                placeholder={t('form.tagsPlaceholder')}
                 className="min-w-[120px] flex-1 bg-transparent text-sm outline-none"
               />
             </div>
           </div>
-          <p className="mt-1 text-xs text-text-muted">Press Enter or comma to add</p>
+          <p className="mt-1 text-xs text-text-muted">{t('form.tagsHint')}</p>
         </div>
         <div className="flex justify-end gap-2 pt-2">
           <Button type="button" variant="secondary" onClick={onClose}>
-            Cancel
+            {t('form.cancel')}
           </Button>
           <Button type="submit" loading={create.isPending || update.isPending}>
-            {isEdit ? 'Save' : 'Create'}
+            {isEdit ? t('form.save') : t('form.create')}
           </Button>
         </div>
       </form>

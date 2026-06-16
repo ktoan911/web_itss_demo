@@ -1,0 +1,123 @@
+{
+  "page": {
+    "title": "マイタスク",
+    "addTask": "タスクを追加"
+  },
+  "selection": {
+    "count": "{{count}}件選択中",
+    "clear": "選択を解除",
+    "selectAll": "表示中をすべて選択",
+    "markComplete": "完了にする",
+    "setPriority": "優先度を設定",
+    "delete": "削除",
+    "cancel": "キャンセル"
+  },
+  "tag": {
+    "filteredBy": "タグで絞り込み:",
+    "clearFilter": "タグフィルターを解除"
+  },
+  "empty": {
+    "title": "タスクがまだありません",
+    "description": "「＋ タスクを追加」をクリックして始めましょう。"
+  },
+  "error": {
+    "load": "タスクを読み込めませんでした。"
+  },
+  "confirm": {
+    "deleteTitle": "このタスクを削除しますか？",
+    "deleteConfirm": "削除",
+    "bulkDeleteTitle": "{{count}}件のタスクを削除しますか？",
+    "bulkDeleteDescription": "この操作は元に戻せません。"
+  },
+  "toast": {
+    "completed": "タスクを完了しました",
+    "completeFailed": "タスクを完了できませんでした",
+    "bulkCompleted": "{{count}}件のタスクを完了しました",
+    "bulkCompleteFailed": "タスクを完了できませんでした",
+    "bulkPriorityUpdated": "{{count}}件のタスクを更新しました",
+    "priorityFailed": "優先度を変更できませんでした",
+    "bulkDeleted": "{{count}}件のタスクを削除しました",
+    "bulkDeleteFailed": "タスクを削除できませんでした",
+    "deleted": "タスクを削除しました",
+    "deleteFailed": "削除に失敗しました",
+    "statusFailed": "ステータスを変更できませんでした",
+    "created": "タスクを作成しました",
+    "updated": "タスクを更新しました",
+    "saveFailed": "保存に失敗しました"
+  },
+  "status": {
+    "Todo": "未着手",
+    "InProgress": "進行中",
+    "Completed": "完了"
+  },
+  "priority": {
+    "Low": "低",
+    "Medium": "中",
+    "High": "高"
+  },
+  "filters": {
+    "search": {
+      "label": "検索",
+      "placeholder": "タイトルで検索…"
+    },
+    "status": {
+      "label": "ステータス"
+    },
+    "priority": {
+      "label": "優先度"
+    },
+    "deadline": {
+      "label": "期限",
+      "today": "今日",
+      "upcoming": "今後",
+      "overdue": "期限切れ",
+      "completed": "完了"
+    },
+    "sort": {
+      "label": "並び替え",
+      "deadline": "期限",
+      "priority": "優先度",
+      "newest": "新しい順"
+    },
+    "all": "すべて",
+    "views": {
+      "grid": "グリッド",
+      "list": "リスト",
+      "kanban": "カンバン"
+    }
+  },
+  "kanban": {
+    "empty": "タスクなし",
+    "dragHandle": "ドラッグハンドル",
+    "done": "完了",
+    "edit": "編集",
+    "delete": "削除"
+  },
+  "card": {
+    "complete": "完了",
+    "edit": "編集",
+    "delete": "削除",
+    "selectAria": "タスク「{{title}}」を選択"
+  },
+  "row": {
+    "complete": "完了",
+    "edit": "編集",
+    "delete": "削除"
+  },
+  "form": {
+    "titleEdit": "タスクを編集",
+    "titleNew": "新しいタスク",
+    "fieldTitle": "タイトル",
+    "fieldDescription": "説明",
+    "fieldDeadline": "期限",
+    "fieldPriority": "優先度",
+    "fieldEstimatedPomodoros": "予定ポモドーロ数",
+    "fieldTags": "タグ",
+    "tagsPlaceholder": "タグを追加して Enter キーを押す",
+    "tagsHint": "Enter またはカンマで追加",
+    "removeTag": "削除",
+    "cancel": "キャンセル",
+    "save": "保存",
+    "create": "作成"
+  }
+}

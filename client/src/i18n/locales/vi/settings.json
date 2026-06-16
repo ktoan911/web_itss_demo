@@ -1,0 +1,52 @@
+{
+  "title": "Cài đặt",
+  "profile": {
+    "heading": "Hồ sơ",
+    "fullName": "Họ và tên",
+    "email": "Email",
+    "save": "Lưu"
+  },
+  "password": {
+    "heading": "Đổi mật khẩu",
+    "current": "Mật khẩu hiện tại",
+    "new": "Mật khẩu mới",
+    "confirm": "Xác nhận mật khẩu mới",
+    "update": "Cập nhật mật khẩu"
+  },
+  "durations": {
+    "heading": "Thời lượng Pomodoro (phút)",
+    "focus": "Tập trung",
+    "shortBreak": "Nghỉ ngắn",
+    "longBreak": "Nghỉ dài",
+    "save": "Lưu"
+  },
+  "reminders": {
+    "heading": "Nhắc nhở hạn chót",
+    "tooltip": "Chúng tôi sẽ nhắc bạn trước hạn chót của công việc bằng số giờ này.",
+    "label": "Nhắc tôi trước hạn chót bao nhiêu giờ",
+    "save": "Lưu"
+  },
+  "preferences": {
+    "heading": "Tùy chọn",
+    "theme": "Giao diện",
+    "light": "Sáng",
+    "dark": "Tối",
+    "notifications": "Bật thông báo",
+    "save": "Lưu"
+  },
+  "language": {
+    "heading": "Ngôn ngữ"
+  },
+  "toast": {
+    "profileUpdated": "Đã cập nhật hồ sơ",
+    "profileFailed": "Thất bại",
+    "passwordUpdated": "Đã cập nhật mật khẩu",
+    "passwordFailed": "Thất bại",
+    "durationsUpdated": "Đã cập nhật thời lượng",
+    "durationsFailed": "Thất bại",
+    "reminderUpdated": "Đã cập nhật khoảng thời gian nhắc nhở",
+    "reminderFailed": "Thất bại",
+    "preferencesSaved": "Đã lưu tùy chọn",
+    "preferencesFailed": "Thất bại"
+  }
+}

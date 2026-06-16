@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Loading } from '@/components/common/Loading';
 import { ErrorState } from '@/components/common/ErrorState';
 import { EmptyState } from '@/components/common/EmptyState';
@@ -12,6 +13,7 @@ import { usePomodoroStatsQuery, useTaskStatsQuery } from '@/hooks/queries/useSta
 import type { StatRange } from '@/types/statistics';
 
 export default function StatisticsPage() {
+  const { t } = useTranslation('statistics');
   const [range, setRange] = useState<StatRange>('7days');
   const taskStats = useTaskStatsQuery(range);
   const pomoStats = usePomodoroStatsQuery(range);
@@ -28,14 +30,14 @@ export default function StatisticsPage() {
   return (
     <div className="space-y-5">
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-semibold tracking-tight">Statistics</h1>
+        <h1 className="text-2xl font-semibold tracking-tight">{t('title')}</h1>
         <div data-tour="stats-range">
           <RangeSelector value={range} onChange={setRange} />
         </div>
       </div>
 
       {noData ? (
-        <EmptyState title="Not enough data yet" description="Complete some tasks or focus sessions to see stats." />
+        <EmptyState title={t('empty.title')} description={t('empty.description')} />
       ) : (
         <>
           <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">

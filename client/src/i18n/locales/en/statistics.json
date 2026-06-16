@@ -1,0 +1,29 @@
+{
+  "title": "Statistics",
+  "empty": {
+    "title": "Not enough data yet",
+    "description": "Complete some tasks or focus sessions to see stats."
+  },
+  "range": {
+    "7days": "7 days",
+    "30days": "30 days",
+    "month": "This month"
+  },
+  "charts": {
+    "tasksCompleted": "Tasks completed",
+    "pomodorosCompleted": "Pomodoros completed",
+    "focusMinutes": "Focus minutes",
+    "tasksByPriority": "Tasks by priority",
+    "tasksByStatus": "Tasks by status"
+  },
+  "priority": {
+    "low": "Low",
+    "medium": "Medium",
+    "high": "High"
+  },
+  "status": {
+    "todo": "To do",
+    "in_progress": "In progress",
+    "done": "Done"
+  }
+}

@@ -1,0 +1,43 @@
+{
+  "greeting": {
+    "welcome": "Welcome back",
+    "welcomeName": "Welcome back, {{name}}"
+  },
+  "summary": {
+    "totalTasks": "Total tasks",
+    "completed": "Completed",
+    "inProgress": "In progress",
+    "overdue": "Overdue",
+    "pomodorosToday": "Pomodoros today",
+    "focusTimeToday": "Focus time today"
+  },
+  "today": {
+    "title": "Today",
+    "tooltip": "Tasks due today. Complete or edit them right here.",
+    "empty": "No tasks for today",
+    "completeFailed": "Failed"
+  },
+  "upcoming": {
+    "title": "Upcoming deadlines",
+    "empty": "Nothing upcoming."
+  },
+  "recentPomodoros": {
+    "title": "Recent pomodoros",
+    "empty": "No sessions yet.",
+    "min": "min"
+  },
+  "streak": {
+    "suffix_one": "day focus streak",
+    "suffix_other": "days focus streak"
+  },
+  "completionChart": {
+    "title": "Last 7 days completion"
+  },
+  "deadlineBanner": {
+    "title": "Deadline reminders",
+    "overduePrefix": "You have",
+    "overdueSuffix_one": "overdue task.",
+    "overdueSuffix_other": "overdue tasks.",
+    "dueSoon": "Due within the next {{hours}}h:"
+  }
+}

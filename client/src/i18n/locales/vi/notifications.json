@@ -1,0 +1,17 @@
+{
+  "bell": {
+    "ariaLabel": "Thông báo"
+  },
+  "panel": {
+    "title": "Thông báo",
+    "markAllRead": "Đánh dấu tất cả đã đọc",
+    "empty": "Bạn đã xem hết thông báo"
+  },
+  "types": {
+    "task_overdue": "Quá hạn",
+    "task_completed": "Hoàn thành",
+    "pomodoro_done": "Pomodoro",
+    "deadline_soon": "Sắp đến hạn",
+    "estimated_reached": "Đạt ước tính"
+  }
+}

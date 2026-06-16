@@ -1,0 +1,52 @@
+{
+  "title": "設定",
+  "profile": {
+    "heading": "プロフィール",
+    "fullName": "氏名",
+    "email": "メールアドレス",
+    "save": "保存"
+  },
+  "password": {
+    "heading": "パスワードの変更",
+    "current": "現在のパスワード",
+    "new": "新しいパスワード",
+    "confirm": "新しいパスワード（確認）",
+    "update": "パスワードを更新"
+  },
+  "durations": {
+    "heading": "Pomodoro の時間（分）",
+    "focus": "集中",
+    "shortBreak": "短い休憩",
+    "longBreak": "長い休憩",
+    "save": "保存"
+  },
+  "reminders": {
+    "heading": "締め切りのリマインダー",
+    "tooltip": "タスクの締め切りの何時間前に通知するかを設定します。",
+    "label": "締め切りの何時間前に通知するか",
+    "save": "保存"
+  },
+  "preferences": {
+    "heading": "環境設定",
+    "theme": "テーマ",
+    "light": "ライト",
+    "dark": "ダーク",
+    "notifications": "通知を有効にする",
+    "save": "保存"
+  },
+  "language": {
+    "heading": "言語"
+  },
+  "toast": {
+    "profileUpdated": "プロフィールを更新しました",
+    "profileFailed": "失敗しました",
+    "passwordUpdated": "パスワードを更新しました",
+    "passwordFailed": "失敗しました",
+    "durationsUpdated": "時間を更新しました",
+    "durationsFailed": "失敗しました",
+    "reminderUpdated": "リマインダーの時間を更新しました",
+    "reminderFailed": "失敗しました",
+    "preferencesSaved": "環境設定を保存しました",
+    "preferencesFailed": "失敗しました"
+  }
+}

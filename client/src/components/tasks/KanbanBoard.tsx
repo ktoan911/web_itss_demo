@@ -18,6 +18,7 @@ import {
 import { CSS } from '@dnd-kit/utilities';
 import { Check, Clock, Edit2, GripVertical, Trash2 } from 'lucide-react';
 import { toast } from 'sonner';
+import { useTranslation } from 'react-i18next';
 import type { Task, TaskStatus } from '@/types/task';
 import { OverdueBadge, PriorityBadge } from '@/components/common/Badge';
 import { Button } from '@/components/common/Button';
@@ -36,16 +37,14 @@ type Props = {
   onToggleSelect?: (id: string) => void;
 };
 
-const COLUMNS: { status: TaskStatus; title: string; accent: string }[] = [
-  { status: 'Todo', title: 'Todo', accent: 'text-status-todo border-status-todo/40' },
+const COLUMNS: { status: TaskStatus; accent: string }[] = [
+  { status: 'Todo', accent: 'text-status-todo border-status-todo/40' },
   {
     status: 'InProgress',
-    title: 'In Progress',
     accent: 'text-status-progress border-status-progress/40',
   },
   {
     status: 'Completed',
-    title: 'Completed',
     accent: 'text-status-done border-status-done/40',
   },
 ];
@@ -59,6 +58,7 @@ export function KanbanBoard({
   selected,
   onToggleSelect,
 }: Props) {
+  const { t } = useTranslation('tasks');
   const changeStatus = useChangeStatus();
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 6 } }),
@@ -92,7 +92,7 @@ export function KanbanBoard({
     changeStatus.mutate(
       { id: task._id, status: nextStatus },
       {
-        onError: () => toast.error('Failed to change status'),
+        onError: () => toast.error(t('toast.statusFailed')),
       },
     );
   };
@@ -106,7 +106,7 @@ export function KanbanBoard({
             <KanbanColumn
               key={col.status}
               id={col.status}
-              title={col.title}
+              title={t(`status.${col.status}`)}
               count={items.length}
               accent={col.accent}
             >
@@ -116,7 +116,7 @@ export function KanbanBoard({
               >
                 {items.length === 0 ? (
                   <div className="flex h-24 items-center justify-center rounded-2xl border border-dashed border-border text-xs text-text-muted">
-                    No tasks
+                    {t('kanban.empty')}
                   </div>
                 ) : (
                   items.map((t) => (
@@ -192,6 +192,7 @@ function KanbanCard({
   selected,
   onToggleSelect,
 }: KanbanCardProps) {
+  const { t } = useTranslation('tasks');
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
     id: task._id,
   });
@@ -216,7 +217,7 @@ function KanbanCard({
         <div className="flex items-start gap-2">
           <button
             type="button"
-            aria-label="Drag handle"
+            aria-label={t('kanban.dragHandle')}
             className="-ml-1 mt-0.5 rounded p-0.5 text-text-muted hover:bg-bg"
             {...attributes}
             {...listeners}
@@ -230,7 +231,7 @@ function KanbanCard({
               onChange={() => onToggleSelect(task._id)}
               onClick={(e) => e.stopPropagation()}
               onPointerDown={stopDrag}
-              aria-label={`Select task ${task.title}`}
+              aria-label={t('card.selectAria', { title: task.title })}
               className="mt-1 h-4 w-4 cursor-pointer rounded border-border text-primary-600 focus:ring-primary-500"
             />
           )}
@@ -279,7 +280,7 @@ function KanbanCard({
               icon={<Check className="h-3.5 w-3.5" />}
               onClick={() => onComplete(task)}
             >
-              Done
+              {t('kanban.done')}
             </Button>
           )}
           <Button
@@ -288,7 +289,7 @@ function KanbanCard({
             icon={<Edit2 className="h-3.5 w-3.5" />}
             onClick={() => onEdit(task)}
           >
-            Edit
+            {t('kanban.edit')}
           </Button>
           <Button
             size="sm"
@@ -296,7 +297,7 @@ function KanbanCard({
             icon={<Trash2 className="h-3.5 w-3.5" />}
             onClick={() => onDelete(task)}
           >
-            Delete
+            {t('kanban.delete')}
           </Button>
         </div>
       </Card>

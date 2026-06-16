@@ -1,0 +1,43 @@
+{
+  "greeting": {
+    "welcome": "おかえりなさい",
+    "welcomeName": "おかえりなさい、{{name}}さん"
+  },
+  "summary": {
+    "totalTasks": "タスク総数",
+    "completed": "完了",
+    "inProgress": "進行中",
+    "overdue": "期限切れ",
+    "pomodorosToday": "本日のポモドーロ",
+    "focusTimeToday": "本日の集中時間"
+  },
+  "today": {
+    "title": "今日",
+    "tooltip": "今日が期限のタスクです。ここで完了や編集ができます。",
+    "empty": "今日のタスクはありません",
+    "completeFailed": "操作に失敗しました"
+  },
+  "upcoming": {
+    "title": "今後の期限",
+    "empty": "予定はありません。"
+  },
+  "recentPomodoros": {
+    "title": "最近のポモドーロ",
+    "empty": "セッションはまだありません。",
+    "min": "分"
+  },
+  "streak": {
+    "suffix_one": "日連続の集中記録",
+    "suffix_other": "日連続の集中記録"
+  },
+  "completionChart": {
+    "title": "過去7日間の完了状況"
+  },
+  "deadlineBanner": {
+    "title": "期限のリマインダー",
+    "overduePrefix": "",
+    "overdueSuffix_one": "件の期限切れタスクがあります。",
+    "overdueSuffix_other": "件の期限切れタスクがあります。",
+    "dueSoon": "今後{{hours}}時間以内に期限:"
+  }
+}

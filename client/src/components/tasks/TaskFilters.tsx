@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import { Search } from 'lucide-react';
 import { Input } from '@/components/common/Input';
 import type { TaskListQuery } from '@/types/task';
@@ -11,77 +12,74 @@ type Props = {
   onViewChange: (v: View) => void;
 };
 
-const VIEWS: { id: View; label: string }[] = [
-  { id: 'grid', label: 'Grid' },
-  { id: 'list', label: 'List' },
-  { id: 'kanban', label: 'Kanban' },
-];
+const VIEW_IDS: View[] = ['grid', 'list', 'kanban'];
 
 export function TaskFilters({ filters, onChange, view, onViewChange }: Props) {
+  const { t } = useTranslation('tasks');
   const set = (patch: Partial<TaskListQuery>) => onChange({ ...filters, ...patch });
   return (
     <div className="flex flex-wrap items-end gap-3">
       <div className="relative w-full sm:w-64">
         <Input
-          label="Search"
-          placeholder="Search by title…"
+          label={t('filters.search.label')}
+          placeholder={t('filters.search.placeholder')}
           value={filters.search ?? ''}
           onChange={(e) => set({ search: e.target.value || undefined })}
         />
         <Search className="pointer-events-none absolute right-3 top-9 h-4 w-4 text-text-muted" />
       </div>
       <Select
-        label="Status"
+        label={t('filters.status.label')}
         value={filters.status ?? ''}
         onChange={(v) => set({ status: (v || undefined) as any })}
         options={[
-          ['', 'All'],
-          ['Todo', 'Todo'],
-          ['InProgress', 'In progress'],
-          ['Completed', 'Completed'],
+          ['', t('filters.all')],
+          ['Todo', t('status.Todo')],
+          ['InProgress', t('status.InProgress')],
+          ['Completed', t('status.Completed')],
         ]}
       />
       <Select
-        label="Priority"
+        label={t('filters.priority.label')}
         value={filters.priority ?? ''}
         onChange={(v) => set({ priority: (v || undefined) as any })}
         options={[
-          ['', 'All'],
-          ['Low', 'Low'],
-          ['Medium', 'Medium'],
-          ['High', 'High'],
+          ['', t('filters.all')],
+          ['Low', t('priority.Low')],
+          ['Medium', t('priority.Medium')],
+          ['High', t('priority.High')],
         ]}
       />
       <Select
-        label="Deadline"
+        label={t('filters.deadline.label')}
         value={filters.deadlineFilter ?? ''}
         onChange={(v) => set({ deadlineFilter: (v || undefined) as any })}
         options={[
-          ['', 'All'],
-          ['today', 'Today'],
-          ['upcoming', 'Upcoming'],
-          ['overdue', 'Overdue'],
-          ['completed', 'Completed'],
+          ['', t('filters.all')],
+          ['today', t('filters.deadline.today')],
+          ['upcoming', t('filters.deadline.upcoming')],
+          ['overdue', t('filters.deadline.overdue')],
+          ['completed', t('filters.deadline.completed')],
         ]}
       />
       <Select
-        label="Sort"
+        label={t('filters.sort.label')}
         value={filters.sortBy ?? 'deadline'}
         onChange={(v) => set({ sortBy: v as any })}
         options={[
-          ['deadline', 'Deadline'],
-          ['priority', 'Priority'],
-          ['newest', 'Newest'],
+          ['deadline', t('filters.sort.deadline')],
+          ['priority', t('filters.sort.priority')],
+          ['newest', t('filters.sort.newest')],
         ]}
       />
       <div className="ml-auto inline-flex rounded-2xl border border-border bg-surface p-0.5">
-        {VIEWS.map((v) => (
+        {VIEW_IDS.map((id) => (
           <button
-            key={v.id}
-            onClick={() => onViewChange(v.id)}
-            className={`rounded-xl px-3 py-1.5 text-xs ${view === v.id ? 'bg-primary-50 text-primary-700' : 'text-text-muted'}`}
+            key={id}
+            onClick={() => onViewChange(id)}
+            className={`rounded-xl px-3 py-1.5 text-xs ${view === id ? 'bg-primary-50 text-primary-700' : 'text-text-muted'}`}
           >
-            {v.label}
+            {t(`filters.views.${id}`)}
           </button>
         ))}
       </div>

@@ -1,0 +1,123 @@
+{
+  "page": {
+    "title": "Công việc của tôi",
+    "addTask": "Thêm công việc"
+  },
+  "selection": {
+    "count": "Đã chọn {{count}}",
+    "clear": "Bỏ chọn",
+    "selectAll": "Chọn tất cả đang hiển thị",
+    "markComplete": "Đánh dấu hoàn thành",
+    "setPriority": "Đặt độ ưu tiên",
+    "delete": "Xóa",
+    "cancel": "Hủy"
+  },
+  "tag": {
+    "filteredBy": "Lọc theo thẻ:",
+    "clearFilter": "Xóa bộ lọc thẻ"
+  },
+  "empty": {
+    "title": "Chưa có công việc nào",
+    "description": "Nhấn + Thêm công việc để bắt đầu."
+  },
+  "error": {
+    "load": "Không thể tải công việc."
+  },
+  "confirm": {
+    "deleteTitle": "Xóa công việc này?",
+    "deleteConfirm": "Xóa",
+    "bulkDeleteTitle": "Xóa {{count}} công việc?",
+    "bulkDeleteDescription": "Hành động này không thể hoàn tác."
+  },
+  "toast": {
+    "completed": "Đã hoàn thành công việc",
+    "completeFailed": "Không thể hoàn thành công việc",
+    "bulkCompleted": "Đã hoàn thành {{count}} công việc",
+    "bulkCompleteFailed": "Không thể hoàn thành các công việc",
+    "bulkPriorityUpdated": "Đã cập nhật {{count}} công việc",
+    "priorityFailed": "Không thể thay đổi độ ưu tiên",
+    "bulkDeleted": "Đã xóa {{count}} công việc",
+    "bulkDeleteFailed": "Không thể xóa các công việc",
+    "deleted": "Đã xóa công việc",
+    "deleteFailed": "Xóa thất bại",
+    "statusFailed": "Không thể thay đổi trạng thái",
+    "created": "Đã tạo công việc",
+    "updated": "Đã cập nhật công việc",
+    "saveFailed": "Lưu thất bại"
+  },
+  "status": {
+    "Todo": "Cần làm",
+    "InProgress": "Đang làm",
+    "Completed": "Hoàn thành"
+  },
+  "priority": {
+    "Low": "Thấp",
+    "Medium": "Trung bình",
+    "High": "Cao"
+  },
+  "filters": {
+    "search": {
+      "label": "Tìm kiếm",
+      "placeholder": "Tìm theo tiêu đề…"
+    },
+    "status": {
+      "label": "Trạng thái"
+    },
+    "priority": {
+      "label": "Độ ưu tiên"
+    },
+    "deadline": {
+      "label": "Hạn chót",
+      "today": "Hôm nay",
+      "upcoming": "Sắp tới",
+      "overdue": "Quá hạn",
+      "completed": "Hoàn thành"
+    },
+    "sort": {
+      "label": "Sắp xếp",
+      "deadline": "Hạn chót",
+      "priority": "Độ ưu tiên",
+      "newest": "Mới nhất"
+    },
+    "all": "Tất cả",
+    "views": {
+      "grid": "Lưới",
+      "list": "Danh sách",
+      "kanban": "Kanban"
+    }
+  },
+  "kanban": {
+    "empty": "Không có công việc",
+    "dragHandle": "Tay kéo",
+    "done": "Xong",
+    "edit": "Sửa",
+    "delete": "Xóa"
+  },
+  "card": {
+    "complete": "Hoàn thành",
+    "edit": "Sửa",
+    "delete": "Xóa",
+    "selectAria": "Chọn công việc {{title}}"
+  },
+  "row": {
+    "complete": "Hoàn thành",
+    "edit": "Sửa",
+    "delete": "Xóa"
+  },
+  "form": {
+    "titleEdit": "Sửa công việc",
+    "titleNew": "Công việc mới",
+    "fieldTitle": "Tiêu đề",
+    "fieldDescription": "Mô tả",
+    "fieldDeadline": "Hạn chót",
+    "fieldPriority": "Độ ưu tiên",
+    "fieldEstimatedPomodoros": "Số Pomodoro dự kiến",
+    "fieldTags": "Thẻ",
+    "tagsPlaceholder": "Thêm thẻ và nhấn Enter",
+    "tagsHint": "Nhấn Enter hoặc dấu phẩy để thêm",
+    "removeTag": "Xóa",
+    "cancel": "Hủy",
+    "save": "Lưu",
+    "create": "Tạo"
+  }
+}

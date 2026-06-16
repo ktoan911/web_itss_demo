@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
 import {
   ArrowLeft,
@@ -48,10 +49,10 @@ const QUOTES = [
   },
 ];
 
-const MODE_LABELS: Record<PomodoroMode, string> = {
-  Focus: 'Focus session',
-  ShortBreak: 'Short break',
-  LongBreak: 'Long break',
+const MODE_KEY: Record<PomodoroMode, string> = {
+  Focus: 'focus',
+  ShortBreak: 'shortBreak',
+  LongBreak: 'longBreak',
 };
 
 const fmtTime = (ms: number) => {
@@ -66,6 +67,7 @@ const fmtTime = (ms: number) => {
 const TEXT_SHADOW = '0 2px 12px rgba(0,0,0,0.85), 0 0 4px rgba(0,0,0,0.6)';
 
 export default function PomodoroPage() {
+  const { t } = useTranslation('pomodoro');
   const navigate = useNavigate();
   const tasks = useTasksQuery({ status: undefined, sortBy: 'deadline' });
   useRecentSessionsQuery();
@@ -118,7 +120,7 @@ export default function PomodoroPage() {
 
   const onModeChange = (m: PomodoroMode) => {
     if (status !== 'idle') {
-      const ok = window.confirm('Switch will reset the timer. Continue?');
+      const ok = window.confirm(t('confirm.switchReset'));
       if (!ok) return;
       reset();
     }
@@ -139,7 +141,12 @@ export default function PomodoroPage() {
     }
   };
 
-  const playLabel = status === 'running' ? 'Pause' : status === 'paused' ? 'Resume' : 'Start';
+  const playLabel =
+    status === 'running'
+      ? t('controls.pause')
+      : status === 'paused'
+        ? t('controls.resume')
+        : t('controls.start');
 
   return (
     <div
@@ -154,7 +161,7 @@ export default function PomodoroPage() {
 
       <button
         onClick={() => navigate('/dashboard')}
-        aria-label="Back"
+        aria-label={t('controls.back')}
         className="absolute left-6 top-6 z-20 flex items-center gap-2 rounded-full bg-black/40 px-3 py-2 text-sm backdrop-blur transition hover:bg-black/60"
       >
         <ArrowLeft className="h-4 w-4" />
@@ -166,7 +173,7 @@ export default function PomodoroPage() {
       >
         <span className="text-2xl font-semibold tracking-tight">Task88</span>
         <span className="hidden text-[11px] uppercase tracking-[0.2em] text-white/80 sm:inline">
-          Focus Workspace
+          {t('workspace.subtitle')}
         </span>
       </div>
 
@@ -174,7 +181,7 @@ export default function PomodoroPage() {
         <div
           className="absolute left-6 top-16 z-10 flex items-center gap-1 rounded-full bg-black/40 px-3 py-1 text-sm backdrop-blur"
           style={{ textShadow: TEXT_SHADOW }}
-          title={`${streak}-day focus streak`}
+          title={t('streak.title', { count: streak })}
         >
           <Flame className="h-4 w-4 text-orange-400" />
           <span className="font-medium">{streak}</span>
@@ -203,7 +210,7 @@ export default function PomodoroPage() {
                 autoFocus
                 className="w-full rounded-xl bg-white/10 px-3 py-2 text-sm text-white outline-none [&>option]:bg-neutral-900"
               >
-                <option value="">No task selected</option>
+                <option value="">{t('taskPicker.noTask')}</option>
                 {focusables.map((t) => (
                   <option key={t._id} value={t._id}>
                     {t.title} — {t.completedPomodoros}/{t.estimatedPomodoros}
@@ -217,7 +224,7 @@ export default function PomodoroPage() {
               className="mx-auto block rounded-full bg-black/30 px-5 py-2 text-lg font-medium text-white backdrop-blur-sm transition hover:bg-black/45"
               style={{ textShadow: TEXT_SHADOW }}
             >
-              {selectedTask ? selectedTask.title : 'What are you working on?'}
+              {selectedTask ? selectedTask.title : t('taskPicker.prompt')}
             </button>
           )}
         </div>
@@ -230,14 +237,14 @@ export default function PomodoroPage() {
         </div>
 
         <p className="mt-6 text-sm text-white" style={{ textShadow: TEXT_SHADOW }}>
-          {MODE_LABELS[mode]}
+          {t(`modeStatus.${MODE_KEY[mode]}`)}
         </p>
 
         <div className="mt-8 flex items-center gap-6">
           <button
             onClick={toggleMaster}
-            aria-label={masterMuted ? 'Unmute music' : 'Mute music'}
-            title={masterMuted ? 'Unmute music' : 'Mute music'}
+            aria-label={masterMuted ? t('controls.unmuteMusic') : t('controls.muteMusic')}
+            title={masterMuted ? t('controls.unmuteMusic') : t('controls.muteMusic')}
             className="rounded-full bg-black/30 p-3 text-white backdrop-blur transition hover:bg-black/50"
           >
             {masterMuted ? <VolumeX className="h-5 w-5" /> : <Volume2 className="h-5 w-5" />}
@@ -251,10 +258,10 @@ export default function PomodoroPage() {
                 { notifySoundEnabled: next },
                 { onError: () => setSoundEnabled(!next) },
               );
-              toast.info(next ? 'Timer sound on' : 'Timer sound off');
+              toast.info(next ? t('toast.timerSoundOn') : t('toast.timerSoundOff'));
             }}
-            aria-label={soundEnabled ? 'Turn off timer sound' : 'Turn on timer sound'}
-            title={soundEnabled ? 'Turn off timer sound' : 'Turn on timer sound'}
+            aria-label={soundEnabled ? t('controls.timerSoundOff') : t('controls.timerSoundOn')}
+            title={soundEnabled ? t('controls.timerSoundOff') : t('controls.timerSoundOn')}
             className="rounded-full bg-black/30 p-3 text-white backdrop-blur transition hover:bg-black/50"
           >
             {soundEnabled ? <Bell className="h-5 w-5" /> : <BellOff className="h-5 w-5" />}
@@ -262,7 +269,7 @@ export default function PomodoroPage() {
 
           <button
             onClick={reset}
-            aria-label="Reset"
+            aria-label={t('controls.reset')}
             className="rounded-full bg-black/30 p-3 text-white backdrop-blur transition hover:bg-black/50"
           >
             <RotateCcw className="h-5 w-5" />
@@ -279,7 +286,7 @@ export default function PomodoroPage() {
 
           <button
             onClick={skip}
-            aria-label="Skip"
+            aria-label={t('controls.skip')}
             className="rounded-full bg-black/30 p-3 text-white backdrop-blur transition hover:bg-black/50"
           >
             <SkipForward className="h-5 w-5" />
@@ -287,7 +294,7 @@ export default function PomodoroPage() {
 
           <button
             onClick={toggleFullscreen}
-            aria-label={isFullscreen ? 'Exit fullscreen' : 'Fullscreen'}
+            aria-label={isFullscreen ? t('controls.exitFullscreen') : t('controls.fullscreen')}
             className="rounded-full bg-black/30 p-3 text-white backdrop-blur transition hover:bg-black/50"
           >
             {isFullscreen ? <Minimize2 className="h-5 w-5" /> : <Maximize2 className="h-5 w-5" />}
@@ -305,7 +312,7 @@ export default function PomodoroPage() {
                   : 'bg-black/30 text-white/85 hover:bg-black/45'
               }`}
             >
-              {MODE_LABELS[m]}
+              {t(`modeStatus.${MODE_KEY[m]}`)}
             </button>
           ))}
         </div>
@@ -314,9 +321,9 @@ export default function PomodoroPage() {
       <div className="absolute bottom-6 left-6 z-10 flex items-center gap-3">
         <BackgroundGallery />
         <button
-          aria-label="Notes"
+          aria-label={t('controls.notes')}
           className="rounded-full bg-black/30 p-3 text-white backdrop-blur transition hover:bg-black/50"
-          onClick={() => toast.info('Session notes (coming soon)')}
+          onClick={() => toast.info(t('toast.notesComingSoon'))}
         >
           <StickyNote className="h-5 w-5" />
         </button>
@@ -332,11 +339,11 @@ export default function PomodoroPage() {
           if (!estimateTask) return ack();
           complete.mutate(estimateTask._id, {
             onSuccess: () => {
-              toast.success('Task completed');
+              toast.success(t('toast.taskCompleted'));
               ack();
             },
             onError: () => {
-              toast.error('Failed to complete');
+              toast.error(t('toast.failedComplete'));
               ack();
             },
           });

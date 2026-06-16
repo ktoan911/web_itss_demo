@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import { Check, Edit2, Trash2 } from 'lucide-react';
 import type { Task } from '@/types/task';
 import { OverdueBadge, PriorityBadge, StatusBadge } from '@/components/common/Badge';
@@ -24,6 +25,7 @@ export function TaskRow({
   selected,
   onToggleSelect,
 }: Props) {
+  const { t } = useTranslation('tasks');
   return (
     <div
       className={cn(
@@ -36,7 +38,7 @@ export function TaskRow({
           type="checkbox"
           checked={!!selected}
           onChange={() => onToggleSelect(task._id)}
-          aria-label={`Select task ${task.title}`}
+          aria-label={t('card.selectAria', { title: task.title })}
           className="h-4 w-4 cursor-pointer rounded border-border text-primary-600 focus:ring-primary-500"
         />
       )}
@@ -72,7 +74,7 @@ export function TaskRow({
             variant="ghost"
             icon={<Check className="h-4 w-4" />}
             onClick={() => onComplete(task)}
-            aria-label="Complete"
+            aria-label={t('row.complete')}
           />
         )}
         <Button
@@ -80,14 +82,14 @@ export function TaskRow({
           variant="ghost"
           icon={<Edit2 className="h-4 w-4" />}
           onClick={() => onEdit(task)}
-          aria-label="Edit"
+          aria-label={t('row.edit')}
         />
         <Button
           size="sm"
           variant="ghost"
           icon={<Trash2 className="h-4 w-4" />}
           onClick={() => onDelete(task)}
-          aria-label="Delete"
+          aria-label={t('row.delete')}
         />
       </div>
     </div>

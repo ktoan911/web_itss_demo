@@ -1,6 +1,7 @@
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Link, useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
 import { loginSchema, type LoginValues } from '@/validators/auth.schema';
 import { useLogin } from '@/hooks/queries/useAuthQueries';
@@ -19,14 +20,15 @@ export default function LoginPage() {
   });
   const login = useLogin();
   const navigate = useNavigate();
+  const { t } = useTranslation('auth');
 
   const onSubmit = (v: LoginValues) =>
     login.mutate(v, {
       onSuccess: (data) => {
-        toast.success(`Welcome back, ${data.user.fullName.split(' ')[0]}`);
+        toast.success(t('toast.welcome', { name: data.user.fullName.split(' ')[0] }));
         navigate('/dashboard');
       },
-      onError: (err: any) => toast.error(getApiErrorMessage(err, 'Login failed')),
+      onError: (err: any) => toast.error(getApiErrorMessage(err, t('toast.loginFailed'))),
     });
 
   return (
@@ -34,31 +36,31 @@ export default function LoginPage() {
       <div className="w-full max-w-md rounded-3xl border border-border bg-surface p-8 shadow-sm">
         <div className="mb-6 text-center">
           <h1 className="text-2xl font-semibold">Task88</h1>
-          <p className="text-sm text-text-muted">Sign in to continue</p>
+          <p className="text-sm text-text-muted">{t('login.subtitle')}</p>
         </div>
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
           <Input
-            label="Email"
+            label={t('fields.email')}
             type="email"
             autoComplete="email"
             {...register('email')}
             error={errors.email?.message}
           />
           <Input
-            label="Password"
+            label={t('fields.password')}
             type="password"
             autoComplete="current-password"
             {...register('password')}
             error={errors.password?.message}
           />
           <Button type="submit" fullWidth loading={login.isPending}>
-            Log in
+            {t('actions.login')}
           </Button>
         </form>
         <p className="mt-6 text-center text-sm text-text-muted">
-          New here?{' '}
+          {t('login.noAccount')}{' '}
           <Link to="/register" className="text-primary-600 hover:underline">
-            Create account
+            {t('actions.createAccount')}
           </Link>
         </p>
       </div>

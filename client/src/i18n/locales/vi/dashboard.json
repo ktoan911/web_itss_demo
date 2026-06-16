@@ -1,0 +1,43 @@
+{
+  "greeting": {
+    "welcome": "Chào mừng trở lại",
+    "welcomeName": "Chào mừng trở lại, {{name}}"
+  },
+  "summary": {
+    "totalTasks": "Tổng số nhiệm vụ",
+    "completed": "Đã hoàn thành",
+    "inProgress": "Đang thực hiện",
+    "overdue": "Quá hạn",
+    "pomodorosToday": "Pomodoro hôm nay",
+    "focusTimeToday": "Thời gian tập trung hôm nay"
+  },
+  "today": {
+    "title": "Hôm nay",
+    "tooltip": "Các nhiệm vụ đến hạn hôm nay. Hoàn thành hoặc chỉnh sửa ngay tại đây.",
+    "empty": "Không có nhiệm vụ nào hôm nay",
+    "completeFailed": "Thao tác thất bại"
+  },
+  "upcoming": {
+    "title": "Hạn chót sắp tới",
+    "empty": "Không có gì sắp tới."
+  },
+  "recentPomodoros": {
+    "title": "Pomodoro gần đây",
+    "empty": "Chưa có phiên nào.",
+    "min": "phút"
+  },
+  "streak": {
+    "suffix_one": "ngày chuỗi tập trung",
+    "suffix_other": "ngày chuỗi tập trung"
+  },
+  "completionChart": {
+    "title": "Hoàn thành trong 7 ngày qua"
+  },
+  "deadlineBanner": {
+    "title": "Nhắc nhở hạn chót",
+    "overduePrefix": "Bạn có",
+    "overdueSuffix_one": "nhiệm vụ quá hạn.",
+    "overdueSuffix_other": "nhiệm vụ quá hạn.",
+    "dueSoon": "Đến hạn trong {{hours}} giờ tới:"
+  }
+}

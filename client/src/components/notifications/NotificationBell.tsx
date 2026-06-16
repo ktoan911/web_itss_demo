@@ -1,9 +1,11 @@
 import { useEffect, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Bell } from 'lucide-react';
 import { useNotificationsQuery } from '@/hooks/queries/useNotificationQueries';
 import { NotificationPanel } from './NotificationPanel';
 
 export function NotificationBell() {
+  const { t } = useTranslation('notifications');
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
   const { data } = useNotificationsQuery();
@@ -23,7 +25,7 @@ export function NotificationBell() {
     <div ref={ref} className="relative">
       <button
         onClick={() => setOpen((v) => !v)}
-        aria-label="Notifications"
+        aria-label={t('bell.ariaLabel')}
         className="relative rounded-2xl p-2 text-text-muted hover:bg-bg"
       >
         <Bell className="h-5 w-5" />

@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { CheckCircle, Clock, AlertTriangle, ListTodo, Timer, Flame } from 'lucide-react';
 import { Loading } from '@/components/common/Loading';
 import { ErrorState } from '@/components/common/ErrorState';
@@ -18,6 +19,7 @@ import { minutesToHM } from '@/utils/dateUtils';
 import type { Task } from '@/types/task';
 
 export default function DashboardPage() {
+  const { t } = useTranslation('dashboard');
   const { user } = useAuth();
   const dash = useDashboardQuery();
   const [editing, setEditing] = useState<Task | null>(null);
@@ -30,7 +32,9 @@ export default function DashboardPage() {
     <div className="space-y-5">
       <div>
         <h1 className="text-2xl font-semibold tracking-tight">
-          Welcome back{user ? `, ${user.fullName.split(' ')[0]}` : ''}
+          {user
+            ? t('greeting.welcomeName', { name: user.fullName.split(' ')[0] })
+            : t('greeting.welcome')}
         </h1>
         <p className="text-sm text-text-muted">{new Date().toDateString()}</p>
       </div>
@@ -43,23 +47,23 @@ export default function DashboardPage() {
       />
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <SummaryCard icon={ListTodo}      label="Total tasks"     value={d.totalTasks} />
-        <SummaryCard icon={CheckCircle}   label="Completed"        value={d.completedTasks} tone="good" />
-        <SummaryCard icon={Clock}         label="In progress"      value={d.inProgressTasks} />
-        <SummaryCard icon={AlertTriangle} label="Overdue"          value={d.overdueTasks} tone="warn" />
+        <SummaryCard icon={ListTodo}      label={t('summary.totalTasks')}     value={d.totalTasks} />
+        <SummaryCard icon={CheckCircle}   label={t('summary.completed')}        value={d.completedTasks} tone="good" />
+        <SummaryCard icon={Clock}         label={t('summary.inProgress')}      value={d.inProgressTasks} />
+        <SummaryCard icon={AlertTriangle} label={t('summary.overdue')}          value={d.overdueTasks} tone="warn" />
       </div>
 
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
         <StreakCard streak={d.streak} />
-        <SummaryCard icon={Timer} label="Pomodoros today"  value={d.todayPomodoros} />
-        <SummaryCard icon={Flame} label="Focus time today" value={minutesToHM(d.todayFocusMinutes)} tone="good" />
+        <SummaryCard icon={Timer} label={t('summary.pomodorosToday')}  value={d.todayPomodoros} />
+        <SummaryCard icon={Flame} label={t('summary.focusTimeToday')} value={minutesToHM(d.todayFocusMinutes)} tone="good" />
       </div>
 
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
         <Card>
           <h3 className="mb-3 flex items-center gap-1.5 text-sm font-semibold">
-            Today
-            <InfoTooltip text="Tasks due today. Complete or edit them right here." />
+            {t('today.title')}
+            <InfoTooltip text={t('today.tooltip')} />
           </h3>
           <TodayTasks tasks={d.todayTasks} onEdit={setEditing} />
         </Card>

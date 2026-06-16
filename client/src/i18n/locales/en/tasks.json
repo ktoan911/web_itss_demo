@@ -1,0 +1,123 @@
+{
+  "page": {
+    "title": "My Tasks",
+    "addTask": "Add Task"
+  },
+  "selection": {
+    "count": "{{count}} selected",
+    "clear": "Clear",
+    "selectAll": "Select all visible",
+    "markComplete": "Mark complete",
+    "setPriority": "Set priority",
+    "delete": "Delete",
+    "cancel": "Cancel"
+  },
+  "tag": {
+    "filteredBy": "Filtered by tag:",
+    "clearFilter": "Clear tag filter"
+  },
+  "empty": {
+    "title": "No tasks yet",
+    "description": "Click + Add Task to get started."
+  },
+  "error": {
+    "load": "Couldn't load tasks."
+  },
+  "confirm": {
+    "deleteTitle": "Delete this task?",
+    "deleteConfirm": "Delete",
+    "bulkDeleteTitle": "Delete {{count}} task(s)?",
+    "bulkDeleteDescription": "This action cannot be undone."
+  },
+  "toast": {
+    "completed": "Task completed",
+    "completeFailed": "Failed to complete task",
+    "bulkCompleted": "Completed {{count}} task(s)",
+    "bulkCompleteFailed": "Failed to complete tasks",
+    "bulkPriorityUpdated": "Updated {{count}} task(s)",
+    "priorityFailed": "Failed to change priority",
+    "bulkDeleted": "Deleted {{count}} task(s)",
+    "bulkDeleteFailed": "Failed to delete tasks",
+    "deleted": "Task deleted",
+    "deleteFailed": "Failed to delete",
+    "statusFailed": "Failed to change status",
+    "created": "Task created",
+    "updated": "Task updated",
+    "saveFailed": "Save failed"
+  },
+  "status": {
+    "Todo": "Todo",
+    "InProgress": "In progress",
+    "Completed": "Completed"
+  },
+  "priority": {
+    "Low": "Low",
+    "Medium": "Medium",
+    "High": "High"
+  },
+  "filters": {
+    "search": {
+      "label": "Search",
+      "placeholder": "Search by title…"
+    },
+    "status": {
+      "label": "Status"
+    },
+    "priority": {
+      "label": "Priority"
+    },
+    "deadline": {
+      "label": "Deadline",
+      "today": "Today",
+      "upcoming": "Upcoming",
+      "overdue": "Overdue",
+      "completed": "Completed"
+    },
+    "sort": {
+      "label": "Sort",
+      "deadline": "Deadline",
+      "priority": "Priority",
+      "newest": "Newest"
+    },
+    "all": "All",
+    "views": {
+      "grid": "Grid",
+      "list": "List",
+      "kanban": "Kanban"
+    }
+  },
+  "kanban": {
+    "empty": "No tasks",
+    "dragHandle": "Drag handle",
+    "done": "Done",
+    "edit": "Edit",
+    "delete": "Delete"
+  },
+  "card": {
+    "complete": "Complete",
+    "edit": "Edit",
+    "delete": "Delete",
+    "selectAria": "Select task {{title}}"
+  },
+  "row": {
+    "complete": "Complete",
+    "edit": "Edit",
+    "delete": "Delete"
+  },
+  "form": {
+    "titleEdit": "Edit task",
+    "titleNew": "New task",
+    "fieldTitle": "Title",
+    "fieldDescription": "Description",
+    "fieldDeadline": "Deadline",
+    "fieldPriority": "Priority",
+    "fieldEstimatedPomodoros": "Est. Pomodoros",
+    "fieldTags": "Tags",
+    "tagsPlaceholder": "Add tag and press Enter",
+    "tagsHint": "Press Enter or comma to add",
+    "removeTag": "Remove",
+    "cancel": "Cancel",
+    "save": "Save",
+    "create": "Create"
+  }
+}

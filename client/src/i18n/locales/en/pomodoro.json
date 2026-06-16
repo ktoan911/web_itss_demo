@@ -1,0 +1,102 @@
+{
+  "modes": {
+    "focus": "Focus",
+    "shortBreak": "Short Break",
+    "longBreak": "Long Break"
+  },
+  "modeStatus": {
+    "focus": "Focus session",
+    "shortBreak": "Short break",
+    "longBreak": "Long break"
+  },
+  "workspace": {
+    "subtitle": "Focus Workspace"
+  },
+  "streak": {
+    "title": "{{count}}-day focus streak"
+  },
+  "taskPicker": {
+    "noTask": "No task selected",
+    "prompt": "What are you working on?"
+  },
+  "confirm": {
+    "switchReset": "Switch will reset the timer. Continue?"
+  },
+  "controls": {
+    "start": "Start",
+    "pause": "Pause",
+    "resume": "Resume",
+    "reset": "Reset",
+    "skip": "Skip",
+    "back": "Back",
+    "notes": "Notes",
+    "fullscreen": "Fullscreen",
+    "exitFullscreen": "Exit fullscreen",
+    "muteMusic": "Mute music",
+    "unmuteMusic": "Unmute music",
+    "timerSoundOn": "Turn on timer sound",
+    "timerSoundOff": "Turn off timer sound"
+  },
+  "toast": {
+    "timerSoundOn": "Timer sound on",
+    "timerSoundOff": "Timer sound off",
+    "notesComingSoon": "Session notes (coming soon)",
+    "taskCompleted": "Task completed",
+    "failedComplete": "Failed to complete"
+  },
+  "selector": {
+    "label": "Focus on",
+    "noTask": "No task"
+  },
+  "timer": {
+    "focusingOn": "Focusing on: {{task}}",
+    "noTask": "No task selected"
+  },
+  "history": {
+    "empty": "No sessions yet.",
+    "minutes": "{{count}} min"
+  },
+  "sound": {
+    "ambient": "Ambient sound",
+    "music": "Focus music",
+    "close": "Close",
+    "volume": "Volume"
+  },
+  "background": {
+    "change": "Change background",
+    "title": "Background library",
+    "uploading": "Uploading…",
+    "uploadImage": "Upload image",
+    "useImage": "Use this image",
+    "useImageFixed": "Use this image (switches to Fixed mode)",
+    "deleteImage": "Delete image",
+    "modes": {
+      "fixed": {
+        "label": "Fixed",
+        "desc": "Tap an image to use it as a fixed background."
+      },
+      "random": {
+        "label": "Random",
+        "desc": "A random image from the library every minute."
+      },
+      "sequence": {
+        "label": "Sequence",
+        "desc": "Cycles through the library in order every minute."
+      }
+    },
+    "toast": {
+      "noValidImages": "No valid images",
+      "uploaded": "Uploaded {{count}} image(s)",
+      "uploadFailed": "Upload failed"
+    }
+  },
+  "dialog": {
+    "estimateReached": {
+      "title": "Estimate reached",
+      "thisTask": "this task",
+      "body": "You've reached the estimated pomodoros for {{task}}. Mark as completed?",
+      "keepGoing": "Keep going",
+      "markComplete": "Mark complete"
+    }
+  }
+}
